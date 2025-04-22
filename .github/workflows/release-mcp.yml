@@ -61,16 +61,20 @@ jobs:
       - name: Archive artifact
         if: ${{ !contains(matrix.settings.target, 'windows') }}
         run: |
-          cd target/${{ matrix.settings.target }}/release
           mkdir dist/
-          tar -czvf dist/longport-mcp-${{ matrix.settings.target }}.tar.gz ${{ matrix.settings.bin }}${{ matrix.settings.bin_suffix }}
+          cd target/${{ matrix.settings.target }}/release
+          tar czvf longport-mcp-${{ matrix.settings.target }}.tar.gz longport-mcp
+          cd ../../..
+          mv target/${{ matrix.settings.target }}/release/longport-mcp-${{ matrix.settings.target }}.tar.gz dist/
 
-      - name: Archive artifact(Windows)
+      - name: Archive artifact (Windows)
         if: ${{ contains(matrix.settings.target, 'windows') }}
         run: |
-          cd target/${{ matrix.settings.target }}/release
           mkdir dist/
-          Compress-Archive -Path ${{ matrix.settings.bin }}${{ matrix.settings.bin_suffix }} -DestinationPath dist/longport-mcp-${{ matrix.settings.target }}.zip
+          cd target/${{ matrix.settings.target }}/release
+          Compress-Archive -Path longport-mcp.exe -DestinationPath longport-mcp-${{ matrix.settings.target }}.zip
+          cd ../../..
+          mv target/${{ matrix.settings.target }}/release/longport-mcp-${{ matrix.settings.target }}.zip dist/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
