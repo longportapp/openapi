@@ -10,7 +10,7 @@ A [MCP](https://modelcontextprotocol.io/introduction) server implementation for 
 
 ## Installation
 
-## macOS or Linux
+### macOS or Linux
 
 Run script to install:
 
@@ -18,7 +18,7 @@ Run script to install:
 curl -sSL https://raw.githubusercontent.com/longportapp/openapi/refs/heads/main/mcp/install | bash
 ```
 
-## Windows
+### Windows
 
 Download the latest binary from the [Releases](https://github.com/longportapp/openapi/releases/tag/longport-mcp-0.1.0) page.
 
@@ -34,7 +34,9 @@ Once you done server setup, and connected, you can talk with AI:
 - Generate a portfolio performance chart for my holding stocks, and return me with data table and pie chart (Just return result no code).
 - Check the price of the stocks I hold today, and if they fall/rise by more than 3%, sell(If fall, buy if rise) 1/3 at the market price.
 
-## Use in Cursor
+## Usage
+
+### Use in Cursor
 
 To configure LongPort MCP in Cursor:
 
@@ -52,7 +54,7 @@ Or use this config:
 
 ```json
 {
-    "mcpServers": {
+  "mcpServers": {
     "longport-mcp": {
       "command": "/usr/local/bin/longport-mcp",
       "env": {
@@ -65,7 +67,7 @@ Or use this config:
 }
 ```
 
-## Use in Cherry Studio
+### Use in Cherry Studio
 
 To configure LongPort MCP in Cherry Studio:
 
