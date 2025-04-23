@@ -8,7 +8,7 @@ use longport::{
 };
 use poem_mcpserver::{
     Tools,
-    tool::{IntoContent, Json, Text},
+    content::{IntoContent, IntoContents, Json, Text},
 };
 use time::{Date, OffsetDateTime, macros::format_description};
 
@@ -45,7 +45,7 @@ impl Longport {
         /// A list of security symbols. (e.g. ["700.HK", "AAPL.US", "000001.SH",
         /// "D05.SG"])
         symbols: Vec<String>,
-    ) -> Result<impl IntoContent, Error> {
+    ) -> Result<impl IntoContents, Error> {
         Ok(self
             .quote_context
             .static_info(symbols)
@@ -56,7 +56,7 @@ impl Longport {
     }
 
     /// Get the latest price of the securities.
-    async fn quote(&self, symbols: Vec<String>) -> Result<impl IntoContent, Error> {
+    async fn quote(&self, symbols: Vec<String>) -> Result<impl IntoContents, Error> {
         Ok(self
             .quote_context
             .quote(symbols)
@@ -67,7 +67,7 @@ impl Longport {
     }
 
     /// Get the latest depth of the securities.
-    async fn depth(&self, symbol: String) -> Result<impl IntoContent, Error> {
+    async fn depth(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.depth(symbol).await?))
     }
 
@@ -77,7 +77,7 @@ impl Longport {
         symbol: String,
         /// max 1000
         count: usize,
-    ) -> Result<impl IntoContent, Error> {
+    ) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.trades(symbol, count).await?))
     }
 
@@ -85,8 +85,8 @@ impl Longport {
     async fn candlesticks(
         &self,
         symbol: String,
-        /// 1m, 2m, 3m, 5m, 10m, 15m, 20m, 30m, 45m, 60m, 120m, 180m, 240m
-        /// (minutes) day, week, month, quarter, year
+        /// 1m, 2m, 3m, 5m, 10m, 15m, 20m, 30m, 45m, 60m, 120m, 180m, 240m, day,
+        /// week, month, quarter, year
         period: String,
         /// last n candlesticks (max: 1000)
         count: usize,
@@ -97,7 +97,7 @@ impl Longport {
         /// - normal: regular trading hours
         /// - all: all trading hours (normal, pre, post, overnight)
         trade_sessions: String,
-    ) -> Result<impl IntoContent, Error> {
+    ) -> Result<impl IntoContents, Error> {
         let period = match period.as_str() {
             "1m" => Period::OneMinute,
             "2m" => Period::TwoMinute,
@@ -163,7 +163,7 @@ impl Longport {
         start_date: String,
         /// End date of the trading days. (Format: "yyyy-mm-dd")
         end_date: String,
-    ) -> Result<impl IntoContent, Error> {
+    ) -> Result<impl IntoContents, Error> {
         let date_format = format_description!("[year]-[month]-[day]");
         let market = market.parse::<Market>().map_err(|err| Error::ParseField {
             name: "market",
@@ -187,17 +187,17 @@ impl Longport {
     }
 
     /// Returns the real-time broker queue data of security.
-    async fn broker_queue(&self, symbol: String) -> Result<impl IntoContent, Error> {
+    async fn broker_queue(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.brokers(symbol).await?))
     }
 
     /// Returns the participants information.
-    async fn broker_info(&self) -> Result<impl IntoContent, Error> {
+    async fn broker_info(&self) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.participants().await?))
     }
 
     /// Returns the option chain list of the security.
-    async fn option_chain_list(&self, symbol: String) -> Result<impl IntoContent, Error> {
+    async fn option_chain_list(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(self
             .quote_context
             .option_chain_expiry_date_list(symbol)
@@ -218,7 +218,7 @@ impl Longport {
         symbol: String,
         /// format: "yyyy-mm-dd"
         expiry_date: String,
-    ) -> Result<impl IntoContent, Error> {
+    ) -> Result<impl IntoContents, Error> {
         let expiry_date = Date::parse(&expiry_date, format_description!("[year]-[month]-[day]"))
             .map_err(|err| Error::ParseField {
                 name: "expiry_date",
@@ -232,17 +232,17 @@ impl Longport {
     }
 
     // Returns the capital flow of the security.
-    async fn capital_flow(&self, symbol: String) -> Result<impl IntoContent, Error> {
+    async fn capital_flow(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.capital_flow(symbol).await?))
     }
 
     /// Returns the capital distribution of the security.
-    async fn capital_distribution(&self, symbol: String) -> Result<impl IntoContent, Error> {
+    async fn capital_distribution(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.capital_distribution(symbol).await?))
     }
 
     /// Get the account balance.
-    async fn account_balance(&self) -> Result<impl IntoContent, Error> {
+    async fn account_balance(&self) -> Result<impl IntoContents, Error> {
         Ok(self
             .trade_context
             .account_balance(None)
@@ -253,7 +253,7 @@ impl Longport {
     }
 
     /// Returns the stock positions.
-    async fn stock_positions(&self) -> Result<impl IntoContent, Error> {
+    async fn stock_positions(&self) -> Result<impl IntoContents, Error> {
         Ok(self
             .trade_context
             .stock_positions(None)
@@ -265,7 +265,7 @@ impl Longport {
     }
 
     /// Returns the fund positions.
-    async fn fund_positions(&self) -> Result<impl IntoContent, Error> {
+    async fn fund_positions(&self) -> Result<impl IntoContents, Error> {
         Ok(self
             .trade_context
             .fund_positions(None)
@@ -278,7 +278,7 @@ impl Longport {
 
     /// Returns the initial margin ratio, maintain the margin ratio and
     /// strengthen the margin ratio of stocks.
-    async fn magin_ratio(&self, symbol: String) -> Result<impl IntoContent, Error> {
+    async fn magin_ratio(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.trade_context.margin_ratio(symbol).await?))
     }
 
@@ -323,7 +323,7 @@ impl Longport {
         /// - GTC: Good Till Cancel
         /// - GTD: Good Till Date
         time_in_force: String,
-    ) -> Result<impl IntoContent, Error> {
+    ) -> Result<impl IntoContents, Error> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
             order_type
@@ -418,17 +418,17 @@ impl Longport {
         self.trade_context.submit_order(opts).await.map(Json)
     }
 
-    async fn cancel_order(&self, order_id: String) -> Result<impl IntoContent, Error> {
+    async fn cancel_order(&self, order_id: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.trade_context.cancel_order(order_id).await?))
     }
 
     /// Get the order detail.
-    async fn order_detail(&self, order_id: String) -> Result<impl IntoContent, Error> {
+    async fn order_detail(&self, order_id: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.trade_context.order_detail(order_id).await?))
     }
 
-    /// Get today's orders.
-    async fn today_orders(&self) -> Result<impl IntoContent, Error> {
+    /// Get the current account's orders for the day.
+    async fn today_orders(&self) -> Result<impl IntoContents, Error> {
         Ok(self
             .trade_context
             .today_orders(None)
@@ -438,7 +438,7 @@ impl Longport {
             .collect::<Vec<_>>())
     }
 
-    /// Get the histroy orders.
+    /// Get the historical orders of the current account.
     ///
     /// does not include today's orders
     async fn histroy_orders(
@@ -449,7 +449,7 @@ impl Longport {
         start_at: String,
         /// format: RFC3339
         end_at: String,
-    ) -> Result<impl IntoContent, Error> {
+    ) -> Result<impl IntoContents, Error> {
         let mut opts = GetHistoryOrdersOptions::new()
             .start_at(
                 OffsetDateTime::parse(&start_at, &time::format_description::well_known::Rfc3339)
