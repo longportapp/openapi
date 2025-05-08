@@ -348,16 +348,16 @@ impl Longport {
         /// SLO: Special Limit Order. Not Support Replace Order.
         order_type: String,
         /// for LO, ELO, ALO, ODD, LIT
-        submitted_price: Option<String>,
-        submitted_quantity: String,
+        submitted_price: Option<Decimal>,
+        submitted_quantity: Decimal,
         /// for LIT, MIT
-        trigger_price: Option<String>,
+        trigger_price: Option<Decimal>,
         /// for TSLPAMT, TSLPPCT
-        limit_offset: Option<String>,
+        limit_offset: Option<Decimal>,
         /// for TSLPAMT
-        trailing_amount: Option<String>,
+        trailing_amount: Option<Decimal>,
         /// for TSLPPCT (0-1)
-        trailing_percent: Option<String>,
+        trailing_percent: Option<Decimal>,
         /// format: "yyyy-mm-dd"
         expire_date: Option<String>,
         /// Side of the order (Buy or Sell)
@@ -383,12 +383,7 @@ impl Longport {
                 name: "side",
                 error: err.to_string(),
             })?,
-            submitted_quantity
-                .parse::<Decimal>()
-                .map_err(|err| Error::ParseField {
-                    name: "submitted_quantity",
-                    error: err.to_string(),
-                })?,
+            submitted_quantity,
             time_in_force
                 .parse::<TimeInForceType>()
                 .map_err(|err| Error::ParseField {
@@ -398,48 +393,19 @@ impl Longport {
         );
 
         if let Some(submitted_price) = submitted_price {
-            opts = opts.submitted_price(submitted_price.parse::<Decimal>().map_err(|err| {
-                Error::ParseField {
-                    name: "submitted_price",
-                    error: err.to_string(),
-                }
-            })?);
+            opts = opts.submitted_price(submitted_price);
         }
-
         if let Some(trigger_price) = trigger_price {
-            opts = opts.trigger_price(trigger_price.parse::<Decimal>().map_err(|err| {
-                Error::ParseField {
-                    name: "trigger_price",
-                    error: err.to_string(),
-                }
-            })?);
+            opts = opts.trigger_price(trigger_price);
         }
-
         if let Some(limit_offset) = limit_offset {
-            opts = opts.limit_offset(limit_offset.parse::<Decimal>().map_err(|err| {
-                Error::ParseField {
-                    name: "limit_offset",
-                    error: err.to_string(),
-                }
-            })?);
+            opts = opts.limit_offset(limit_offset);
         }
-
         if let Some(trailing_amount) = trailing_amount {
-            opts = opts.trailing_amount(trailing_amount.parse::<Decimal>().map_err(|err| {
-                Error::ParseField {
-                    name: "trailing_amount",
-                    error: err.to_string(),
-                }
-            })?);
+            opts = opts.trailing_amount(trailing_amount);
         }
-
         if let Some(trailing_percent) = trailing_percent {
-            opts = opts.trailing_percent(trailing_percent.parse::<Decimal>().map_err(|err| {
-                Error::ParseField {
-                    name: "trailing_percent",
-                    error: err.to_string(),
-                }
-            })?);
+            opts = opts.trailing_percent(trailing_percent);
         }
 
         if let Some(expire_date) = expire_date {
