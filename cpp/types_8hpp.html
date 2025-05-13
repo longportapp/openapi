@@ -198,11 +198,17 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1quote_1_1_quote_package_detail.html">longport::quote::QuotePackageDetail</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Quote package detail.  <a href="structlongport_1_1quote_1_1_quote_package_detail.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1quote_1_1_market_temperature.html">longport::quote::MarketTemperature</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Market temperature.  <a href="structlongport_1_1quote_1_1_market_temperature.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1quote_1_1_history_market_temperature_response.html">longport::quote::HistoryMarketTemperatureResponse</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">History market temperature response.  <a href="structlongport_1_1quote_1_1_history_market_temperature_response.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_execution.html">longport::trade::Execution</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exexution.  <a href="structlongport_1_1trade_1_1_execution.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_get_history_executions_options.html">longport::trade::GetHistoryExecutionsOptions</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for get histroy executions request.  <a href="structlongport_1_1trade_1_1_get_history_executions_options.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for get history executions request.  <a href="structlongport_1_1trade_1_1_get_history_executions_options.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_get_today_executions_options.html">longport::trade::GetTodayExecutionsOptions</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Options for get today executions request.  <a href="structlongport_1_1trade_1_1_get_today_executions_options.html#details">More...</a><br /></td></tr>
@@ -323,23 +329,34 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:ac15877688faec3e2d5776a503a55e5a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Market.  <a href="namespacelongport.html#ac15877688faec3e2d5776a503a55e5a4">More...</a><br /></td></tr>
 <tr class="separator:ac15877688faec3e2d5776a503a55e5a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60167d694ea9a5fec686d08fa21dae17"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17">longport::quote::Period</a> { <br />
-&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ab24f6123111e5fd9d9444fcd337dcbd6">longport::quote::Min1</a>
-, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ae0b846401f21ef8503ab4bfa55649394">longport::quote::Min5</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a3a51cf727d9f56f3cc12d17cde3dc6d4">longport::quote::Min2</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a9411261aa7a1feb4c1f6c29aea80d8fb">longport::quote::Min3</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ae0b846401f21ef8503ab4bfa55649394">longport::quote::Min5</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ace206c54e65dc9a89cb29403ca50d88c">longport::quote::Min10</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a97a580d0446206827c6ae4e20ed134bb">longport::quote::Min15</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a8567fe8f8a7e6d99392ae723dc2fa0af">longport::quote::Min20</a>
 , <br />
 &#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ab95b6f260f78066d9bb4030f2329b6d6">longport::quote::Min30</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a46d6397ee59dd3383df82448aaa20494">longport::quote::Min45</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ab716a1caf194b2097b12292aae8a2338">longport::quote::Min60</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a9032908ff892830a1efce0be6eac3af7">longport::quote::Min120</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a0de5e5701fb4f466c659d9c3174c018c">longport::quote::Min180</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a0cd598285f4200c53d86bf643632487e">longport::quote::Min240</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a03727ac48595a24daed975559c944a44">longport::quote::Day</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ad2ce009594dcc60befa6a4e6cbeb71fc">longport::quote::Week</a>
 , <br />
 &#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a7cbb885aa1164b390a0bc050a64e1812">longport::quote::Month</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ab25cde1e74f3d27f678c2e309e06102e">longport::quote::Quarter</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17a537c66b24ef5c83b7382cdc3f34885f2">longport::quote::Year</a>
 <br />
  }</td></tr>
 <tr class="memdesc:a60167d694ea9a5fec686d08fa21dae17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Candlestick period.  <a href="namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17">More...</a><br /></td></tr>
 <tr class="separator:a60167d694ea9a5fec686d08fa21dae17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62da9df44e4a5b18f738f9a29079d4a0"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0">longport::quote::TradeSession</a> { <a class="el" href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0a960b44c579bc2f6818d2daaf9e4c16f0">longport::quote::Normal</a>
+<tr class="memitem:a62da9df44e4a5b18f738f9a29079d4a0"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0">longport::quote::TradeSession</a> { <a class="el" href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0abdbc8fcc2413db6daf161df5698fb50e">longport::quote::Intraday</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0afb55a965b77791b31ffd2bb548f71080">longport::quote::Pre</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0a03d947a2158373c3b9d74325850cb8b9">longport::quote::Post</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0a60d2e80b9b8ac1b2afaf1d7181b725c2">longport::quote::Overnight</a>
@@ -347,7 +364,7 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:a62da9df44e4a5b18f738f9a29079d4a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trade session.  <a href="namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0">More...</a><br /></td></tr>
 <tr class="separator:a62da9df44e4a5b18f738f9a29079d4a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84897730f6f4409836383f61865e073a"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073a">longport::quote::SecurityBoard</a> { <br />
-&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa835344567af7a0b3da89e39951f0a5c9">longport::quote::USMain</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa5d92141c0486bfd4c1e5644a6842e9b7">longport::quote::USPink</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aae1d2dd3413a95ec9129793ac603bcae1">longport::quote::USDJI</a>
@@ -400,13 +417,13 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a6ead1faa00772e4d59f678c774007949"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trade status.  <a href="namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949">More...</a><br /></td></tr>
 <tr class="separator:a6ead1faa00772e4d59f678c774007949"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a93b0788c16ed4e4300f06ba983d947e1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a93b0788c16ed4e4300f06ba983d947e1">longport::quote::OptionType</a> { <a class="el" href="namespacelongport_1_1quote.html#a93b0788c16ed4e4300f06ba983d947e1a88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+<tr class="memitem:a93b0788c16ed4e4300f06ba983d947e1"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a93b0788c16ed4e4300f06ba983d947e1">longport::quote::OptionType</a> { <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a93b0788c16ed4e4300f06ba983d947e1ac6c6f067a3ead9ce67a1c67a790fa26b">longport::quote::American</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a93b0788c16ed4e4300f06ba983d947e1a912d59cdf1d3f551fae21f6f0062258f">longport::quote::Europe</a>
  }</td></tr>
 <tr class="memdesc:a93b0788c16ed4e4300f06ba983d947e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Option type.  <a href="namespacelongport_1_1quote.html#a93b0788c16ed4e4300f06ba983d947e1">More...</a><br /></td></tr>
 <tr class="separator:a93b0788c16ed4e4300f06ba983d947e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4385779fe33deef064dddc7475dc9ff3"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a4385779fe33deef064dddc7475dc9ff3">longport::quote::OptionDirection</a> { <a class="el" href="namespacelongport_1_1quote.html#a4385779fe33deef064dddc7475dc9ff3a88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+<tr class="memitem:a4385779fe33deef064dddc7475dc9ff3"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a4385779fe33deef064dddc7475dc9ff3">longport::quote::OptionDirection</a> { <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a4385779fe33deef064dddc7475dc9ff3ad0bf1810982e9728fcf3ac444a015373">longport::quote::Put</a>
 , <a class="el" href="namespacelongport_1_1quote.html#a4385779fe33deef064dddc7475dc9ff3ac3755e61202abd74da5885d2e9c9160e">longport::quote::Call</a>
  }</td></tr>
@@ -419,7 +436,7 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:a04fcc5a9def5bd8192509610dd79a1f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trade direction.  <a href="namespacelongport_1_1quote.html#a04fcc5a9def5bd8192509610dd79a1f0">More...</a><br /></td></tr>
 <tr class="separator:a04fcc5a9def5bd8192509610dd79a1f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc6eac080c16a5f14aa8612f111c50d4"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4">longport::quote::WarrantType</a> { <br />
-&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4a88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
 , <a class="el" href="namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4ac3755e61202abd74da5885d2e9c9160e">longport::quote::Call</a>
 , <a class="el" href="namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4ad0bf1810982e9728fcf3ac444a015373">longport::quote::Put</a>
 , <a class="el" href="namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4a92c21511d7b383b2f8ba5b00c3c9a473">longport::quote::Bull</a>
@@ -554,6 +571,27 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:aa93af3fc6c64ad59a3314237846cdca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Security list category.  <a href="namespacelongport_1_1quote.html#aa93af3fc6c64ad59a3314237846cdca6">More...</a><br /></td></tr>
 <tr class="separator:aa93af3fc6c64ad59a3314237846cdca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa089b5c43711da2e1982c6cae06bd6f"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#afa089b5c43711da2e1982c6cae06bd6f">longport::quote::TradeSessions</a> { <a class="el" href="namespacelongport_1_1quote.html#afa089b5c43711da2e1982c6cae06bd6fabdbc8fcc2413db6daf161df5698fb50e">longport::quote::Intraday</a>
+, <a class="el" href="namespacelongport_1_1quote.html#afa089b5c43711da2e1982c6cae06bd6fab1c94ca2fbc3e78fc30069c8d0f01680">longport::quote::All</a>
+ }</td></tr>
+<tr class="memdesc:afa089b5c43711da2e1982c6cae06bd6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trade sessions.  <a href="namespacelongport_1_1quote.html#afa089b5c43711da2e1982c6cae06bd6f">More...</a><br /></td></tr>
+<tr class="separator:afa089b5c43711da2e1982c6cae06bd6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c44f69c0146a4f836f4f75fe8c90d5c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5c">longport::quote::Granularity</a> { <br />
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca35969be5653e7865b7daf69d5cb2c4f5">longport::quote::Unknown</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca88183b946cc5f0e8c96b2e66e1c74a7e">longport::quote::Unknown</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca6fb29de98538e5d5335519854ab57ed7">longport::quote::Daily</a>
+, <a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5cab84e1c5a158a59252803658eb956e308">longport::quote::Weekly</a>
+, <br />
+&#160;&#160;<a class="el" href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5caeecb4ec4a5d360293ea0f611cd7a0017">longport::quote::Monthly</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:a3c44f69c0146a4f836f4f75fe8c90d5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data granularity.  <a href="namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5c">More...</a><br /></td></tr>
+<tr class="separator:a3c44f69c0146a4f836f4f75fe8c90d5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accefd393398a0c5823816256fc3c50ad"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacelongport_1_1trade.html#accefd393398a0c5823816256fc3c50ad">longport::trade::TopicType</a> { <a class="el" href="namespacelongport_1_1trade.html#accefd393398a0c5823816256fc3c50ada47f9082fc380ca62d531096aa1d110f1">longport::trade::Private</a>
  }</td></tr>
 <tr class="memdesc:accefd393398a0c5823816256fc3c50ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Topic type.  <a href="namespacelongport_1_1trade.html#accefd393398a0c5823816256fc3c50ad">More...</a><br /></td></tr>
