@@ -1,6 +1,6 @@
 from datetime import datetime, date, time
 from decimal import Decimal
-from typing import Any, Callable, List, Mapping, Optional, Type, Protocol
+from typing import Any, Callable, List, Optional, Type
 
 
 class OpenApiException(Exception):
@@ -37,7 +37,7 @@ class HttpClient:
                  app_secret: str, access_token: str) -> None: ...
 
     @classmethod
-    def from_env(cls: Type) -> HttpClient:
+    def from_env(cls: Type[HttpClient]) -> HttpClient:
         """
         Create a new `HttpClient` from the given environment variables
 
@@ -123,7 +123,7 @@ class Config:
     ) -> None: ...
 
     @classmethod
-    def from_env(cls: Type) -> Config:
+    def from_env(cls: Type[Config]) -> Config:
         """
         Create a new `Config` from the given environment variables
 
@@ -3317,7 +3317,7 @@ class QuoteContext:
                 print(group_id)
         """
 
-    def delete_watchlist_group(self, id: int, purge: bool = False):
+    def delete_watchlist_group(self, id: int, purge: bool = False) -> int:
         """
         Delete watchlist group
 
@@ -3335,7 +3335,7 @@ class QuoteContext:
                 ctx.delete_watchlist_group(10086)
         """
 
-    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]] = None, mode: Optional[Type[SecuritiesUpdateMode]] = None):
+    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]] = None, mode: Optional[Type[SecuritiesUpdateMode]] = None) -> int:
         """
         Update watchlist group
 
@@ -3399,7 +3399,7 @@ class QuoteContext:
                 print(resp)
         """
 
-    def history_market_temperature(self, market: Type[Market], start: date, end: date):
+    def history_market_temperature(self, market: Type[Market], start: date, end: date) -> HistoryMarketTemperatureResponse:
         """
         Get historical market temperature
 
