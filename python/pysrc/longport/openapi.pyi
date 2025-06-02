@@ -2355,11 +2355,6 @@ class SecurityCalcIndex:
     Change value
     """
 
-    change_value: Optional[Decimal]
-    """
-    Change value
-    """
-
     change_rate: Optional[Decimal]
     """
     Change ratio
