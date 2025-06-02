@@ -3312,7 +3312,7 @@ class QuoteContext:
                 print(group_id)
         """
 
-    def delete_watchlist_group(self, id: int, purge: bool = False) -> int:
+    def delete_watchlist_group(self, id: int, purge: bool = False):
         """
         Delete watchlist group
 
@@ -3330,7 +3330,7 @@ class QuoteContext:
                 ctx.delete_watchlist_group(10086)
         """
 
-    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]] = None, mode: Optional[Type[SecuritiesUpdateMode]] = None) -> int:
+    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]] = None, mode: Optional[Type[SecuritiesUpdateMode]] = None):
         """
         Update watchlist group
 
