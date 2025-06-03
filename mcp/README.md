@@ -60,7 +60,7 @@ Or use this config:
       "env": {
         "LONGPORT_APP_KEY": "your-app-key",
         "LONGPORT_APP_SECRET": "your-app-secret",
-        "LONGPORT_APP_PASSPHRASE": "your-aaccess-token"
+        "LONGPORT_ACCESS_TOKEN": "your-aaccess-token"
       }
     }
   }
