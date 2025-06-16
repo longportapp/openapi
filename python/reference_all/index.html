@@ -1736,6 +1736,14 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.FrozenTransactionFee">FrozenTransactionFee</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.FrozenTransactionFee.currency">currency</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.FrozenTransactionFee.frozen_transaction_fee">frozen_transaction_fee</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.AccountBalance">AccountBalance</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AccountBalance.total_cash">total_cash</a>
@@ -1759,6 +1767,8 @@
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AccountBalance.maintenance_margin">maintenance_margin</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AccountBalance.buy_power">buy_power</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AccountBalance.frozen_transaction_fees">frozen_transaction_fees</a>
     </li>
         </ul>
     </li>
@@ -28768,6 +28778,93 @@ print(resp)</code></pre>
 
 
 
+<h2 id="longport.openapi.FrozenTransactionFee" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">FrozenTransactionFee</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.FrozenTransactionFee.currency" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">currency</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">currency: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Currency</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.FrozenTransactionFee.frozen_transaction_fee" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">frozen_transaction_fee</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">frozen_transaction_fee: Decimal</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Frozen transaction fee</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="longport.openapi.AccountBalance" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">AccountBalance</span>
 
@@ -29045,6 +29142,29 @@ print(resp)</code></pre>
     <div class="doc doc-contents ">
 
         <p>Buy power</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.AccountBalance.frozen_transaction_fees" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">frozen_transaction_fees</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">frozen_transaction_fees: FrozenTransactionFee</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Frozen transaction fees</p>
 
     </div>
 

@@ -18,10 +18,13 @@ var searchData=
   ['free_5fstatus_181',['free_status',['../structlongport_1_1trade_1_1_order_detail.html#a18fbc8d68071d79b0f1fc774aa5a017a',1,'longport::trade::OrderDetail']]],
   ['from_5fenv_182',['from_env',['../classlongport_1_1_http_client.html#a80b9af25ad9fea79dbf7219d12dec6b5',1,'longport::HttpClient::from_env()'],['../classlongport_1_1_config.html#ab6c542b85e343959b3d0f92ae005b575',1,'longport::Config::from_env()']]],
   ['frozen_5fcash_183',['frozen_cash',['../structlongport_1_1trade_1_1_cash_info.html#ab0d5dd301e71e228d00b89645a6f582b',1,'longport::trade::CashInfo']]],
-  ['fund_184',['Fund',['../namespacelongport_1_1trade.html#ad4e703fdb2ce4e5ef37fc1bb74368507ac1098dd48f0fb20eeea79235055d02ca',1,'longport::trade']]],
-  ['fund_5fpositions_185',['fund_positions',['../classlongport_1_1trade_1_1_trade_context.html#a0f0a02725a1533f3acefa4250cce5cc9',1,'longport::trade::TradeContext']]],
-  ['fundposition_186',['FundPosition',['../structlongport_1_1trade_1_1_fund_position.html',1,'longport::trade']]],
-  ['fundpositionchannel_187',['FundPositionChannel',['../structlongport_1_1trade_1_1_fund_position_channel.html',1,'longport::trade']]],
-  ['fundpositionsresponse_188',['FundPositionsResponse',['../structlongport_1_1trade_1_1_fund_positions_response.html',1,'longport::trade']]],
-  ['fuse_189',['Fuse',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949aa7513661ae079a868d2986c7aed2d913',1,'longport::quote']]]
+  ['frozen_5ftransaction_5ffee_184',['frozen_transaction_fee',['../structlongport_1_1trade_1_1_frozen_transaction_fee.html#a7fe3251117234582d9a69e6190eeb277',1,'longport::trade::FrozenTransactionFee']]],
+  ['frozen_5ftransaction_5ffees_185',['frozen_transaction_fees',['../structlongport_1_1trade_1_1_account_balance.html#a87411d57a28cb82d56f795ba0e271205',1,'longport::trade::AccountBalance']]],
+  ['frozentransactionfee_186',['FrozenTransactionFee',['../structlongport_1_1trade_1_1_frozen_transaction_fee.html',1,'longport::trade']]],
+  ['fund_187',['Fund',['../namespacelongport_1_1trade.html#ad4e703fdb2ce4e5ef37fc1bb74368507ac1098dd48f0fb20eeea79235055d02ca',1,'longport::trade']]],
+  ['fund_5fpositions_188',['fund_positions',['../classlongport_1_1trade_1_1_trade_context.html#a0f0a02725a1533f3acefa4250cce5cc9',1,'longport::trade::TradeContext']]],
+  ['fundposition_189',['FundPosition',['../structlongport_1_1trade_1_1_fund_position.html',1,'longport::trade']]],
+  ['fundpositionchannel_190',['FundPositionChannel',['../structlongport_1_1trade_1_1_fund_position_channel.html',1,'longport::trade']]],
+  ['fundpositionsresponse_191',['FundPositionsResponse',['../structlongport_1_1trade_1_1_fund_positions_response.html',1,'longport::trade']]],
+  ['fuse_192',['Fuse',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949aa7513661ae079a868d2986c7aed2d913',1,'longport::quote']]]
 ];

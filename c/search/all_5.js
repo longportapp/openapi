@@ -9,5 +9,7 @@ var searchData=
   ['free_5famount_138',['free_amount',['../structlb__order__detail__t.html#af4cc931c2127744b256ffd91425706a6',1,'lb_order_detail_t']]],
   ['free_5fcurrency_139',['free_currency',['../structlb__order__detail__t.html#a9f14251c5599f1a7f5978b571062915a',1,'lb_order_detail_t']]],
   ['free_5fstatus_140',['free_status',['../structlb__order__detail__t.html#a3e0fadeb1cc5e64b9572ebb0d035a346',1,'lb_order_detail_t']]],
-  ['frozen_5fcash_141',['frozen_cash',['../structlb__cash__info__t.html#a574dd0ea4e1438186829379a0a305e11',1,'lb_cash_info_t']]]
+  ['frozen_5fcash_141',['frozen_cash',['../structlb__cash__info__t.html#a574dd0ea4e1438186829379a0a305e11',1,'lb_cash_info_t']]],
+  ['frozen_5ftransaction_5ffee_142',['frozen_transaction_fee',['../structlb__frozen__transaction__fee__t.html#a98ec640d591344744ff27b49b2d04905',1,'lb_frozen_transaction_fee_t']]],
+  ['frozen_5ftransaction_5ffees_143',['frozen_transaction_fees',['../structlb__account__balance__t.html#a8d7ba8a601aa5e0ce6732ef387408abc',1,'lb_account_balance_t']]]
 ];
