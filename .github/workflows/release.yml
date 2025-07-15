@@ -118,7 +118,7 @@ jobs:
         run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
 
       - name: Publish maven package
-        uses: samuelmeuli/action-maven-publish@v1
+        uses: WasiqB/maven-publish-action@v2.11.0
         with:
           directory: java/javasrc
           maven_profiles: release
