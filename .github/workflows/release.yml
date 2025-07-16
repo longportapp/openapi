@@ -100,7 +100,19 @@ jobs:
           mkdir -p ~/.m2
           cat > ~/.m2/settings.xml << EOF
           <settings>
-            <servers>
+            <profiles>
+              <profile>
+                <id>gpg</id>
+                <activation>
+                  <activeByDefault>true</activeByDefault>
+                </activation>
+                <properties>
+                  <gpg.executable>gpg</gpg.executable>
+                  <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+                </properties>
+              </profile>
+            </profiles>
+              <servers>
               <server>
                 <id>central</id>
                 <username>${{ secrets.CENTRAL_USERNAME }}</username>
@@ -139,9 +151,7 @@ jobs:
         run: |
           echo "$GPG_PRIVATE_KEY" > private.key
           gpg --import private.key
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
 
       - name: Deploy Maven package
         working-directory: java/javasrc
-        run: mvn clean deploy -Dgpg.passphrase="${GPG_PASSPHRASE}" -P release
+        run: mvn clean deploy -P release
