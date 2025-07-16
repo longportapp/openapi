@@ -121,7 +121,6 @@ jobs:
             </servers>
           </settings>
           EOF
-          cat ~/.m2/settings.xml
 
       - name: Copy jnis
         working-directory: java
@@ -151,7 +150,7 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
           echo "$GPG_PRIVATE_KEY" > private.key
-          gpg --import private.key
+          gpg --import --batch private.key
           rm private.key
 
       - name: Deploy Maven package
