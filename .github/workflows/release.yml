@@ -132,6 +132,16 @@ jobs:
         working-directory: java/javasrc
         run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
 
+      - name: Import GPG private key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" > private.key
+          gpg --import private.key
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+
       - name: Deploy Maven package
         working-directory: java/javasrc
-        run: mvn clean deploy -P release
+        run: mvn clean deploy -Dgpg.passphrase="${GPG_PASSPHRASE}" -P release
