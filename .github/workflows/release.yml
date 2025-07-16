@@ -112,7 +112,7 @@ jobs:
                 </properties>
               </profile>
             </profiles>
-              <servers>
+            <servers>
               <server>
                 <id>central</id>
                 <username>${{ secrets.CENTRAL_USERNAME }}</username>
@@ -151,6 +151,7 @@ jobs:
         run: |
           echo "$GPG_PRIVATE_KEY" > private.key
           gpg --import private.key
+          rm private.key
 
       - name: Deploy Maven package
         working-directory: java/javasrc
