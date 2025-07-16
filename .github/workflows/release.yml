@@ -108,11 +108,11 @@ jobs:
                 </activation>
                 <properties>
                   <gpg.executable>gpg</gpg.executable>
-                  <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+                  <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
                 </properties>
               </profile>
             </profiles>
-            <servers>
+              <servers>
               <server>
                 <id>central</id>
                 <username>${{ secrets.CENTRAL_USERNAME }}</username>
@@ -121,6 +121,7 @@ jobs:
             </servers>
           </settings>
           EOF
+          cat ~/.m2/settings.xml
 
       - name: Copy jnis
         working-directory: java
