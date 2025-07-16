@@ -155,4 +155,4 @@ jobs:
 
       - name: Deploy Maven package
         working-directory: java/javasrc
-        run: mvn clean deploy -P release
+        run: mvn deploy --activate-profiles release
