@@ -95,6 +95,21 @@ jobs:
           pattern: jnis-*
           merge-multiple: true
 
+      - name: Configure Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml << EOF
+          <settings>
+            <servers>
+              <server>
+                <id>central</id>
+                <username>${{ secrets.CENTRAL_USERNAME }}</username>
+                <password>${{ secrets.CENTRAL_PASSWORD }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
       - name: Copy jnis
         working-directory: java
         run: |
@@ -117,13 +132,6 @@ jobs:
         working-directory: java/javasrc
         run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
 
-      - name: Publish maven package
-        uses: WasiqB/maven-publish-action@v2.11.0
-        with:
-          directory: java/javasrc
-          maven_profiles: release
-          maven_goals_phases: deploy
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          server_username: ${{ secrets.OSSRH_USERNAME }}
-          server_password: ${{ secrets.OSSRH_PASSWORD }}
+      - name: Deploy Maven package
+        working-directory: java/javasrc
+        run: mvn clean deploy -P release
