@@ -70,6 +70,22 @@ impl Longport {
             .collect::<Vec<_>>())
     }
 
+    /// Get the latest price of option securities.
+    async fn option_quote(
+        &self,
+        /// A list of option symbols. (e.g. ["AAPL230317P160000.US", "AAPL230317C160000.US"])
+        /// Maximum 500 symbols per request.
+        symbols: Vec<String>,
+    ) -> Result<impl IntoContents, Error> {
+        Ok(self
+            .quote_context
+            .option_quote(symbols)
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect::<Vec<_>>())
+    }
+
     /// Get the latest depth of the securities.
     async fn depth(&self, symbol: String) -> Result<impl IntoContents, Error> {
         Ok(Json(self.quote_context.depth(symbol).await?))
