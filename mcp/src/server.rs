@@ -73,8 +73,8 @@ impl Longport {
     /// Get the latest price of option securities.
     async fn option_quote(
         &self,
-        /// A list of option symbols. (e.g. ["AAPL230317P160000.US", "AAPL230317C160000.US"])
-        /// Maximum 500 symbols per request.
+        /// A list of option symbols. (e.g. ["AAPL230317P160000.US",
+        /// "AAPL230317C160000.US"]) Maximum 500 symbols per request.
         symbols: Vec<String>,
     ) -> Result<impl IntoContents, Error> {
         Ok(self
