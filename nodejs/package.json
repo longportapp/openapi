@@ -5,13 +5,14 @@
   "types": "index.d.ts",
   "napi": {
     "binaryName": "longport",
-    "targets": {
-      "additional": [
-        "aarch64-apple-darwin",
-        "aarch64-unknown-linux-gnu",
-        "x86_64-unknown-linux-musl"
-      ]
-    }
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin"
+    ]
   },
   "license": "MIT OR Apache-2.0",
   "description": "A Node.js library for LongPort Open API",
@@ -21,7 +22,7 @@
   },
   "homepage": "https://open.longportapp.com/en/",
   "devDependencies": {
-    "@napi-rs/cli": "^2.9.0"
+    "@napi-rs/cli": "^3.0.3"
   },
   "engines": {
     "node": ">= 10"
