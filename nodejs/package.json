@@ -4,8 +4,8 @@
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
-    "name": "longport",
-    "triples": {
+    "binaryName": "longport",
+    "targets": {
       "additional": [
         "aarch64-apple-darwin",
         "aarch64-unknown-linux-gnu",
