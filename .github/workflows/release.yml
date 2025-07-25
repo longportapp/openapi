@@ -158,10 +158,10 @@ jobs:
         run: ls -R ./npm
         shell: bash
         working-directory: ./nodejs
-      # - name: Publish
-      #   run: |
-      #     echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-      #     npm publish --access public
-      #   working-directory: ./nodejs
-      #   env:
-      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          npm publish --access public
+        working-directory: ./nodejs
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
