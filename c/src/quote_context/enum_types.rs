@@ -592,6 +592,9 @@ pub enum CSecurityListCategory {
     /// Overnight
     #[c(remote = "Overnight")]
     SecurityListCategoryOvernight,
+    /// Crypto
+    #[c(remote = "Crypto")]
+    SecurityListCategoryCrypto,
 }
 
 /// Trade sessions

@@ -2084,6 +2084,8 @@ convert(SecurityListCategory category)
   switch (category) {
     case SecurityListCategory::Overnight:
       return SecurityListCategoryOvernight;
+    case SecurityListCategory::Crypto:
+      return SecurityListCategoryCrypto;
     default:
       throw std::invalid_argument("unreachable");
   }

@@ -1336,6 +1336,8 @@ pub struct SecurityCalcIndex {
 pub enum SecurityListCategory {
     /// Overnight
     Overnight,
+    /// Crypto
+    Crypto,
 }
 
 /// Security

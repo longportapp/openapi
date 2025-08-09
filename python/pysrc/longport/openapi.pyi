@@ -542,6 +542,11 @@ class SecurityListCategory:
         Overnight
         """
 
+    class Crypto(SecurityListCategory):
+        """
+        Crypto
+        """
+
 
 class SecurityStaticInfo:
     """

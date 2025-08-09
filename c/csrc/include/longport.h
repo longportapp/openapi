@@ -928,6 +928,10 @@ typedef enum lb_security_list_category_t {
    * Overnight
    */
   SecurityListCategoryOvernight,
+  /**
+   * Crypto
+   */
+  SecurityListCategoryCrypto,
 } lb_security_list_category_t;
 
 /**

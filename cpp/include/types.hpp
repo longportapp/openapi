@@ -1177,6 +1177,8 @@ enum class SecurityListCategory
 {
   /// Overnight
   Overnight,
+  /// Crypto
+  Crypto,
 };
 
 /// Quote package detail

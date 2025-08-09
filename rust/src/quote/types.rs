@@ -1848,6 +1848,8 @@ impl SecurityCalcIndex {
 pub enum SecurityListCategory {
     /// Overnight
     Overnight,
+    /// Crypto
+    Crypto,
 }
 
 impl_serialize_for_enum_string!(SecurityListCategory);

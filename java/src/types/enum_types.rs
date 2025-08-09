@@ -316,7 +316,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longport/quote/SecurityListCategory",
     longport::quote::SecurityListCategory,
-    [Overnight]
+    [Overnight, Crypto]
 );
 
 impl_java_enum!(

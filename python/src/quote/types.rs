@@ -1299,6 +1299,8 @@ pub(crate) struct SecurityCalcIndex {
 pub(crate) enum SecurityListCategory {
     /// Overnight
     Overnight,
+    /// Crypto
+    Crypto,
 }
 
 /// Security
