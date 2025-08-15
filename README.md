@@ -1,5 +1,6 @@
 # LongPort OpenAPI SDK
 
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/longportapp/openapi)](https://archestra.ai/mcp-catalog/longportapp__openapi)
 [![](https://img.shields.io/crates/v/longport.svg)](https://crates.io/crates/longport) [![Go project version](https://badge.fury.io/go/github.com%2Flongportapp%2Fopenapi-go.svg)](https://badge.fury.io/go/github.com%2Flongportapp%2Fopenapi-go) [![PyPI version](https://badge.fury.io/py/longport.svg)](https://badge.fury.io/py/longport) [![npm version](https://badge.fury.io/js/longport.svg)](https://badge.fury.io/js/longport) [![Maven Central](https://img.shields.io/maven-central/v/io.github.longportapp/openapi-sdk)](https://search.maven.org/artifact/io.github.longportapp/openapi-sdk)
 
 
