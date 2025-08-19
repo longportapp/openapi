@@ -626,6 +626,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="longport_8h.html#a314b7af320779ef1151f6cceba24aad3a271c68892160ae3e035d88ab15c5149a">MarketCN</a>
 , <br />
 &#160;&#160;<a class="el" href="longport_8h.html#a314b7af320779ef1151f6cceba24aad3a51550bc2fc27282a9947526ae60432f6">MarketSG</a>
+, <a class="el" href="longport_8h.html#a314b7af320779ef1151f6cceba24aad3af2541828ffcf1c8b32dd42255daed547">MarketCrypto</a>
 <br />
  }</td></tr>
 <tr class="separator:a314b7af320779ef1151f6cceba24aad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -970,8 +971,8 @@ Functions</h2></td></tr>
 <tr class="separator:ac9eacc29f1a673f94bee898c23486a92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0508f7f84fdb6b81b22e0c7033b03c41"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a0508f7f84fdb6b81b22e0c7033b03c41">lb_quote_context_trades</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, uintptr_t count, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:a0508f7f84fdb6b81b22e0c7033b03c41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bfbdc173e20c4b8c3db5abe92dc82bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a4bfbdc173e20c4b8c3db5abe92dc82bd">lb_quote_context_intraday</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
-<tr class="separator:a4bfbdc173e20c4b8c3db5abe92dc82bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84ade69853fe821e99c59376371bb07e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a84ade69853fe821e99c59376371bb07e">lb_quote_context_intraday</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, enum <a class="el" href="longport_8h.html#a2a66eba975eabf1c37b85e3a60ce4cb0">lb_trade_sessions_t</a> trade_sessions, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a84ade69853fe821e99c59376371bb07e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3d223f7f6fabb162108773ccaf003e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#ab3d223f7f6fabb162108773ccaf003e2">lb_quote_context_candlesticks</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, enum <a class="el" href="longport_8h.html#a2232d462d8b15fd3688cc8dfc15542e9">lb_period_t</a> period, uintptr_t count, enum <a class="el" href="longport_8h.html#ac7dfa4da1bb548d6575c619f3f22515f">lb_adjust_type_t</a> adjust_type, enum <a class="el" href="longport_8h.html#a2a66eba975eabf1c37b85e3a60ce4cb0">lb_trade_sessions_t</a> trade_sessions, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:ab3d223f7f6fabb162108773ccaf003e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d30f70b9f4f565bef54eda02d1de011"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a2d30f70b9f4f565bef54eda02d1de011">lb_quote_context_history_candlesticks_by_offset</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, enum <a class="el" href="longport_8h.html#a2232d462d8b15fd3688cc8dfc15542e9">lb_period_t</a> period, enum <a class="el" href="longport_8h.html#ac7dfa4da1bb548d6575c619f3f22515f">lb_adjust_type_t</a> adjust_type, bool forward, const struct <a class="el" href="structlb__datetime__t.html">lb_datetime_t</a> *time, uintptr_t count, enum <a class="el" href="longport_8h.html#a2a66eba975eabf1c37b85e3a60ce4cb0">lb_trade_sessions_t</a> trade_sessions, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
@@ -1014,8 +1015,8 @@ Functions</h2></td></tr>
 <tr class="separator:a52394feb380f1902173dc21c700a069e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07e1b1e600db1aa0d8ea79cdb1d1b5b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a07e1b1e600db1aa0d8ea79cdb1d1b5b0">lb_quote_context_realtime_candlesticks</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, const char *symbol, enum <a class="el" href="longport_8h.html#a2232d462d8b15fd3688cc8dfc15542e9">lb_period_t</a> period, uintptr_t count, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:a07e1b1e600db1aa0d8ea79cdb1d1b5b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b9ecadb46cede5f5cf06dc10d0176df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a5b9ecadb46cede5f5cf06dc10d0176df">lb_quote_context_security_list</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, enum <a class="el" href="longport_8h.html#a314b7af320779ef1151f6cceba24aad3">lb_market_t</a> market, enum <a class="el" href="longport_8h.html#a69241c689dd7776335e35020eebee485">lb_security_list_category_t</a> category, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
-<tr class="separator:a5b9ecadb46cede5f5cf06dc10d0176df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2606f4e47c0b55c27c824f973abac0f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a2606f4e47c0b55c27c824f973abac0f8">lb_quote_context_security_list</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, enum <a class="el" href="longport_8h.html#a314b7af320779ef1151f6cceba24aad3">lb_market_t</a> market, const enum <a class="el" href="longport_8h.html#a69241c689dd7776335e35020eebee485">lb_security_list_category_t</a> *category, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
+<tr class="separator:a2606f4e47c0b55c27c824f973abac0f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae69ec976ef34c666617539016cf06480"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#ae69ec976ef34c666617539016cf06480">lb_quote_context_market_temperature</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, enum <a class="el" href="longport_8h.html#a314b7af320779ef1151f6cceba24aad3">lb_market_t</a> market, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
 <tr class="separator:ae69ec976ef34c666617539016cf06480"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0580bf6dfcb5bcc80700fb8a4f067ccf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a0580bf6dfcb5bcc80700fb8a4f067ccf">lb_quote_context_history_market_temperature</a> (const struct <a class="el" href="longport_8h.html#a2fc8527444c5b89959fe12f79a292603">lb_quote_context_t</a> *ctx, enum <a class="el" href="longport_8h.html#a314b7af320779ef1151f6cceba24aad3">lb_market_t</a> market, const struct <a class="el" href="structlb__date__t.html">lb_date_t</a> *start, const struct <a class="el" href="structlb__date__t.html">lb_date_t</a> *end, <a class="el" href="longport_8h.html#a5af8e7ecef5e7ac7662ccc466ab87233">lb_async_callback_t</a> callback, void *userdata)</td></tr>
@@ -3482,6 +3483,8 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a314b7af320779ef1151f6cceba24aad3a271c68892160ae3e035d88ab15c5149a"></a>MarketCN&#160;</td><td class="fielddoc"><p>CN market </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a314b7af320779ef1151f6cceba24aad3a51550bc2fc27282a9947526ae60432f6"></a>MarketSG&#160;</td><td class="fielddoc"><p>SG market </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a314b7af320779ef1151f6cceba24aad3af2541828ffcf1c8b32dd42255daed547"></a>MarketCrypto&#160;</td><td class="fielddoc"><p>Crypto market </p>
 </td></tr>
 </table>
 
@@ -6214,8 +6217,8 @@ Variables</h1>
 
 </div>
 </div>
-<a id="a4bfbdc173e20c4b8c3db5abe92dc82bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4bfbdc173e20c4b8c3db5abe92dc82bd">&#9670;&nbsp;</a></span>lb_quote_context_intraday()</h2>
+<a id="a84ade69853fe821e99c59376371bb07e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84ade69853fe821e99c59376371bb07e">&#9670;&nbsp;</a></span>lb_quote_context_intraday()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6231,6 +6234,12 @@ Variables</h1>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>symbol</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum <a class="el" href="longport_8h.html#a2a66eba975eabf1c37b85e3a60ce4cb0">lb_trade_sessions_t</a>&#160;</td>
+          <td class="paramname"><em>trade_sessions</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -6905,8 +6914,8 @@ Variables</h1>
 
 </div>
 </div>
-<a id="a5b9ecadb46cede5f5cf06dc10d0176df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b9ecadb46cede5f5cf06dc10d0176df">&#9670;&nbsp;</a></span>lb_quote_context_security_list()</h2>
+<a id="a2606f4e47c0b55c27c824f973abac0f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2606f4e47c0b55c27c824f973abac0f8">&#9670;&nbsp;</a></span>lb_quote_context_security_list()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -6926,7 +6935,7 @@ Variables</h1>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">enum <a class="el" href="longport_8h.html#a69241c689dd7776335e35020eebee485">lb_security_list_category_t</a>&#160;</td>
+          <td class="paramtype">const enum <a class="el" href="longport_8h.html#a69241c689dd7776335e35020eebee485">lb_security_list_category_t</a> *&#160;</td>
           <td class="paramname"><em>category</em>, </td>
         </tr>
         <tr>
