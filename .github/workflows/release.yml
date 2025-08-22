@@ -151,6 +151,6 @@ jobs:
           gpg --import --batch private.key
           rm private.key
 
-      # - name: Deploy Maven package
-      #   working-directory: java/javasrc
-      #   run: mvn deploy --activate-profiles release
+      - name: Deploy Maven package
+        working-directory: java/javasrc
+        run: mvn deploy --activate-profiles release
