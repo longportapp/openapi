@@ -17,6 +17,14 @@ int main()
 	longport::Config config;
 	longport::Status status = longport::Config::from_env(config);
 
+	TA_RetCode retCode;
+	retCode = TA_Initialize();
+	if (retCode != TA_SUCCESS)
+	{
+		std::cout << "Cannot initialize TA-Lib !\n";
+		return -1;
+	}
+	
 	if (!status) {
 		std::cout << "failed to load configuration from environment: "
 			<< status.message() << std::endl;
@@ -79,6 +87,11 @@ int main()
 		});
 
 	std::cin.get();
+	retCode = TA_Shutdown();
+	if (retCode != TA_SUCCESS)
+	{
+		std::cout << "Cannot TA_Shutdown TA-Lib !\n";
+	}
 	return 0;
 }
 
