@@ -61,7 +61,7 @@ int main()
 			// dynamically allocate output arrays
 			// 12, 26, 9, TA_MAType_EMA - are defaults for MACD
 			int data_size = InReal.size();
-			int OutSize = data_size - TA_BBANDS_Lookback(12, 26, 9, TA_MAType_EMA);
+			int OutSize = data_size - TA_MACDEXT_Lookback(12, TA_MAType_EMA, 26, TA_MAType_EMA, 9, TA_MAType_EMA);
 			if (OutSize != 0) {
 				OutMACD.resize(OutSize);
 				OutMACDSignal.resize(OutSize);
