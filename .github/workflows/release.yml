@@ -831,7 +831,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Update versions
-        run: node ./.github/misc/update_jssdk_version.mjs $(sed -nE 's/^\s*version = "(.*?)"/\1/p' nodejs/Cargo.toml)
+        run: node ./.github/misc/update_jssdk_version.mjs $(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml)
       - name: Setup node
         uses: actions/setup-node@v4
         with:
