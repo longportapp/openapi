@@ -503,6 +503,7 @@ impl From<Candlestick> for CCandlestickOwned {
             turnover,
             timestamp,
             trade_session,
+            ..
         } = candlestick;
         CCandlestickOwned {
             close: close.into(),

@@ -265,7 +265,8 @@ impl_java_class!(
         turnover,
         timestamp,
         trade_session
-    ]
+    ],
+    non_exhaustive
 );
 
 impl_java_class!(

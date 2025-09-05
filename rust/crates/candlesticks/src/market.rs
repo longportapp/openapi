@@ -233,6 +233,11 @@ impl Market {
                 let mut candlestick = prev;
 
                 if update_fields.contains(UpdateFields::PRICE) {
+                    if !candlestick.open_updated() {
+                        candlestick.set_open(trade.price());
+                        candlestick.set_open_updated(true);
+                    }
+
                     candlestick.set_high(if trade.price() > candlestick.high() {
                         trade.price()
                     } else {
@@ -267,6 +272,7 @@ impl Market {
                         volume: trade.volume(),
                         turnover: trade.turnover(self.lot_size),
                         trade_session,
+                        open_updated: true,
                     });
                     UpdateAction::AppendNew {
                         confirmed: None,
@@ -286,6 +292,7 @@ impl Market {
                     volume: V::zero(),
                     turnover: R::zero(),
                     trade_session,
+                    open_updated: false,
                 });
 
                 if update_fields.contains(UpdateFields::PRICE) {
@@ -293,6 +300,7 @@ impl Market {
                     new_candlestick.set_high(trade.price());
                     new_candlestick.set_low(trade.price());
                     new_candlestick.set_close(trade.price());
+                    new_candlestick.set_open_updated(true);
                 }
 
                 if update_fields.contains(UpdateFields::VOLUME) {
@@ -340,6 +348,7 @@ impl Market {
                     volume: quote.volume(),
                     turnover: quote.turnover(),
                     trade_session,
+                    open_updated: true,
                 }))
             }
             None => UpdateAction::AppendNew {
@@ -353,6 +362,7 @@ impl Market {
                     volume: quote.volume(),
                     turnover: quote.turnover(),
                     trade_session,
+                    open_updated: true,
                 }),
             },
             Some(prev) if time > prev.time() => UpdateAction::AppendNew {
@@ -366,6 +376,7 @@ impl Market {
                     volume: quote.volume(),
                     turnover: quote.turnover(),
                     trade_session,
+                    open_updated: true,
                 }),
             },
             _ => UpdateAction::None,

@@ -12,6 +12,7 @@ pub struct CandlestickComponents<PriceType, VolumeType, TurnoverType, TradeSessi
     pub volume: VolumeType,
     pub turnover: TurnoverType,
     pub trade_session: TradeSessionType,
+    pub open_updated: bool,
 }
 
 pub trait CandlestickType {
@@ -51,4 +52,7 @@ pub trait CandlestickType {
     fn set_turnover(&mut self, turnover: Self::TurnoverType);
 
     fn trade_session(&self) -> Self::TradeSessionType;
+
+    fn set_open_updated(&mut self, open_updated: bool);
+    fn open_updated(&self) -> bool;
 }

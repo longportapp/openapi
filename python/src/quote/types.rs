@@ -632,7 +632,7 @@ pub(crate) struct IntradayLine {
 /// Candlestick
 #[pyclass]
 #[derive(Debug, PyObject, Clone)]
-#[py(remote = "longport::quote::Candlestick")]
+#[py(remote = "longport::quote::Candlestick", non_exhaustive)]
 pub(crate) struct Candlestick {
     /// Close price
     close: PyDecimal,

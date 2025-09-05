@@ -28,6 +28,8 @@ struct ObjectArgs {
     data: Data<Ignored, ObjectField>,
 
     remote: TypePath,
+    #[darling(default)]
+    non_exhaustive: bool,
 }
 
 pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
@@ -35,6 +37,7 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
         ident,
         data,
         remote,
+        non_exhaustive,
     } = ObjectArgs::from_derive_input(&args)?;
 
     let s = match data {
@@ -46,6 +49,11 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
     let mut getters = Vec::new();
     let mut from_fields = Vec::new();
     let mut set_dictitem = Vec::new();
+    let non_exhaustive = if non_exhaustive {
+        Some(quote! { , .. })
+    } else {
+        None
+    };
 
     for field in &s.fields {
         let field_ident = field.ident.as_ref().unwrap();
@@ -55,7 +63,7 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
         set_dictitem.push(quote! {
             d.set_item(#name, self.#field_ident.clone().into_pyobject(py)?)?;
         });
-        fields.push(field_ident);
+        fields.push(field_ident.clone());
         getters.push(quote! {
             #[getter]
             #[inline]
@@ -119,7 +127,7 @@ pub(crate) fn generate(args: DeriveInput) -> GeneratorResult<TokenStream> {
         impl ::std::convert::TryFrom<#remote> for #ident {
             type Error = ::pyo3::PyErr;
 
-            fn try_from(#remote { #(#fields),* }: #remote) -> ::std::result::Result<Self, Self::Error> {
+            fn try_from(#remote { #(#fields),* #non_exhaustive }: #remote) -> ::std::result::Result<Self, Self::Error> {
                 use ::std::convert::TryInto;
                 use ::std::iter::Iterator;
 

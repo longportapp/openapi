@@ -665,7 +665,7 @@ pub struct IntradayLine {
 /// Candlestick
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Copy, Clone)]
-#[js(remote = "longport::quote::Candlestick")]
+#[js(remote = "longport::quote::Candlestick", non_exhaustive)]
 pub struct Candlestick {
     /// Close price
     close: Decimal,

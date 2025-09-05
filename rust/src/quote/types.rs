@@ -798,6 +798,7 @@ pub struct Candlestick {
     pub timestamp: OffsetDateTime,
     /// Trade session
     pub trade_session: TradeSession,
+    open_updated: bool,
 }
 
 impl TryFrom<quote::Candlestick> for Candlestick {
@@ -816,6 +817,7 @@ impl TryFrom<quote::Candlestick> for Candlestick {
             trade_session: longport_proto::quote::TradeSession::try_from(value.trade_session)
                 .map_err(|err| Error::parse_field_error("trade_session", err))?
                 .into(),
+            open_updated: true,
         })
     }
 }
@@ -844,6 +846,7 @@ impl longport_candlesticks::CandlestickType for Candlestick {
             volume: components.volume,
             turnover: components.turnover,
             trade_session: components.trade_session,
+            open_updated: components.open_updated,
         }
     }
 
@@ -920,6 +923,16 @@ impl longport_candlesticks::CandlestickType for Candlestick {
     #[inline]
     fn trade_session(&self) -> Self::TradeSessionType {
         self.trade_session
+    }
+
+    #[inline]
+    fn set_open_updated(&mut self, updated: bool) {
+        self.open_updated = updated;
+    }
+
+    #[inline]
+    fn open_updated(&self) -> bool {
+        self.open_updated
     }
 }
 

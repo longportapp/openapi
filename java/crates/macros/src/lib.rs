@@ -92,6 +92,22 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
         fields
     };
 
+    let mut non_exhaustive = false;
+
+    for expr in exprs {
+        if let Expr::Path(ExprPath { path, .. }) = &expr
+            && path.is_ident("non_exhaustive")
+        {
+            non_exhaustive = true;
+        }
+    }
+
+    let non_exhaustive = if non_exhaustive {
+        Some(quote! { , .. })
+    } else {
+        None
+    };
+
     let signature = format!("L{classname};");
     let mut set_fields = Vec::new();
 
@@ -155,7 +171,7 @@ pub fn impl_java_class(input: TokenStream) -> TokenStream {
 
         impl crate::types::IntoJValue for #type_path {
             fn into_jvalue<'a>(self, env: &mut jni::JNIEnv<'a>) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
-                let #type_path { #(#field_names),* } = self;
+                let #type_path { #(#field_names),* #non_exhaustive } = self;
                 let cls = <Self as crate::types::ClassLoader>::class_ref();
                 let obj = env.new_object(cls.borrow(), "()V", &[])?;
                 #(#set_fields)*
