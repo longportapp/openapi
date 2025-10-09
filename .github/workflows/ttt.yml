@@ -1,0 +1,57 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - ttt2
+    pull_request: {}
+
+jobs:
+    build-python-sdk-linux-cross:
+        runs-on: ubuntu-22.04
+        strategy:
+            fail-fast: true
+            matrix:
+                python-version:
+                    ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+                target: [aarch64]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  submodules: true
+            - name: Build wheels
+              uses: PyO3/maturin-action@v1
+              with:
+                  target: ${{ matrix.target }}
+                  manylinux: 2_28
+                  args: -i python${{ matrix.python-version }} --out dist -m python/Cargo.toml
+            - uses: uraimo/run-on-arch-action@v3
+              name: Install built wheel
+              with:
+                  arch: none
+                  distro: none
+                  base_image: "--platform=linux/aarch64 ubuntu:20.04"
+                  githubToken: ${{ github.token }}
+                  dockerRunArgs: |
+                      --volume "${PWD}/dist:/artifacts"
+                  install: |
+                      apt-get update
+                      apt-get install -y --no-install-recommends software-properties-common curl
+                      curl https://pyenv.run | bash
+                      export PATH="$HOME/.pyenv/bin:$PATH"
+                      eval "$(pyenv init --path)"
+                      pyenv install ${{ matrix.python-version }}
+                      pyenv global ${{ matrix.python-version }}
+                  run: |
+                      ls -lrth /artifacts
+                      PYTHON=python${{ matrix.python-version }}
+                      $PYTHON -m venv venv
+                      venv/bin/pip install -U pip
+                      venv/bin/pip install longport --no-index --find-links /artifacts --force-reinstall
+                      venv/bin/python -c 'import longport'
+            - name: Upload wheels
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wheels-linux-${{ matrix.target }}-${{ matrix.python-version }}
+                  path: dist
