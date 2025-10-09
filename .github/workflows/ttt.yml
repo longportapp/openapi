@@ -38,16 +38,16 @@ jobs:
                   install: |
                       apt-get update
                       apt-get install -y --no-install-recommends software-properties-common curl
-                      sudo add-apt-repository ppa:deadsnakes/ppa
-                      sudo apt update
-                      apt-get install -y python${{ matrix.python-version }}-venv
+                      curl -fsSL https://pyenv.run | bash
+                      export PATH="$HOME/.pyenv/bin:$PATH"
+                      eval "$(pyenv init --path)"
+                      pyenv install ${{ matrix.python-version }}
+                      pyenv global ${{ matrix.python-version }}
                   run: |
                       ls -lrth /artifacts
-                      PYTHON=python${{ matrix.python-version }}
-                      $PYTHON -m venv venv
-                      venv/bin/pip install -U pip
-                      venv/bin/pip install longport --no-index --find-links /artifacts --force-reinstall
-                      venv/bin/python -c 'import longport'
+                      pip install -U pip
+                      pip install longport --no-index --find-links /artifacts --force-reinstall
+                      python -c 'import longport'
             - name: Upload wheels
               uses: actions/upload-artifact@v4
               with:
