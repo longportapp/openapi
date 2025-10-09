@@ -37,10 +37,10 @@ jobs:
                       --volume "${PWD}/dist:/artifacts"
                   install: |
                       apt-get update
-                      apt-get install -y --no-install-recommends software-properties-common curl
+                      apt-get install -y --no-install-recommends python3 python3-venv software-properties-common
                       add-apt-repository ppa:deadsnakes/ppa
-                      apt update
-                      apt-get install -y python${{ matrix.python-version }}-venv
+                      apt-get update
+                      apt-get install -y curl python${{ matrix.python-version }}-venv
                   run: |
                       ls -lrth /artifacts
                       PYTHON=python${{ matrix.python-version }}
