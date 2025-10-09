@@ -37,7 +37,7 @@ jobs:
                       --volume "${PWD}/dist:/artifacts"
                   install: |
                       apt-get update
-                      apt-get install -y --no-install-recommends software-properties-common curl
+                      apt-get install -y --no-install-recommends software-properties-common curl git gcc
                       curl -fsSL https://pyenv.run | bash
                       export PATH="$HOME/.pyenv/bin:$PATH"
                       eval "$(pyenv init --path)"
