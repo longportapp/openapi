@@ -1,14 +1,20 @@
 use longport::{
     Decimal, Error, Market, QuoteContext, TradeContext,
-    quote::{AdjustType, Period, TradeSessions},
+    quote::{
+        AdjustType, Candlestick, CapitalDistributionResponse, CapitalFlowLine,
+        HistoryMarketTemperatureResponse, MarketTemperature, MarketTradingDays, OptionQuote,
+        ParticipantInfo, Period, SecurityBrokers, SecurityDepth, SecurityQuote, SecurityStaticInfo,
+        StrikePriceInfo, Trade, TradeSessions,
+    },
     trade::{
-        GetHistoryOrdersOptions, OrderSide, OrderType, OutsideRTH, SubmitOrderOptions,
-        TimeInForceType,
+        AccountBalance, FundPositionChannel, GetHistoryOrdersOptions, MarginRatio, Order,
+        OrderDetail, OrderSide, OrderType, OutsideRTH, StockPositionChannel, SubmitOrderOptions,
+        SubmitOrderResponse, TimeInForceType,
     },
 };
 use poem_mcpserver::{
     Tools,
-    content::{IntoContent, IntoContents, Json, Text},
+    content::{Json, Text},
 };
 use time::{
     Date, OffsetDateTime, format_description::BorrowedFormatItem, macros::format_description,
@@ -35,7 +41,7 @@ impl Longport {
 #[Tools]
 impl Longport {
     /// Get current time.
-    async fn now(&self) -> impl IntoContent {
+    async fn now(&self) -> Text<String> {
         Text(
             OffsetDateTime::now_utc()
                 .format(&time::format_description::well_known::Rfc3339)
@@ -49,7 +55,7 @@ impl Longport {
         /// A list of security symbols. (e.g. ["700.HK", "AAPL.US", "000001.SH",
         /// "D05.SG"])
         symbols: Vec<String>,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Vec<Json<SecurityStaticInfo>>, Error> {
         Ok(self
             .quote_context
             .static_info(symbols)
@@ -60,7 +66,7 @@ impl Longport {
     }
 
     /// Get the latest price of the securities.
-    async fn quote(&self, symbols: Vec<String>) -> Result<impl IntoContents, Error> {
+    async fn quote(&self, symbols: Vec<String>) -> Result<Vec<Json<SecurityQuote>>, Error> {
         Ok(self
             .quote_context
             .quote(symbols)
@@ -76,7 +82,7 @@ impl Longport {
         /// A list of option symbols. (e.g. ["AAPL230317P160000.US",
         /// "AAPL230317C160000.US"]) Maximum 500 symbols per request.
         symbols: Vec<String>,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Vec<Json<OptionQuote>>, Error> {
         Ok(self
             .quote_context
             .option_quote(symbols)
@@ -87,7 +93,7 @@ impl Longport {
     }
 
     /// Get the latest depth of the securities.
-    async fn depth(&self, symbol: String) -> Result<impl IntoContents, Error> {
+    async fn depth(&self, symbol: String) -> Result<Json<SecurityDepth>, Error> {
         Ok(Json(self.quote_context.depth(symbol).await?))
     }
 
@@ -97,8 +103,14 @@ impl Longport {
         symbol: String,
         /// max 1000
         count: usize,
-    ) -> Result<impl IntoContents, Error> {
-        Ok(Json(self.quote_context.trades(symbol, count).await?))
+    ) -> Result<Vec<Json<Trade>>, Error> {
+        Ok(self
+            .quote_context
+            .trades(symbol, count)
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect::<Vec<_>>())
     }
 
     /// Get the latest n candlesticks of the security.
@@ -117,7 +129,7 @@ impl Longport {
         /// - intraday: regular trading hours
         /// - all: all trading hours (intraday, pre, post, overnight)
         trade_sessions: String,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Vec<Json<Candlestick>>, Error> {
         let period = match period.as_str() {
             "1m" => Period::OneMinute,
             "2m" => Period::TwoMinute,
@@ -155,21 +167,23 @@ impl Longport {
             }
         };
 
-        Ok(Json(
-            self.quote_context
-                .candlesticks(
-                    symbol,
-                    period,
-                    count,
-                    if forward_adjust {
-                        AdjustType::ForwardAdjust
-                    } else {
-                        AdjustType::NoAdjust
-                    },
-                    trade_sessions,
-                )
-                .await?,
-        ))
+        Ok(self
+            .quote_context
+            .candlesticks(
+                symbol,
+                period,
+                count,
+                if forward_adjust {
+                    AdjustType::ForwardAdjust
+                } else {
+                    AdjustType::NoAdjust
+                },
+                trade_sessions,
+            )
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect::<Vec<_>>())
     }
 
     /// Get the trading days between the specified dates.
@@ -183,7 +197,7 @@ impl Longport {
         start_date: String,
         /// End date of the trading days. (Format: "yyyy-mm-dd")
         end_date: String,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Json<MarketTradingDays>, Error> {
         let market = market.parse::<Market>().map_err(|err| Error::ParseField {
             name: "market",
             error: err.to_string(),
@@ -206,17 +220,23 @@ impl Longport {
     }
 
     /// Returns the real-time broker queue data of security.
-    async fn broker_queue(&self, symbol: String) -> Result<impl IntoContents, Error> {
+    async fn broker_queue(&self, symbol: String) -> Result<Json<SecurityBrokers>, Error> {
         Ok(Json(self.quote_context.brokers(symbol).await?))
     }
 
     /// Returns the participants information.
-    async fn broker_info(&self) -> Result<impl IntoContents, Error> {
-        Ok(Json(self.quote_context.participants().await?))
+    async fn broker_info(&self) -> Result<Vec<Json<ParticipantInfo>>, Error> {
+        Ok(self
+            .quote_context
+            .participants()
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect::<Vec<_>>())
     }
 
     /// Returns the option chain list of the security.
-    async fn option_chain_list(&self, symbol: String) -> Result<impl IntoContents, Error> {
+    async fn option_chain_list(&self, symbol: String) -> Result<Vec<Text<String>>, Error> {
         Ok(self
             .quote_context
             .option_chain_expiry_date_list(symbol)
@@ -237,26 +257,37 @@ impl Longport {
         symbol: String,
         /// format: "yyyy-mm-dd"
         expiry_date: String,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Vec<Json<StrikePriceInfo>>, Error> {
         let expiry_date = Date::parse(&expiry_date, format_description!("[year]-[month]-[day]"))
             .map_err(|err| Error::ParseField {
                 name: "expiry_date",
                 error: err.to_string(),
             })?;
-        Ok(Json(
-            self.quote_context
-                .option_chain_info_by_date(symbol, expiry_date)
-                .await?,
-        ))
+        Ok(self
+            .quote_context
+            .option_chain_info_by_date(symbol, expiry_date)
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect::<Vec<_>>())
     }
 
     // Returns the capital flow of the security.
-    async fn capital_flow(&self, symbol: String) -> Result<impl IntoContents, Error> {
-        Ok(Json(self.quote_context.capital_flow(symbol).await?))
+    async fn capital_flow(&self, symbol: String) -> Result<Vec<Json<CapitalFlowLine>>, Error> {
+        Ok(self
+            .quote_context
+            .capital_flow(symbol)
+            .await?
+            .into_iter()
+            .map(Json)
+            .collect::<Vec<_>>())
     }
 
     /// Returns the capital distribution of the security.
-    async fn capital_distribution(&self, symbol: String) -> Result<impl IntoContents, Error> {
+    async fn capital_distribution(
+        &self,
+        symbol: String,
+    ) -> Result<Json<CapitalDistributionResponse>, Error> {
         Ok(Json(self.quote_context.capital_distribution(symbol).await?))
     }
 
@@ -265,7 +296,7 @@ impl Longport {
         &self,
         /// Market code. (e.g. "HK", "US", "CN", "SG")
         market: String,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Json<MarketTemperature>, Error> {
         let market = market.parse::<Market>().map_err(|err| Error::ParseField {
             name: "market",
             error: err.to_string(),
@@ -284,7 +315,7 @@ impl Longport {
         start: String,
         /// format: "yyyy-mm-dd"
         end: String,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Json<HistoryMarketTemperatureResponse>, Error> {
         let market = market.parse::<Market>().map_err(|err| Error::ParseField {
             name: "market",
             error: err.to_string(),
@@ -305,7 +336,7 @@ impl Longport {
     }
 
     /// Get the account balance.
-    async fn account_balance(&self) -> Result<impl IntoContents, Error> {
+    async fn account_balance(&self) -> Result<Vec<Json<AccountBalance>>, Error> {
         Ok(self
             .trade_context
             .account_balance(None)
@@ -316,7 +347,7 @@ impl Longport {
     }
 
     /// Returns the stock positions.
-    async fn stock_positions(&self) -> Result<impl IntoContents, Error> {
+    async fn stock_positions(&self) -> Result<Vec<Json<StockPositionChannel>>, Error> {
         Ok(self
             .trade_context
             .stock_positions(None)
@@ -328,7 +359,7 @@ impl Longport {
     }
 
     /// Returns the fund positions.
-    async fn fund_positions(&self) -> Result<impl IntoContents, Error> {
+    async fn fund_positions(&self) -> Result<Vec<Json<FundPositionChannel>>, Error> {
         Ok(self
             .trade_context
             .fund_positions(None)
@@ -341,7 +372,7 @@ impl Longport {
 
     /// Returns the initial margin ratio, maintain the margin ratio and
     /// strengthen the margin ratio of stocks.
-    async fn magin_ratio(&self, symbol: String) -> Result<impl IntoContents, Error> {
+    async fn magin_ratio(&self, symbol: String) -> Result<Json<MarginRatio>, Error> {
         Ok(Json(self.trade_context.margin_ratio(symbol).await?))
     }
 
@@ -386,7 +417,7 @@ impl Longport {
         /// - GTC: Good Till Cancel
         /// - GTD: Good Till Date
         time_in_force: String,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Json<SubmitOrderResponse>, Error> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
             order_type
@@ -447,17 +478,17 @@ impl Longport {
         self.trade_context.submit_order(opts).await.map(Json)
     }
 
-    async fn cancel_order(&self, order_id: String) -> Result<impl IntoContents, Error> {
-        Ok(Json(self.trade_context.cancel_order(order_id).await?))
+    async fn cancel_order(&self, order_id: String) -> Result<(), Error> {
+        self.trade_context.cancel_order(order_id).await
     }
 
     /// Get the order detail.
-    async fn order_detail(&self, order_id: String) -> Result<impl IntoContents, Error> {
+    async fn order_detail(&self, order_id: String) -> Result<Json<OrderDetail>, Error> {
         Ok(Json(self.trade_context.order_detail(order_id).await?))
     }
 
     /// Get the current account's orders for the day.
-    async fn today_orders(&self) -> Result<impl IntoContents, Error> {
+    async fn today_orders(&self) -> Result<Vec<Json<Order>>, Error> {
         Ok(self
             .trade_context
             .today_orders(None)
@@ -478,7 +509,7 @@ impl Longport {
         start_at: String,
         /// format: RFC3339
         end_at: String,
-    ) -> Result<impl IntoContents, Error> {
+    ) -> Result<Vec<Json<Order>>, Error> {
         let mut opts = GetHistoryOrdersOptions::new()
             .start_at(
                 OffsetDateTime::parse(&start_at, &time::format_description::well_known::Rfc3339)
