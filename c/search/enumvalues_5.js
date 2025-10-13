@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['language_5fen_1443',['Language_EN',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1fae9c695c416f014fbd506e8bc75412f59',1,'longport.h']]],
-  ['language_5fzh_5fcn_1444',['Language_ZH_CN',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1faa474147a7830e4ac380329decce70e8a',1,'longport.h']]],
-  ['language_5fzh_5fhk_1445',['Language_ZH_HK',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1fa5d29f72c612e972f4575de179a4a6858',1,'longport.h']]]
+  ['granularitydaily_1450',['GranularityDaily',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120a586d968ee933d5af0e0999ebb6ff0231',1,'longport.h']]],
+  ['granularitymonthly_1451',['GranularityMonthly',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120ab4edd426d7039ff7e82151efd2e724f3',1,'longport.h']]],
+  ['granularityunknown_1452',['GranularityUnknown',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120ae3d262a0ce38dbaa81a452333122eca5',1,'longport.h']]],
+  ['granularityweekly_1453',['GranularityWeekly',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120a8d2c31d415722e66f25fbbd19803b520',1,'longport.h']]]
 ];

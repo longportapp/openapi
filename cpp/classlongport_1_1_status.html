@@ -95,12 +95,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9eaef25c83a92e021114eb4b4071e6da"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#a9eaef25c83a92e021114eb4b4071e6da">is_err</a> () const</td></tr>
 <tr class="memdesc:a9eaef25c83a92e021114eb4b4071e6da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns <code>true</code> if an errors occurs.  <a href="classlongport_1_1_status.html#a9eaef25c83a92e021114eb4b4071e6da">More...</a><br /></td></tr>
 <tr class="separator:a9eaef25c83a92e021114eb4b4071e6da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a646468db58731f79edb5f485d6f69dcd"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#a646468db58731f79edb5f485d6f69dcd">code</a> () const</td></tr>
-<tr class="memdesc:a646468db58731f79edb5f485d6f69dcd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error code.  <a href="classlongport_1_1_status.html#a646468db58731f79edb5f485d6f69dcd">More...</a><br /></td></tr>
-<tr class="separator:a646468db58731f79edb5f485d6f69dcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4287ee50080c74f0776b93352f0585a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#af4287ee50080c74f0776b93352f0585a">message</a> () const</td></tr>
-<tr class="memdesc:af4287ee50080c74f0776b93352f0585a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error message.  <a href="classlongport_1_1_status.html#af4287ee50080c74f0776b93352f0585a">More...</a><br /></td></tr>
-<tr class="separator:af4287ee50080c74f0776b93352f0585a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a0c4640563a1329104d1eeeb7c3863f"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="namespacelongport.html#af5bcd3a8c3c5f5e8487253e271398b48">ErrorKind</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#a0a0c4640563a1329104d1eeeb7c3863f">kind</a> () const</td></tr>
+<tr class="memdesc:a0a0c4640563a1329104d1eeeb7c3863f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error kind if an error occurs.  <a href="classlongport_1_1_status.html#a0a0c4640563a1329104d1eeeb7c3863f">More...</a><br /></td></tr>
+<tr class="separator:a0a0c4640563a1329104d1eeeb7c3863f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa70198a9d5243667cc16648616d34296"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#aa70198a9d5243667cc16648616d34296">code</a> () const</td></tr>
+<tr class="memdesc:aa70198a9d5243667cc16648616d34296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error code if an error occurs.  <a href="classlongport_1_1_status.html#aa70198a9d5243667cc16648616d34296">More...</a><br /></td></tr>
+<tr class="separator:aa70198a9d5243667cc16648616d34296"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a48cb80cf0de774caa8724c398a9271"><td class="memItemLeft" align="right" valign="top">std::optional&lt; const char * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#a0a48cb80cf0de774caa8724c398a9271">message</a> () const</td></tr>
+<tr class="memdesc:a0a48cb80cf0de774caa8724c398a9271"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error message if an error occurs.  <a href="classlongport_1_1_status.html#a0a48cb80cf0de774caa8724c398a9271">More...</a><br /></td></tr>
+<tr class="separator:a0a48cb80cf0de774caa8724c398a9271"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a414a79270c26eaff976b92f92653a817"></a>
@@ -200,14 +203,14 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a646468db58731f79edb5f485d6f69dcd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a646468db58731f79edb5f485d6f69dcd">&#9670;&nbsp;</a></span>code()</h2>
+<a id="aa70198a9d5243667cc16648616d34296"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa70198a9d5243667cc16648616d34296">&#9670;&nbsp;</a></span>code()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int64_t longport::Status::code </td>
+          <td class="memname">std::optional&lt;int64_t&gt; longport::Status::code </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -215,7 +218,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the error code. </p>
+<p>Returns the error code if an error occurs. </p>
 
 </div>
 </div>
@@ -257,14 +260,14 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="af4287ee50080c74f0776b93352f0585a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4287ee50080c74f0776b93352f0585a">&#9670;&nbsp;</a></span>message()</h2>
+<a id="a0a0c4640563a1329104d1eeeb7c3863f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a0c4640563a1329104d1eeeb7c3863f">&#9670;&nbsp;</a></span>kind()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char* longport::Status::message </td>
+          <td class="memname">std::optional&lt;<a class="el" href="namespacelongport.html#af5bcd3a8c3c5f5e8487253e271398b48">ErrorKind</a>&gt; longport::Status::kind </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -272,7 +275,26 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Returns the error message. </p>
+<p>Returns the error kind if an error occurs. </p>
+
+</div>
+</div>
+<a id="a0a48cb80cf0de774caa8724c398a9271"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a48cb80cf0de774caa8724c398a9271">&#9670;&nbsp;</a></span>message()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;const char*&gt; longport::Status::message </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the error message if an error occurs. </p>
 
 </div>
 </div>

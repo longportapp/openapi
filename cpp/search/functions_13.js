@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['warrant_5fissuers_932',['warrant_issuers',['../classlongport_1_1quote_1_1_quote_context.html#afbe16589f9ec238e971b28accbcbb880',1,'longport::quote::QuoteContext']]],
-  ['warrant_5flist_933',['warrant_list',['../classlongport_1_1quote_1_1_quote_context.html#a19c149e3497bfea11baf5a9eaf7a4ff4',1,'longport::quote::QuoteContext']]],
-  ['warrant_5fquote_934',['warrant_quote',['../classlongport_1_1quote_1_1_quote_context.html#ae92955368d26a4ea18bae23e35604039',1,'longport::quote::QuoteContext']]],
-  ['watchlist_935',['watchlist',['../classlongport_1_1quote_1_1_quote_context.html#a3b01947ccd7ed19cadf09ea1f9689bb5',1,'longport::quote::QuoteContext']]]
+  ['unsubscribe_935',['unsubscribe',['../classlongport_1_1quote_1_1_quote_context.html#ab52a7ca741595003213ed7a2f1f88491',1,'longport::quote::QuoteContext::unsubscribe()'],['../classlongport_1_1trade_1_1_trade_context.html#a2abb31b9da78bff20be2c4711ea14611',1,'longport::trade::TradeContext::unsubscribe()']]],
+  ['unsubscribe_5fcandlesticks_936',['unsubscribe_candlesticks',['../classlongport_1_1quote_1_1_quote_context.html#a1959b01fab55b0ed5efd59240a23678b',1,'longport::quote::QuoteContext']]],
+  ['update_5fwatchlist_5fgroup_937',['update_watchlist_group',['../classlongport_1_1quote_1_1_quote_context.html#aa32421ee6a372a48b94f79e87ee57fb1',1,'longport::quote::QuoteContext']]]
 ];

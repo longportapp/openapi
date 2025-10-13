@@ -268,6 +268,8 @@ Typedefs</h2></td></tr>
 <tr class="separator:a9163515c513d33a606638faaeb5030a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6765e79ac3d277e54c7dbaa137db8e4"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longport_8h.html#a20d1ba69477473c4756e801c567ee32d">lb_deduction_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#ab6765e79ac3d277e54c7dbaa137db8e4">lb_deduction_status_t</a></td></tr>
 <tr class="separator:ab6765e79ac3d277e54c7dbaa137db8e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1dbdedca79d9b8c7b658105488706980"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a1dbdedca79d9b8c7b658105488706980">lb_error_kind_t</a></td></tr>
+<tr class="separator:a1dbdedca79d9b8c7b658105488706980"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc0893c9bc35078728fd9b8b59a1b551"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longport_8h.html#a66787add9adafdc6617a25a098ad34bc">lb_filter_warrant_expiry_date_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#acc0893c9bc35078728fd9b8b59a1b551">lb_filter_warrant_expiry_date_t</a></td></tr>
 <tr class="separator:acc0893c9bc35078728fd9b8b59a1b551"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d83381f6e50268a012c568c1a3d02a2"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="longport_8h.html#a341e98a2910f9a3a6623a12bceab96ed">lb_filter_warrant_in_out_bounds_type_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a7d83381f6e50268a012c568c1a3d02a2">lb_filter_warrant_in_out_bounds_type_t</a></td></tr>
@@ -598,6 +600,11 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:a20d1ba69477473c4756e801c567ee32d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa611530095db2da2ce0aad3f458dfd54"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a> { <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54a0d26618a9eadd9019f9b114916f6c816">ErrorKindHttp</a>
+, <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54aa4437b631873d2c02d9d377bb127fb66">ErrorKindOpenApi</a>
+, <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54ad3aa7139a00e8497eee7acf2eb185c60">ErrorKindOther</a>
+ }</td></tr>
+<tr class="separator:aa611530095db2da2ce0aad3f458dfd54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66787add9adafdc6617a25a098ad34bc"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a66787add9adafdc6617a25a098ad34bc">lb_filter_warrant_expiry_date_t</a> { <a class="el" href="longport_8h.html#a66787add9adafdc6617a25a098ad34bca32f16c1dd0498d053c41f7115b99b7c8">WarrantExpiryDate_LT_3</a>
 , <a class="el" href="longport_8h.html#a66787add9adafdc6617a25a098ad34bcac8548a7397ff7b72e5ba66942cfca8d0">WarrantExpiryDate_Between_3_6</a>
 , <a class="el" href="longport_8h.html#a66787add9adafdc6617a25a098ad34bca2d9776b7a523fdd65bf5d6bf73286025">WarrantExpiryDate_Between_6_12</a>
@@ -903,6 +910,8 @@ Functions</h2></td></tr>
 <tr class="separator:adb7a20a00c4213eb95c4bb62e2aa401e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77614c86f046365f4f5376ee3f77b74a"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a77614c86f046365f4f5376ee3f77b74a">lb_error_code</a> (const struct <a class="el" href="longport_8h.html#a74753f2e9628eafaece25e4f8e6ea2cc">lb_error_t</a> *error)</td></tr>
 <tr class="separator:a77614c86f046365f4f5376ee3f77b74a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af71cc9a80a83a021d646e3c889e7f488"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#af71cc9a80a83a021d646e3c889e7f488">lb_error_kind</a> (const struct <a class="el" href="longport_8h.html#a74753f2e9628eafaece25e4f8e6ea2cc">lb_error_t</a> *error)</td></tr>
+<tr class="separator:af71cc9a80a83a021d646e3c889e7f488"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71940b8330005924860a54eceae07645"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="longport_8h.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#a71940b8330005924860a54eceae07645">lb_http_client_new</a> (const char *http_url, const char *app_key, const char *app_secret, const char *access_token)</td></tr>
 <tr class="separator:a71940b8330005924860a54eceae07645"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4a06245a9a102610bbcf6b19adc6fb9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="longport_8h.html#ac4a06245a9a102610bbcf6b19adc6fb9">lb_http_client_free</a> (struct <a class="el" href="longport_8h.html#a59a1c6059784e3e3a881c4322045b9b1">lb_http_client_t</a> *http_client)</td></tr>
@@ -1659,6 +1668,21 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Depth </p>
+
+</div>
+</div>
+<a id="a1dbdedca79d9b8c7b658105488706980"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1dbdedca79d9b8c7b658105488706980">&#9670;&nbsp;</a></span>lb_error_kind_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef enum <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a> <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Error kind </p>
 
 </div>
 </div>
@@ -3362,6 +3386,29 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a20d1ba69477473c4756e801c567ee32daa449fc6ac9e0568a0ac40e9089629aae"></a>DeductionStatusPending&#160;</td><td class="fielddoc"><p>Pending commission-free </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a20d1ba69477473c4756e801c567ee32da6dd36da579baa3498f51ee460bc3b2f4"></a>DeductionStatusDone&#160;</td><td class="fielddoc"><p>Commission-free applied </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aa611530095db2da2ce0aad3f458dfd54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa611530095db2da2ce0aad3f458dfd54">&#9670;&nbsp;</a></span>lb_error_kind_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Error kind </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa611530095db2da2ce0aad3f458dfd54a0d26618a9eadd9019f9b114916f6c816"></a>ErrorKindHttp&#160;</td><td class="fielddoc"><p>HTTP error </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa611530095db2da2ce0aad3f458dfd54aa4437b631873d2c02d9d377bb127fb66"></a>ErrorKindOpenApi&#160;</td><td class="fielddoc"><p>OpenAPI error </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa611530095db2da2ce0aad3f458dfd54ad3aa7139a00e8497eee7acf2eb185c60"></a>ErrorKindOther&#160;</td><td class="fielddoc"><p>Other error </p>
 </td></tr>
 </table>
 
@@ -5435,6 +5482,24 @@ Variables</h1>
       </table>
 </div><div class="memdoc">
 <p>Free the error object </p>
+
+</div>
+</div>
+<a id="af71cc9a80a83a021d646e3c889e7f488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af71cc9a80a83a021d646e3c889e7f488">&#9670;&nbsp;</a></span>lb_error_kind()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="longport_8h.html#aa611530095db2da2ce0aad3f458dfd54">lb_error_kind_t</a> lb_error_kind </td>
+          <td>(</td>
+          <td class="paramtype">const struct <a class="el" href="longport_8h.html#a74753f2e9628eafaece25e4f8e6ea2cc">lb_error_t</a> *&#160;</td>
+          <td class="paramname"><em>error</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

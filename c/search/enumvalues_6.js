@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['marketcn_1446',['MarketCN',['../longport_8h.html#a314b7af320779ef1151f6cceba24aad3a271c68892160ae3e035d88ab15c5149a',1,'longport.h']]],
-  ['marketcrypto_1447',['MarketCrypto',['../longport_8h.html#a314b7af320779ef1151f6cceba24aad3af2541828ffcf1c8b32dd42255daed547',1,'longport.h']]],
-  ['markethk_1448',['MarketHK',['../longport_8h.html#a314b7af320779ef1151f6cceba24aad3a2eee2d56f04d14beed0a81d42edf701f',1,'longport.h']]],
-  ['marketsg_1449',['MarketSG',['../longport_8h.html#a314b7af320779ef1151f6cceba24aad3a51550bc2fc27282a9947526ae60432f6',1,'longport.h']]],
-  ['marketunknown_1450',['MarketUnknown',['../longport_8h.html#a314b7af320779ef1151f6cceba24aad3a3b82ceb85730bbc01f13f536a5f611c6',1,'longport.h']]],
-  ['marketus_1451',['MarketUS',['../longport_8h.html#a314b7af320779ef1151f6cceba24aad3a521c2056e7a70d71b67d33adefce7399',1,'longport.h']]]
+  ['language_5fen_1454',['Language_EN',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1fae9c695c416f014fbd506e8bc75412f59',1,'longport.h']]],
+  ['language_5fzh_5fcn_1455',['Language_ZH_CN',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1faa474147a7830e4ac380329decce70e8a',1,'longport.h']]],
+  ['language_5fzh_5fhk_1456',['Language_ZH_HK',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1fa5d29f72c612e972f4575de179a4a6858',1,'longport.h']]]
 ];

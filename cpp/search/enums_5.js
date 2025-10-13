@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['granularity_1179',['Granularity',['../namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5c',1,'longport::quote']]]
+  ['filterwarrantexpirydate_1184',['FilterWarrantExpiryDate',['../namespacelongport_1_1quote.html#a581b39d5633ca7263f622748ee35d282',1,'longport::quote']]],
+  ['filterwarrantinoutboundstype_1185',['FilterWarrantInOutBoundsType',['../namespacelongport_1_1quote.html#ab0e799c3426ada8aa54e14ffd84714c4',1,'longport::quote']]]
 ];

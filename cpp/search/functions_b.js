@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['norm_5fpdf_847',['norm_pdf',['../classlongport_1_1_decimal.html#a615361713c4c0dace7646b5a857966b6',1,'longport::Decimal']]],
-  ['normalize_848',['normalize',['../classlongport_1_1_decimal.html#acacc87e656f1f30803753113c92a9d1f',1,'longport::Decimal']]]
+  ['margin_5fratio_847',['margin_ratio',['../classlongport_1_1trade_1_1_trade_context.html#a1a4e37575828400b4cfdc782d237775f',1,'longport::trade::TradeContext']]],
+  ['market_5ftemperature_848',['market_temperature',['../classlongport_1_1quote_1_1_quote_context.html#a88b2b36f023a326db724612c0074c5e6',1,'longport::quote::QuoteContext']]],
+  ['max_849',['max',['../classlongport_1_1_decimal.html#ab5cc7c0cab58777e1e0c69e31574de4a',1,'longport::Decimal']]],
+  ['member_5fid_850',['member_id',['../classlongport_1_1quote_1_1_quote_context.html#a36f063c1d634e6701269caf3ad43169a',1,'longport::quote::QuoteContext']]],
+  ['message_851',['message',['../classlongport_1_1_status.html#a0a48cb80cf0de774caa8724c398a9271',1,'longport::Status']]],
+  ['min_852',['min',['../classlongport_1_1_decimal.html#a528b12ea778e9acd96800310a570b3e7',1,'longport::Decimal']]]
 ];

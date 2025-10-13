@@ -50,8 +50,20 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#longport.openapi">openapi</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.ErrorKind">ErrorKind</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.ErrorKind.Http">Http</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.ErrorKind.OpenApi">OpenApi</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.ErrorKind.Other">Other</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.OpenApiException">OpenApiException</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OpenApiException.kind">kind</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OpenApiException.code">code</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OpenApiException.message">message</a>
@@ -2006,6 +2018,192 @@
 
 
 
+<h2 id="longport.openapi.ErrorKind" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ErrorKind</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+
+        <p>Error kind</p>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longport.openapi.ErrorKind.Http" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Http</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ErrorKind (longport.openapi.ErrorKind)" href="#longport.openapi.ErrorKind">ErrorKind</a></code></p>
+
+
+        <p>HTTP error</p>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longport.openapi.ErrorKind.OpenApi" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OpenApi</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ErrorKind (longport.openapi.ErrorKind)" href="#longport.openapi.ErrorKind">ErrorKind</a></code></p>
+
+
+        <p>OpenApi error</p>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="longport.openapi.ErrorKind.Other" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Other</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ErrorKind (longport.openapi.ErrorKind)" href="#longport.openapi.ErrorKind">ErrorKind</a></code></p>
+
+
+        <p>Other error</p>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="longport.openapi.OpenApiException" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">OpenApiException</span>
 
@@ -2042,6 +2240,29 @@
 
 
 
+<h3 id="longport.openapi.OpenApiException.kind" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">kind</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">kind: ErrorKind</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Error kind</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="longport.openapi.OpenApiException.code" class="doc doc-heading">
             <span class="doc doc-object-name doc-attribute-name">code</span>
 
@@ -2051,7 +2272,7 @@
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">code: Optional[int]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">code: int</code></pre>
 
     <div class="doc doc-contents ">
 

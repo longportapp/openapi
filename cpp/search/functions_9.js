@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['ln_839',['ln',['../classlongport_1_1_decimal.html#a59e7469f7dfe70af973ebe9f95bfa95d',1,'longport::Decimal']]],
-  ['log10_840',['log10',['../classlongport_1_1_decimal.html#a76c14efd34e5a2ae85a92e6a277b7bc1',1,'longport::Decimal']]]
+  ['kind_844',['kind',['../classlongport_1_1_status.html#a0a0c4640563a1329104d1eeeb7c3863f',1,'longport::Status']]]
 ];

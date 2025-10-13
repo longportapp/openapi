@@ -1,10 +1,7 @@
 var searchData=
 [
-  ['timeinforcetype_1195',['TimeInForceType',['../namespacelongport_1_1trade.html#aa049d7933fd4e0c5feb2c1b55b416c43',1,'longport::trade']]],
-  ['topictype_1196',['TopicType',['../namespacelongport_1_1trade.html#accefd393398a0c5823816256fc3c50ad',1,'longport::trade']]],
-  ['tradedirection_1197',['TradeDirection',['../namespacelongport_1_1quote.html#a04fcc5a9def5bd8192509610dd79a1f0',1,'longport::quote']]],
-  ['tradesession_1198',['TradeSession',['../namespacelongport_1_1quote.html#a62da9df44e4a5b18f738f9a29079d4a0',1,'longport::quote']]],
-  ['tradesessions_1199',['TradeSessions',['../namespacelongport_1_1quote.html#afa089b5c43711da2e1982c6cae06bd6f',1,'longport::quote']]],
-  ['tradestatus_1200',['TradeStatus',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949',1,'longport::quote']]],
-  ['triggerstatus_1201',['TriggerStatus',['../namespacelongport_1_1trade.html#a248fd8fad7309e7db52963bc06469022',1,'longport::trade']]]
+  ['securitiesupdatemode_1198',['SecuritiesUpdateMode',['../namespacelongport_1_1quote.html#a50a6cc3db5fdf7bc0fb5dcf07d3b1a1a',1,'longport::quote']]],
+  ['securityboard_1199',['SecurityBoard',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073a',1,'longport::quote']]],
+  ['securitylistcategory_1200',['SecurityListCategory',['../namespacelongport_1_1quote.html#aa93af3fc6c64ad59a3314237846cdca6',1,'longport::quote']]],
+  ['sortordertype_1201',['SortOrderType',['../namespacelongport_1_1quote.html#ae5b0516484ac8b93bb8d3c3c26ee746b',1,'longport::quote']]]
 ];

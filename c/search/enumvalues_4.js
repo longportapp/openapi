@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['granularitydaily_1439',['GranularityDaily',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120a586d968ee933d5af0e0999ebb6ff0231',1,'longport.h']]],
-  ['granularitymonthly_1440',['GranularityMonthly',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120ab4edd426d7039ff7e82151efd2e724f3',1,'longport.h']]],
-  ['granularityunknown_1441',['GranularityUnknown',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120ae3d262a0ce38dbaa81a452333122eca5',1,'longport.h']]],
-  ['granularityweekly_1442',['GranularityWeekly',['../longport_8h.html#ac642c0c57b044e0b95b30cc4dc909120a8d2c31d415722e66f25fbbd19803b520',1,'longport.h']]]
+  ['errorkindhttp_1447',['ErrorKindHttp',['../longport_8h.html#aa611530095db2da2ce0aad3f458dfd54a0d26618a9eadd9019f9b114916f6c816',1,'longport.h']]],
+  ['errorkindopenapi_1448',['ErrorKindOpenApi',['../longport_8h.html#aa611530095db2da2ce0aad3f458dfd54aa4437b631873d2c02d9d377bb127fb66',1,'longport.h']]],
+  ['errorkindother_1449',['ErrorKindOther',['../longport_8h.html#aa611530095db2da2ce0aad3f458dfd54ad3aa7139a00e8497eee7acf2eb185c60',1,'longport.h']]]
 ];

@@ -1,14 +1,22 @@
 var searchData=
 [
-  ['tan_918',['tan',['../classlongport_1_1_decimal.html#a9291976a6435cd14a910079f3601e0e2',1,'longport::Decimal']]],
-  ['to_5fdouble_919',['to_double',['../classlongport_1_1_decimal.html#a4192518f18f51b3c5a8e8e0260faf04f',1,'longport::Decimal']]],
-  ['to_5fstring_920',['to_string',['../classlongport_1_1_decimal.html#aeb968996c3ee6f3c1a973f172d276abf',1,'longport::Decimal']]],
-  ['today_5fexecutions_921',['today_executions',['../classlongport_1_1trade_1_1_trade_context.html#ae1ea46077a6372e69b221370260b672b',1,'longport::trade::TradeContext']]],
-  ['today_5forders_922',['today_orders',['../classlongport_1_1trade_1_1_trade_context.html#a4ee406fa9e447375ee073298cb468684',1,'longport::trade::TradeContext']]],
-  ['trade_923',['TRADE',['../classlongport_1_1quote_1_1_sub_flags.html#a6597469c20a397ca2bd0f2c877079992',1,'longport::quote::SubFlags']]],
-  ['tradecontext_924',['TradeContext',['../classlongport_1_1trade_1_1_trade_context.html#a857d9e75d65ea4d7a5c8cf577bc84bb7',1,'longport::trade::TradeContext::TradeContext()'],['../classlongport_1_1trade_1_1_trade_context.html#ae3bdf9ae523eeee1fe12154def6bf8ad',1,'longport::trade::TradeContext::TradeContext(const lb_trade_context_t *ctx)'],['../classlongport_1_1trade_1_1_trade_context.html#af62a367230b7479a07221a747c09056f',1,'longport::trade::TradeContext::TradeContext(const TradeContext &amp;ctx)'],['../classlongport_1_1trade_1_1_trade_context.html#a9d4ba7bcd1375b27323b19b0a4496040',1,'longport::trade::TradeContext::TradeContext(TradeContext &amp;&amp;ctx)']]],
-  ['trades_925',['trades',['../classlongport_1_1quote_1_1_quote_context.html#a9ea898a1e1cf626b4797169fad0f8429',1,'longport::quote::QuoteContext']]],
-  ['trading_5fdays_926',['trading_days',['../classlongport_1_1quote_1_1_quote_context.html#a3b065965da18cc0a143009ded24f1b12',1,'longport::quote::QuoteContext']]],
-  ['trading_5fsession_927',['trading_session',['../classlongport_1_1quote_1_1_quote_context.html#a7bfc910ef7b64f60ad130610073aa7cd',1,'longport::quote::QuoteContext']]],
-  ['trunc_928',['trunc',['../classlongport_1_1_decimal.html#ab7711faa98a04c243b154441a4794236',1,'longport::Decimal']]]
+  ['security_5flist_905',['security_list',['../classlongport_1_1quote_1_1_quote_context.html#a4d15ebbdc3664649e9ad98447a28675d',1,'longport::quote::QuoteContext::security_list(Market market, AsyncCallback&lt; QuoteContext, std::vector&lt; Security &gt;&gt; callback) const'],['../classlongport_1_1quote_1_1_quote_context.html#a32237f629171dd19621d91bf430c3065',1,'longport::quote::QuoteContext::security_list(Market market, SecurityListCategory category, AsyncCallback&lt; QuoteContext, std::vector&lt; Security &gt;&gt; callback) const']]],
+  ['set_5fon_5fbrokers_906',['set_on_brokers',['../classlongport_1_1quote_1_1_quote_context.html#a05d251144d37c24fad1c900642d6c13f',1,'longport::quote::QuoteContext']]],
+  ['set_5fon_5fcandlestick_907',['set_on_candlestick',['../classlongport_1_1quote_1_1_quote_context.html#a69363b1b4eb9e464b89ad24e9800552e',1,'longport::quote::QuoteContext']]],
+  ['set_5fon_5fdepth_908',['set_on_depth',['../classlongport_1_1quote_1_1_quote_context.html#a7a865fec83d66b1e79fb3578ebcbc6c9',1,'longport::quote::QuoteContext']]],
+  ['set_5fon_5forder_5fchanged_909',['set_on_order_changed',['../classlongport_1_1trade_1_1_trade_context.html#a5c990a4bc44c23877406fec69c843fd8',1,'longport::trade::TradeContext']]],
+  ['set_5fon_5fquote_910',['set_on_quote',['../classlongport_1_1quote_1_1_quote_context.html#a78542157427855c1164a8fe8be3a2ab6',1,'longport::quote::QuoteContext']]],
+  ['set_5fon_5ftrades_911',['set_on_trades',['../classlongport_1_1quote_1_1_quote_context.html#a7ab32a8abe9aa184f3e3fee54a05726a',1,'longport::quote::QuoteContext']]],
+  ['sin_912',['sin',['../classlongport_1_1_decimal.html#a02d3c73fea7fe677ab609d2019dd211a',1,'longport::Decimal']]],
+  ['sqrt_913',['sqrt',['../classlongport_1_1_decimal.html#a6ce5eac577fac77750db570f761f5418',1,'longport::Decimal']]],
+  ['static_5finfo_914',['static_info',['../classlongport_1_1quote_1_1_quote_context.html#a8bf81a048ccf53ec1e76a979220c1339',1,'longport::quote::QuoteContext']]],
+  ['status_915',['Status',['../classlongport_1_1_status.html#a414a79270c26eaff976b92f92653a817',1,'longport::Status']]],
+  ['status_916',['status',['../structlongport_1_1_async_result.html#ae30bb6be1fe7369b9f292b16a83c9531',1,'longport::AsyncResult']]],
+  ['status_917',['Status',['../classlongport_1_1_status.html#aba3d6250a71bad7ae0a8009b893a23db',1,'longport::Status::Status(Status &amp;&amp;status) noexcept'],['../classlongport_1_1_status.html#adfb98b7d046ed4c0e4bc7c6d0e7180f6',1,'longport::Status::Status(lb_error_t *err)'],['../classlongport_1_1_status.html#a511250cee4b5332c57e35e5771cad34e',1,'longport::Status::Status(const lb_error_t *err)']]],
+  ['stock_5fpositions_918',['stock_positions',['../classlongport_1_1trade_1_1_trade_context.html#aa432f4ce99c8b2076f13b5747c5727db',1,'longport::trade::TradeContext']]],
+  ['subflags_919',['SubFlags',['../classlongport_1_1quote_1_1_sub_flags.html#ad5bde5d7bd684964e93e26ffda8886fa',1,'longport::quote::SubFlags']]],
+  ['submit_5forder_920',['submit_order',['../classlongport_1_1trade_1_1_trade_context.html#a95b5dee8fc6291636ced41389777a147',1,'longport::trade::TradeContext']]],
+  ['subscribe_921',['subscribe',['../classlongport_1_1quote_1_1_quote_context.html#a997d9b8dcdb2065e98fb9671e78ff945',1,'longport::quote::QuoteContext::subscribe()'],['../classlongport_1_1trade_1_1_trade_context.html#a5eeabdc5ee9de243d89a995e961553f8',1,'longport::trade::TradeContext::subscribe()']]],
+  ['subscribe_5fcandlesticks_922',['subscribe_candlesticks',['../classlongport_1_1quote_1_1_quote_context.html#a432a4d0cdb869ca34a383fff0de0671a',1,'longport::quote::QuoteContext']]],
+  ['subscriptions_923',['subscriptions',['../classlongport_1_1quote_1_1_quote_context.html#a8eee0db8c56c8d4bd0437df01cd2e6a4',1,'longport::quote::QuoteContext']]]
 ];
