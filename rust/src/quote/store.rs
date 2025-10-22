@@ -7,7 +7,7 @@ use crate::{
     Market,
     quote::{
         Brokers, Candlestick, Depth, PushBrokers, PushDepth, PushEvent, PushTrades, SecurityBoard,
-        Trade, TradeDirection, TradeSession, TradeSessions,
+        Trade, TradeSession, TradeSessions,
         push_types::{PushEventDetail, PushQuote},
     },
 };
@@ -171,14 +171,7 @@ impl Candlesticks {
             half_days,
             period,
             self.merge_input(ts),
-            &Trade {
-                price: push_quote.last_done,
-                volume: push_quote.current_volume,
-                timestamp: push_quote.timestamp,
-                trade_type: String::new(),
-                direction: TradeDirection::Neutral,
-                trade_session: push_quote.trade_session,
-            },
+            push_quote,
             UpdateFields::all(),
         )
     }

@@ -100,6 +100,40 @@ impl longport_candlesticks::QuoteType for PushQuote {
     }
 }
 
+impl longport_candlesticks::TradeType for PushQuote {
+    type PriceType = Decimal;
+    type VolumeType = i64;
+    type TurnoverType = Decimal;
+    type TradeSessionType = TradeSession;
+
+    #[inline]
+    fn time(&self) -> OffsetDateTime {
+        self.timestamp
+    }
+
+    #[inline]
+    fn price(&self) -> Self::PriceType {
+        self.last_done
+    }
+
+    #[inline]
+    #[allow(clippy::misnamed_getters)]
+    fn volume(&self) -> Self::VolumeType {
+        self.current_volume
+    }
+
+    #[inline]
+    #[allow(clippy::misnamed_getters)]
+    fn turnover(&self, _lot_size: i32) -> Self::TurnoverType {
+        self.current_turnover
+    }
+
+    #[inline]
+    fn trade_session(&self) -> Self::TradeSessionType {
+        self.trade_session
+    }
+}
+
 /// Depth message
 #[derive(Debug)]
 pub struct PushDepth {

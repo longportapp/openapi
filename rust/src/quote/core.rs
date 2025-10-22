@@ -700,7 +700,7 @@ impl Core {
         let req = SubscribeRequest {
             symbol: vec![symbol.clone()],
             sub_type: (SubFlags::QUOTE | SubFlags::TRADE).into(),
-            is_first_push: true,
+            is_first_push: false,
         };
         self.ws_cli
             .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
@@ -1253,5 +1253,8 @@ mod tests {
         );
         assert_eq!(merge_type(USMain, Intraday, Week), Some(MergeType::Trade));
         assert_eq!(merge_type(USMain, Overnight, Week), None);
+
+        assert_eq!(merge_type(SPXIndex, Intraday, Year), Some(MergeType::Quote));
+        assert_eq!(merge_type(VIXIndex, Intraday, Year), Some(MergeType::Quote));
     }
 }

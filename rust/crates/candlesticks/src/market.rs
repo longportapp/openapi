@@ -1,7 +1,7 @@
 use std::{collections::HashSet, ops::Add};
 
 use num_traits::Zero;
-use time::{Date, Duration, OffsetDateTime, Time, Weekday, macros::time};
+use time::{Date, Duration, OffsetDateTime, PrimitiveDateTime, Time, Weekday, macros::time};
 use time_tz::{OffsetDateTimeExt, PrimitiveDateTimeExt, Tz};
 
 use crate::{
@@ -180,18 +180,22 @@ impl Market {
             Quarter => {
                 let month = t.month();
                 let quarter = (month as u8 - 1) / 3;
-                t.replace_month(time::Month::try_from(quarter * 3 + 1).ok()?)
-                    .ok()?
-                    .replace_day(1)
-                    .ok()?
-                    .replace_time(time!(00:00:00))
+                let date = Date::from_calendar_date(
+                    t.year(),
+                    time::Month::try_from(quarter * 3 + 1).ok()?,
+                    1,
+                )
+                .ok()?;
+                PrimitiveDateTime::new(date, time!(00:00:00))
+                    .assume_timezone(self.timezone)
+                    .take_first()?
             }
-            Year => t
-                .replace_month(time::Month::January)
-                .ok()?
-                .replace_day(1)
-                .ok()?
-                .replace_time(time!(00:00:00)),
+            Year => PrimitiveDateTime::new(
+                Date::from_calendar_date(t.year(), time::Month::January, 1).ok()?,
+                time!(00:00:00),
+            )
+            .assume_timezone(self.timezone)
+            .take_first()?,
         })
     }
 
