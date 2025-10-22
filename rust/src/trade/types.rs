@@ -369,6 +369,7 @@ pub struct OrderHistoryDetail {
     pub price: Decimal,
     /// Executed quantity for executed orders, remaining quantity for expired,
     /// canceled, rejected orders, etc.
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub quantity: Decimal,
     /// Order status
     pub status: OrderStatus,

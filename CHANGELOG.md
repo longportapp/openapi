@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 # [3.0.17] 2025-10-22
 
 - fix candlesticks (K-line) might be generated incorrectly in certain situations.
+- fix parsing `OrderDetail` may fail in certain situations.
 
 # [3.0.16] 2025-10-20
 
