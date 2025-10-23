@@ -700,7 +700,7 @@
 <a href=#700 id=700 data-nosnippet>700</a>        <span class="kw">let </span>req = SubscribeRequest {
 <a href=#701 id=701 data-nosnippet>701</a>            symbol: <span class="macro">vec!</span>[symbol.clone()],
 <a href=#702 id=702 data-nosnippet>702</a>            sub_type: (SubFlags::QUOTE | SubFlags::TRADE).into(),
-<a href=#703 id=703 data-nosnippet>703</a>            is_first_push: <span class="bool-val">true</span>,
+<a href=#703 id=703 data-nosnippet>703</a>            is_first_push: <span class="bool-val">false</span>,
 <a href=#704 id=704 data-nosnippet>704</a>        };
 <a href=#705 id=705 data-nosnippet>705</a>        <span class="self">self</span>.ws_cli
 <a href=#706 id=706 data-nosnippet>706</a>            .request::&lt;<span class="kw">_</span>, ()&gt;(cmd_code::SUBSCRIBE, <span class="prelude-val">None</span>, req)
@@ -1054,199 +1054,207 @@
 <a href=#1054 id=1054 data-nosnippet>1054</a>    }
 <a href=#1055 id=1055 data-nosnippet>1055</a>
 <a href=#1056 id=1056 data-nosnippet>1056</a>    <span class="prelude-val">Some</span>(<span class="kw">match </span>(board, trade_session, period) {
-<a href=#1057 id=1057 data-nosnippet>1057</a>        (USDJI | USNSDQ | USSector | HKHS | HKSector | CNIX | CNSector | STI | SGSector, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-<a href=#1058 id=1058 data-nosnippet>1058</a>            <span class="kw">if </span>period == Day &amp;&amp; trade_session == Intraday {
-<a href=#1059 id=1059 data-nosnippet>1059</a>                MergeType::QuoteDay
-<a href=#1060 id=1060 data-nosnippet>1060</a>            } <span class="kw">else </span>{
-<a href=#1061 id=1061 data-nosnippet>1061</a>                MergeType::Quote
-<a href=#1062 id=1062 data-nosnippet>1062</a>            }
-<a href=#1063 id=1063 data-nosnippet>1063</a>        }
-<a href=#1064 id=1064 data-nosnippet>1064</a>        (<span class="kw">_</span>, <span class="kw">_</span>, Day) <span class="kw">if </span>trade_session == Intraday =&gt; MergeType::QuoteDay,
-<a href=#1065 id=1065 data-nosnippet>1065</a>        <span class="kw">_ </span>=&gt; MergeType::Trade,
-<a href=#1066 id=1066 data-nosnippet>1066</a>    })
-<a href=#1067 id=1067 data-nosnippet>1067</a>}
-<a href=#1068 id=1068 data-nosnippet>1068</a>
-<a href=#1069 id=1069 data-nosnippet>1069</a><span class="kw">async fn </span>fetch_trading_days(cli: <span class="kw-2">&amp;</span>WsClient) -&gt; <span class="prelude-ty">Result</span>&lt;TradingDays&gt; {
-<a href=#1070 id=1070 data-nosnippet>1070</a>    <span class="kw">let </span><span class="kw-2">mut </span>days = TradingDays::default();
-<a href=#1071 id=1071 data-nosnippet>1071</a>    <span class="kw">let </span>begin_day = OffsetDateTime::now_utc().date() - time::Duration::days(<span class="number">5</span>);
-<a href=#1072 id=1072 data-nosnippet>1072</a>    <span class="kw">let </span>end_day = begin_day + time::Duration::days(<span class="number">30</span>);
+<a href=#1057 id=1057 data-nosnippet>1057</a>        (
+<a href=#1058 id=1058 data-nosnippet>1058</a>            USDJI | USNSDQ | USSector | HKHS | HKSector | CNIX | CNSector | STI | SGSector
+<a href=#1059 id=1059 data-nosnippet>1059</a>            | SPXIndex | VIXIndex,
+<a href=#1060 id=1060 data-nosnippet>1060</a>            <span class="kw">_</span>,
+<a href=#1061 id=1061 data-nosnippet>1061</a>            <span class="kw">_</span>,
+<a href=#1062 id=1062 data-nosnippet>1062</a>        ) =&gt; {
+<a href=#1063 id=1063 data-nosnippet>1063</a>            <span class="kw">if </span>period == Day &amp;&amp; trade_session == Intraday {
+<a href=#1064 id=1064 data-nosnippet>1064</a>                MergeType::QuoteDay
+<a href=#1065 id=1065 data-nosnippet>1065</a>            } <span class="kw">else </span>{
+<a href=#1066 id=1066 data-nosnippet>1066</a>                MergeType::Quote
+<a href=#1067 id=1067 data-nosnippet>1067</a>            }
+<a href=#1068 id=1068 data-nosnippet>1068</a>        }
+<a href=#1069 id=1069 data-nosnippet>1069</a>        (<span class="kw">_</span>, <span class="kw">_</span>, Day) <span class="kw">if </span>trade_session == Intraday =&gt; MergeType::QuoteDay,
+<a href=#1070 id=1070 data-nosnippet>1070</a>        <span class="kw">_ </span>=&gt; MergeType::Trade,
+<a href=#1071 id=1071 data-nosnippet>1071</a>    })
+<a href=#1072 id=1072 data-nosnippet>1072</a>}
 <a href=#1073 id=1073 data-nosnippet>1073</a>
-<a href=#1074 id=1074 data-nosnippet>1074</a>    <span class="kw">for </span>market <span class="kw">in </span>[Market::HK, Market::US, Market::SG, Market::CN] {
-<a href=#1075 id=1075 data-nosnippet>1075</a>        <span class="kw">let </span>resp = cli
-<a href=#1076 id=1076 data-nosnippet>1076</a>            .request::&lt;<span class="kw">_</span>, MarketTradeDayResponse&gt;(
-<a href=#1077 id=1077 data-nosnippet>1077</a>                cmd_code::GET_TRADING_DAYS,
-<a href=#1078 id=1078 data-nosnippet>1078</a>                <span class="prelude-val">None</span>,
-<a href=#1079 id=1079 data-nosnippet>1079</a>                MarketTradeDayRequest {
-<a href=#1080 id=1080 data-nosnippet>1080</a>                    market: market.to_string(),
-<a href=#1081 id=1081 data-nosnippet>1081</a>                    beg_day: format_date(begin_day),
-<a href=#1082 id=1082 data-nosnippet>1082</a>                    end_day: format_date(end_day),
-<a href=#1083 id=1083 data-nosnippet>1083</a>                },
-<a href=#1084 id=1084 data-nosnippet>1084</a>            )
-<a href=#1085 id=1085 data-nosnippet>1085</a>            .<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#1086 id=1086 data-nosnippet>1086</a>
-<a href=#1087 id=1087 data-nosnippet>1087</a>        days.normal_days.insert(
-<a href=#1088 id=1088 data-nosnippet>1088</a>            market,
-<a href=#1089 id=1089 data-nosnippet>1089</a>            resp.trade_day
-<a href=#1090 id=1090 data-nosnippet>1090</a>                .iter()
-<a href=#1091 id=1091 data-nosnippet>1091</a>                .map(|value| {
-<a href=#1092 id=1092 data-nosnippet>1092</a>                    parse_date(value).map_err(|err| Error::parse_field_error(<span class="string">"half_trade_day"</span>, err))
-<a href=#1093 id=1093 data-nosnippet>1093</a>                })
-<a href=#1094 id=1094 data-nosnippet>1094</a>                .collect::&lt;<span class="prelude-ty">Result</span>&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
-<a href=#1095 id=1095 data-nosnippet>1095</a>        );
-<a href=#1096 id=1096 data-nosnippet>1096</a>
-<a href=#1097 id=1097 data-nosnippet>1097</a>        days.half_days.insert(
-<a href=#1098 id=1098 data-nosnippet>1098</a>            market,
-<a href=#1099 id=1099 data-nosnippet>1099</a>            resp.half_trade_day
-<a href=#1100 id=1100 data-nosnippet>1100</a>                .iter()
-<a href=#1101 id=1101 data-nosnippet>1101</a>                .map(|value| {
-<a href=#1102 id=1102 data-nosnippet>1102</a>                    parse_date(value).map_err(|err| Error::parse_field_error(<span class="string">"half_trade_day"</span>, err))
-<a href=#1103 id=1103 data-nosnippet>1103</a>                })
-<a href=#1104 id=1104 data-nosnippet>1104</a>                .collect::&lt;<span class="prelude-ty">Result</span>&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
-<a href=#1105 id=1105 data-nosnippet>1105</a>        );
-<a href=#1106 id=1106 data-nosnippet>1106</a>    }
-<a href=#1107 id=1107 data-nosnippet>1107</a>
-<a href=#1108 id=1108 data-nosnippet>1108</a>    <span class="prelude-val">Ok</span>(days)
-<a href=#1109 id=1109 data-nosnippet>1109</a>}
-<a href=#1110 id=1110 data-nosnippet>1110</a>
-<a href=#1111 id=1111 data-nosnippet>1111</a><span class="attr">#[allow(clippy::too_many_arguments)]
-<a href=#1112 id=1112 data-nosnippet>1112</a></span><span class="kw">fn </span>update_and_push_candlestick(
-<a href=#1113 id=1113 data-nosnippet>1113</a>    candlesticks: <span class="kw-2">&amp;mut </span>Candlesticks,
-<a href=#1114 id=1114 data-nosnippet>1114</a>    ts: TradeSession,
-<a href=#1115 id=1115 data-nosnippet>1115</a>    symbol: <span class="kw-2">&amp;</span>str,
-<a href=#1116 id=1116 data-nosnippet>1116</a>    period: Period,
-<a href=#1117 id=1117 data-nosnippet>1117</a>    action: UpdateAction&lt;Candlestick&gt;,
-<a href=#1118 id=1118 data-nosnippet>1118</a>    push_candlestick_mode: PushCandlestickMode,
-<a href=#1119 id=1119 data-nosnippet>1119</a>    tx: <span class="kw-2">&amp;mut </span>mpsc::UnboundedSender&lt;PushEvent&gt;,
-<a href=#1120 id=1120 data-nosnippet>1120</a>) {
-<a href=#1121 id=1121 data-nosnippet>1121</a>    <span class="kw">let </span><span class="kw-2">mut </span>push_candlesticks = Vec::new();
-<a href=#1122 id=1122 data-nosnippet>1122</a>
-<a href=#1123 id=1123 data-nosnippet>1123</a>    <span class="kw">match </span>action {
-<a href=#1124 id=1124 data-nosnippet>1124</a>        UpdateAction::UpdateLast(candlestick) =&gt; {
-<a href=#1125 id=1125 data-nosnippet>1125</a>            <span class="kw">let </span>tail = candlesticks.tails.get_mut(<span class="kw-2">&amp;</span>ts).unwrap();
-<a href=#1126 id=1126 data-nosnippet>1126</a>            candlesticks.candlesticks[tail.index] = candlestick;
-<a href=#1127 id=1127 data-nosnippet>1127</a>            tail.candlestick = candlestick;
-<a href=#1128 id=1128 data-nosnippet>1128</a>
-<a href=#1129 id=1129 data-nosnippet>1129</a>            <span class="kw">if </span>push_candlestick_mode == PushCandlestickMode::Realtime {
-<a href=#1130 id=1130 data-nosnippet>1130</a>                push_candlesticks.push((candlestick, <span class="bool-val">false</span>));
-<a href=#1131 id=1131 data-nosnippet>1131</a>            }
-<a href=#1132 id=1132 data-nosnippet>1132</a>        }
-<a href=#1133 id=1133 data-nosnippet>1133</a>        UpdateAction::AppendNew { confirmed, new } =&gt; {
-<a href=#1134 id=1134 data-nosnippet>1134</a>            <span class="kw">let </span>index = <span class="kw">if let </span><span class="prelude-val">Some</span>(tail) = candlesticks.tails.get_mut(<span class="kw-2">&amp;</span>ts) {
-<a href=#1135 id=1135 data-nosnippet>1135</a>                candlesticks.candlesticks.insert(tail.index + <span class="number">1</span>, new);
-<a href=#1136 id=1136 data-nosnippet>1136</a>                tail.index += <span class="number">1</span>;
-<a href=#1137 id=1137 data-nosnippet>1137</a>                tail.candlestick = new;
-<a href=#1138 id=1138 data-nosnippet>1138</a>                tail.index
-<a href=#1139 id=1139 data-nosnippet>1139</a>            } <span class="kw">else </span>{
-<a href=#1140 id=1140 data-nosnippet>1140</a>                <span class="kw">let </span>index = candlesticks.insert_candlestick_by_time(new);
-<a href=#1141 id=1141 data-nosnippet>1141</a>                candlesticks.tails.insert(
-<a href=#1142 id=1142 data-nosnippet>1142</a>                    ts,
-<a href=#1143 id=1143 data-nosnippet>1143</a>                    TailCandlestick {
-<a href=#1144 id=1144 data-nosnippet>1144</a>                        index,
-<a href=#1145 id=1145 data-nosnippet>1145</a>                        candlestick: new,
-<a href=#1146 id=1146 data-nosnippet>1146</a>                    },
-<a href=#1147 id=1147 data-nosnippet>1147</a>                );
-<a href=#1148 id=1148 data-nosnippet>1148</a>                index
-<a href=#1149 id=1149 data-nosnippet>1149</a>            };
-<a href=#1150 id=1150 data-nosnippet>1150</a>
-<a href=#1151 id=1151 data-nosnippet>1151</a>            <span class="kw">for </span>tail <span class="kw">in </span>candlesticks.tails.values_mut() {
-<a href=#1152 id=1152 data-nosnippet>1152</a>                <span class="kw">if </span>tail.index &gt; index {
-<a href=#1153 id=1153 data-nosnippet>1153</a>                    tail.index += <span class="number">1</span>;
-<a href=#1154 id=1154 data-nosnippet>1154</a>                }
-<a href=#1155 id=1155 data-nosnippet>1155</a>            }
-<a href=#1156 id=1156 data-nosnippet>1156</a>
-<a href=#1157 id=1157 data-nosnippet>1157</a>            candlesticks.check_and_remove();
-<a href=#1158 id=1158 data-nosnippet>1158</a>
-<a href=#1159 id=1159 data-nosnippet>1159</a>            <span class="kw">match </span>push_candlestick_mode {
-<a href=#1160 id=1160 data-nosnippet>1160</a>                PushCandlestickMode::Realtime =&gt; {
-<a href=#1161 id=1161 data-nosnippet>1161</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(confirmed) = confirmed {
-<a href=#1162 id=1162 data-nosnippet>1162</a>                        push_candlesticks.push((confirmed, <span class="bool-val">true</span>));
-<a href=#1163 id=1163 data-nosnippet>1163</a>                    }
-<a href=#1164 id=1164 data-nosnippet>1164</a>                    push_candlesticks.push((new, <span class="bool-val">false</span>));
-<a href=#1165 id=1165 data-nosnippet>1165</a>                }
-<a href=#1166 id=1166 data-nosnippet>1166</a>                PushCandlestickMode::Confirmed =&gt; {
-<a href=#1167 id=1167 data-nosnippet>1167</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(confirmed) = confirmed {
-<a href=#1168 id=1168 data-nosnippet>1168</a>                        push_candlesticks.push((confirmed, <span class="bool-val">true</span>));
-<a href=#1169 id=1169 data-nosnippet>1169</a>                    }
+<a href=#1074 id=1074 data-nosnippet>1074</a><span class="kw">async fn </span>fetch_trading_days(cli: <span class="kw-2">&amp;</span>WsClient) -&gt; <span class="prelude-ty">Result</span>&lt;TradingDays&gt; {
+<a href=#1075 id=1075 data-nosnippet>1075</a>    <span class="kw">let </span><span class="kw-2">mut </span>days = TradingDays::default();
+<a href=#1076 id=1076 data-nosnippet>1076</a>    <span class="kw">let </span>begin_day = OffsetDateTime::now_utc().date() - time::Duration::days(<span class="number">5</span>);
+<a href=#1077 id=1077 data-nosnippet>1077</a>    <span class="kw">let </span>end_day = begin_day + time::Duration::days(<span class="number">30</span>);
+<a href=#1078 id=1078 data-nosnippet>1078</a>
+<a href=#1079 id=1079 data-nosnippet>1079</a>    <span class="kw">for </span>market <span class="kw">in </span>[Market::HK, Market::US, Market::SG, Market::CN] {
+<a href=#1080 id=1080 data-nosnippet>1080</a>        <span class="kw">let </span>resp = cli
+<a href=#1081 id=1081 data-nosnippet>1081</a>            .request::&lt;<span class="kw">_</span>, MarketTradeDayResponse&gt;(
+<a href=#1082 id=1082 data-nosnippet>1082</a>                cmd_code::GET_TRADING_DAYS,
+<a href=#1083 id=1083 data-nosnippet>1083</a>                <span class="prelude-val">None</span>,
+<a href=#1084 id=1084 data-nosnippet>1084</a>                MarketTradeDayRequest {
+<a href=#1085 id=1085 data-nosnippet>1085</a>                    market: market.to_string(),
+<a href=#1086 id=1086 data-nosnippet>1086</a>                    beg_day: format_date(begin_day),
+<a href=#1087 id=1087 data-nosnippet>1087</a>                    end_day: format_date(end_day),
+<a href=#1088 id=1088 data-nosnippet>1088</a>                },
+<a href=#1089 id=1089 data-nosnippet>1089</a>            )
+<a href=#1090 id=1090 data-nosnippet>1090</a>            .<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#1091 id=1091 data-nosnippet>1091</a>
+<a href=#1092 id=1092 data-nosnippet>1092</a>        days.normal_days.insert(
+<a href=#1093 id=1093 data-nosnippet>1093</a>            market,
+<a href=#1094 id=1094 data-nosnippet>1094</a>            resp.trade_day
+<a href=#1095 id=1095 data-nosnippet>1095</a>                .iter()
+<a href=#1096 id=1096 data-nosnippet>1096</a>                .map(|value| {
+<a href=#1097 id=1097 data-nosnippet>1097</a>                    parse_date(value).map_err(|err| Error::parse_field_error(<span class="string">"half_trade_day"</span>, err))
+<a href=#1098 id=1098 data-nosnippet>1098</a>                })
+<a href=#1099 id=1099 data-nosnippet>1099</a>                .collect::&lt;<span class="prelude-ty">Result</span>&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
+<a href=#1100 id=1100 data-nosnippet>1100</a>        );
+<a href=#1101 id=1101 data-nosnippet>1101</a>
+<a href=#1102 id=1102 data-nosnippet>1102</a>        days.half_days.insert(
+<a href=#1103 id=1103 data-nosnippet>1103</a>            market,
+<a href=#1104 id=1104 data-nosnippet>1104</a>            resp.half_trade_day
+<a href=#1105 id=1105 data-nosnippet>1105</a>                .iter()
+<a href=#1106 id=1106 data-nosnippet>1106</a>                .map(|value| {
+<a href=#1107 id=1107 data-nosnippet>1107</a>                    parse_date(value).map_err(|err| Error::parse_field_error(<span class="string">"half_trade_day"</span>, err))
+<a href=#1108 id=1108 data-nosnippet>1108</a>                })
+<a href=#1109 id=1109 data-nosnippet>1109</a>                .collect::&lt;<span class="prelude-ty">Result</span>&lt;HashSet&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
+<a href=#1110 id=1110 data-nosnippet>1110</a>        );
+<a href=#1111 id=1111 data-nosnippet>1111</a>    }
+<a href=#1112 id=1112 data-nosnippet>1112</a>
+<a href=#1113 id=1113 data-nosnippet>1113</a>    <span class="prelude-val">Ok</span>(days)
+<a href=#1114 id=1114 data-nosnippet>1114</a>}
+<a href=#1115 id=1115 data-nosnippet>1115</a>
+<a href=#1116 id=1116 data-nosnippet>1116</a><span class="attr">#[allow(clippy::too_many_arguments)]
+<a href=#1117 id=1117 data-nosnippet>1117</a></span><span class="kw">fn </span>update_and_push_candlestick(
+<a href=#1118 id=1118 data-nosnippet>1118</a>    candlesticks: <span class="kw-2">&amp;mut </span>Candlesticks,
+<a href=#1119 id=1119 data-nosnippet>1119</a>    ts: TradeSession,
+<a href=#1120 id=1120 data-nosnippet>1120</a>    symbol: <span class="kw-2">&amp;</span>str,
+<a href=#1121 id=1121 data-nosnippet>1121</a>    period: Period,
+<a href=#1122 id=1122 data-nosnippet>1122</a>    action: UpdateAction&lt;Candlestick&gt;,
+<a href=#1123 id=1123 data-nosnippet>1123</a>    push_candlestick_mode: PushCandlestickMode,
+<a href=#1124 id=1124 data-nosnippet>1124</a>    tx: <span class="kw-2">&amp;mut </span>mpsc::UnboundedSender&lt;PushEvent&gt;,
+<a href=#1125 id=1125 data-nosnippet>1125</a>) {
+<a href=#1126 id=1126 data-nosnippet>1126</a>    <span class="kw">let </span><span class="kw-2">mut </span>push_candlesticks = Vec::new();
+<a href=#1127 id=1127 data-nosnippet>1127</a>
+<a href=#1128 id=1128 data-nosnippet>1128</a>    <span class="kw">match </span>action {
+<a href=#1129 id=1129 data-nosnippet>1129</a>        UpdateAction::UpdateLast(candlestick) =&gt; {
+<a href=#1130 id=1130 data-nosnippet>1130</a>            <span class="kw">let </span>tail = candlesticks.tails.get_mut(<span class="kw-2">&amp;</span>ts).unwrap();
+<a href=#1131 id=1131 data-nosnippet>1131</a>            candlesticks.candlesticks[tail.index] = candlestick;
+<a href=#1132 id=1132 data-nosnippet>1132</a>            tail.candlestick = candlestick;
+<a href=#1133 id=1133 data-nosnippet>1133</a>
+<a href=#1134 id=1134 data-nosnippet>1134</a>            <span class="kw">if </span>push_candlestick_mode == PushCandlestickMode::Realtime {
+<a href=#1135 id=1135 data-nosnippet>1135</a>                push_candlesticks.push((candlestick, <span class="bool-val">false</span>));
+<a href=#1136 id=1136 data-nosnippet>1136</a>            }
+<a href=#1137 id=1137 data-nosnippet>1137</a>        }
+<a href=#1138 id=1138 data-nosnippet>1138</a>        UpdateAction::AppendNew { confirmed, new } =&gt; {
+<a href=#1139 id=1139 data-nosnippet>1139</a>            <span class="kw">let </span>index = <span class="kw">if let </span><span class="prelude-val">Some</span>(tail) = candlesticks.tails.get_mut(<span class="kw-2">&amp;</span>ts) {
+<a href=#1140 id=1140 data-nosnippet>1140</a>                candlesticks.candlesticks.insert(tail.index + <span class="number">1</span>, new);
+<a href=#1141 id=1141 data-nosnippet>1141</a>                tail.index += <span class="number">1</span>;
+<a href=#1142 id=1142 data-nosnippet>1142</a>                tail.candlestick = new;
+<a href=#1143 id=1143 data-nosnippet>1143</a>                tail.index
+<a href=#1144 id=1144 data-nosnippet>1144</a>            } <span class="kw">else </span>{
+<a href=#1145 id=1145 data-nosnippet>1145</a>                <span class="kw">let </span>index = candlesticks.insert_candlestick_by_time(new);
+<a href=#1146 id=1146 data-nosnippet>1146</a>                candlesticks.tails.insert(
+<a href=#1147 id=1147 data-nosnippet>1147</a>                    ts,
+<a href=#1148 id=1148 data-nosnippet>1148</a>                    TailCandlestick {
+<a href=#1149 id=1149 data-nosnippet>1149</a>                        index,
+<a href=#1150 id=1150 data-nosnippet>1150</a>                        candlestick: new,
+<a href=#1151 id=1151 data-nosnippet>1151</a>                    },
+<a href=#1152 id=1152 data-nosnippet>1152</a>                );
+<a href=#1153 id=1153 data-nosnippet>1153</a>                index
+<a href=#1154 id=1154 data-nosnippet>1154</a>            };
+<a href=#1155 id=1155 data-nosnippet>1155</a>
+<a href=#1156 id=1156 data-nosnippet>1156</a>            <span class="kw">for </span>tail <span class="kw">in </span>candlesticks.tails.values_mut() {
+<a href=#1157 id=1157 data-nosnippet>1157</a>                <span class="kw">if </span>tail.index &gt; index {
+<a href=#1158 id=1158 data-nosnippet>1158</a>                    tail.index += <span class="number">1</span>;
+<a href=#1159 id=1159 data-nosnippet>1159</a>                }
+<a href=#1160 id=1160 data-nosnippet>1160</a>            }
+<a href=#1161 id=1161 data-nosnippet>1161</a>
+<a href=#1162 id=1162 data-nosnippet>1162</a>            candlesticks.check_and_remove();
+<a href=#1163 id=1163 data-nosnippet>1163</a>
+<a href=#1164 id=1164 data-nosnippet>1164</a>            <span class="kw">match </span>push_candlestick_mode {
+<a href=#1165 id=1165 data-nosnippet>1165</a>                PushCandlestickMode::Realtime =&gt; {
+<a href=#1166 id=1166 data-nosnippet>1166</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(confirmed) = confirmed {
+<a href=#1167 id=1167 data-nosnippet>1167</a>                        push_candlesticks.push((confirmed, <span class="bool-val">true</span>));
+<a href=#1168 id=1168 data-nosnippet>1168</a>                    }
+<a href=#1169 id=1169 data-nosnippet>1169</a>                    push_candlesticks.push((new, <span class="bool-val">false</span>));
 <a href=#1170 id=1170 data-nosnippet>1170</a>                }
-<a href=#1171 id=1171 data-nosnippet>1171</a>            }
-<a href=#1172 id=1172 data-nosnippet>1172</a>        }
-<a href=#1173 id=1173 data-nosnippet>1173</a>        UpdateAction::None =&gt; {}
-<a href=#1174 id=1174 data-nosnippet>1174</a>    };
-<a href=#1175 id=1175 data-nosnippet>1175</a>
-<a href=#1176 id=1176 data-nosnippet>1176</a>    <span class="kw">for </span>(candlestick, is_confirmed) <span class="kw">in </span>push_candlesticks {
-<a href=#1177 id=1177 data-nosnippet>1177</a>        <span class="kw">if </span>candlesticks.trade_sessions.contains(ts) {
-<a href=#1178 id=1178 data-nosnippet>1178</a>            <span class="macro">tracing::info!</span>(
-<a href=#1179 id=1179 data-nosnippet>1179</a>                symbol = symbol,
-<a href=#1180 id=1180 data-nosnippet>1180</a>                period = <span class="question-mark">?</span>period,
-<a href=#1181 id=1181 data-nosnippet>1181</a>                is_confirmed = is_confirmed,
-<a href=#1182 id=1182 data-nosnippet>1182</a>                candlestick = <span class="question-mark">?</span>candlestick,
-<a href=#1183 id=1183 data-nosnippet>1183</a>                trade_session = <span class="question-mark">?</span>ts,
-<a href=#1184 id=1184 data-nosnippet>1184</a>                <span class="string">"push candlestick"
-<a href=#1185 id=1185 data-nosnippet>1185</a>            </span>);
-<a href=#1186 id=1186 data-nosnippet>1186</a>            <span class="kw">let _ </span>= tx.send(PushEvent {
-<a href=#1187 id=1187 data-nosnippet>1187</a>                sequence: <span class="number">0</span>,
-<a href=#1188 id=1188 data-nosnippet>1188</a>                symbol: symbol.to_string(),
-<a href=#1189 id=1189 data-nosnippet>1189</a>                detail: PushEventDetail::Candlestick(PushCandlestick {
-<a href=#1190 id=1190 data-nosnippet>1190</a>                    period,
-<a href=#1191 id=1191 data-nosnippet>1191</a>                    candlestick,
-<a href=#1192 id=1192 data-nosnippet>1192</a>                    is_confirmed,
-<a href=#1193 id=1193 data-nosnippet>1193</a>                }),
-<a href=#1194 id=1194 data-nosnippet>1194</a>            });
-<a href=#1195 id=1195 data-nosnippet>1195</a>        }
-<a href=#1196 id=1196 data-nosnippet>1196</a>    }
-<a href=#1197 id=1197 data-nosnippet>1197</a>}
-<a href=#1198 id=1198 data-nosnippet>1198</a>
-<a href=#1199 id=1199 data-nosnippet>1199</a><span class="kw">fn </span>parse_market_from_symbol(symbol: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Market&gt; {
-<a href=#1200 id=1200 data-nosnippet>1200</a>    <span class="kw">let </span>market = symbol.rfind(<span class="string">'.'</span>).map(|idx| <span class="kw-2">&amp;</span>symbol[idx + <span class="number">1</span>..])<span class="question-mark">?</span>;
-<a href=#1201 id=1201 data-nosnippet>1201</a>    <span class="prelude-val">Some</span>(<span class="kw">match </span>market {
-<a href=#1202 id=1202 data-nosnippet>1202</a>        <span class="string">"US" </span>=&gt; Market::US,
-<a href=#1203 id=1203 data-nosnippet>1203</a>        <span class="string">"HK" </span>=&gt; Market::HK,
-<a href=#1204 id=1204 data-nosnippet>1204</a>        <span class="string">"SG" </span>=&gt; Market::SG,
-<a href=#1205 id=1205 data-nosnippet>1205</a>        <span class="string">"SH" </span>| <span class="string">"SZ" </span>=&gt; Market::CN,
-<a href=#1206 id=1206 data-nosnippet>1206</a>        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
-<a href=#1207 id=1207 data-nosnippet>1207</a>    })
-<a href=#1208 id=1208 data-nosnippet>1208</a>}
-<a href=#1209 id=1209 data-nosnippet>1209</a>
-<a href=#1210 id=1210 data-nosnippet>1210</a><span class="attr">#[cfg(test)]
-<a href=#1211 id=1211 data-nosnippet>1211</a></span><span class="kw">mod </span>tests {
-<a href=#1212 id=1212 data-nosnippet>1212</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#1213 id=1213 data-nosnippet>1213</a>
-<a href=#1214 id=1214 data-nosnippet>1214</a>    <span class="attr">#[test]
-<a href=#1215 id=1215 data-nosnippet>1215</a>    </span><span class="kw">fn </span>test_parse_market_from_symbol() {
-<a href=#1216 id=1216 data-nosnippet>1216</a>        <span class="macro">assert_eq!</span>(parse_market_from_symbol(<span class="string">"AAPL.US"</span>), <span class="prelude-val">Some</span>(Market::US));
-<a href=#1217 id=1217 data-nosnippet>1217</a>        <span class="macro">assert_eq!</span>(parse_market_from_symbol(<span class="string">"BRK.A.US"</span>), <span class="prelude-val">Some</span>(Market::US));
-<a href=#1218 id=1218 data-nosnippet>1218</a>    }
-<a href=#1219 id=1219 data-nosnippet>1219</a>
-<a href=#1220 id=1220 data-nosnippet>1220</a>    <span class="attr">#[test]
-<a href=#1221 id=1221 data-nosnippet>1221</a>    </span><span class="kw">fn </span>test_merge_type() {
-<a href=#1222 id=1222 data-nosnippet>1222</a>        <span class="kw">use </span>Period::<span class="kw-2">*</span>;
-<a href=#1223 id=1223 data-nosnippet>1223</a>        <span class="kw">use </span>SecurityBoard::<span class="kw-2">*</span>;
-<a href=#1224 id=1224 data-nosnippet>1224</a>        <span class="kw">use </span>TradeSession::<span class="kw-2">*</span>;
-<a href=#1225 id=1225 data-nosnippet>1225</a>
-<a href=#1226 id=1226 data-nosnippet>1226</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Intraday, Day), <span class="prelude-val">Some</span>(MergeType::QuoteDay));
-<a href=#1227 id=1227 data-nosnippet>1227</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Overnight, Day), <span class="prelude-val">None</span>);
-<a href=#1228 id=1228 data-nosnippet>1228</a>        <span class="macro">assert_eq!</span>(
-<a href=#1229 id=1229 data-nosnippet>1229</a>            merge_type(USDJI, Intraday, OneMinute),
-<a href=#1230 id=1230 data-nosnippet>1230</a>            <span class="prelude-val">Some</span>(MergeType::Quote)
-<a href=#1231 id=1231 data-nosnippet>1231</a>        );
-<a href=#1232 id=1232 data-nosnippet>1232</a>        <span class="macro">assert_eq!</span>(
-<a href=#1233 id=1233 data-nosnippet>1233</a>            merge_type(USDJI, Overnight, OneMinute),
-<a href=#1234 id=1234 data-nosnippet>1234</a>            <span class="prelude-val">Some</span>(MergeType::Quote)
-<a href=#1235 id=1235 data-nosnippet>1235</a>        );
-<a href=#1236 id=1236 data-nosnippet>1236</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Intraday, Week), <span class="prelude-val">Some</span>(MergeType::Quote));
-<a href=#1237 id=1237 data-nosnippet>1237</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Overnight, Week), <span class="prelude-val">None</span>);
-<a href=#1238 id=1238 data-nosnippet>1238</a>
-<a href=#1239 id=1239 data-nosnippet>1239</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Intraday, Day), <span class="prelude-val">Some</span>(MergeType::QuoteDay));
-<a href=#1240 id=1240 data-nosnippet>1240</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Overnight, Day), <span class="prelude-val">None</span>);
-<a href=#1241 id=1241 data-nosnippet>1241</a>        <span class="macro">assert_eq!</span>(
-<a href=#1242 id=1242 data-nosnippet>1242</a>            merge_type(USMain, Intraday, OneMinute),
-<a href=#1243 id=1243 data-nosnippet>1243</a>            <span class="prelude-val">Some</span>(MergeType::Trade)
-<a href=#1244 id=1244 data-nosnippet>1244</a>        );
-<a href=#1245 id=1245 data-nosnippet>1245</a>        <span class="macro">assert_eq!</span>(
-<a href=#1246 id=1246 data-nosnippet>1246</a>            merge_type(USMain, Overnight, OneMinute),
-<a href=#1247 id=1247 data-nosnippet>1247</a>            <span class="prelude-val">Some</span>(MergeType::Trade)
-<a href=#1248 id=1248 data-nosnippet>1248</a>        );
-<a href=#1249 id=1249 data-nosnippet>1249</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Intraday, Week), <span class="prelude-val">Some</span>(MergeType::Trade));
-<a href=#1250 id=1250 data-nosnippet>1250</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Overnight, Week), <span class="prelude-val">None</span>);
-<a href=#1251 id=1251 data-nosnippet>1251</a>    }
-<a href=#1252 id=1252 data-nosnippet>1252</a>}</code></pre></div></section></main></body></html>
+<a href=#1171 id=1171 data-nosnippet>1171</a>                PushCandlestickMode::Confirmed =&gt; {
+<a href=#1172 id=1172 data-nosnippet>1172</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(confirmed) = confirmed {
+<a href=#1173 id=1173 data-nosnippet>1173</a>                        push_candlesticks.push((confirmed, <span class="bool-val">true</span>));
+<a href=#1174 id=1174 data-nosnippet>1174</a>                    }
+<a href=#1175 id=1175 data-nosnippet>1175</a>                }
+<a href=#1176 id=1176 data-nosnippet>1176</a>            }
+<a href=#1177 id=1177 data-nosnippet>1177</a>        }
+<a href=#1178 id=1178 data-nosnippet>1178</a>        UpdateAction::None =&gt; {}
+<a href=#1179 id=1179 data-nosnippet>1179</a>    };
+<a href=#1180 id=1180 data-nosnippet>1180</a>
+<a href=#1181 id=1181 data-nosnippet>1181</a>    <span class="kw">for </span>(candlestick, is_confirmed) <span class="kw">in </span>push_candlesticks {
+<a href=#1182 id=1182 data-nosnippet>1182</a>        <span class="kw">if </span>candlesticks.trade_sessions.contains(ts) {
+<a href=#1183 id=1183 data-nosnippet>1183</a>            <span class="macro">tracing::info!</span>(
+<a href=#1184 id=1184 data-nosnippet>1184</a>                symbol = symbol,
+<a href=#1185 id=1185 data-nosnippet>1185</a>                period = <span class="question-mark">?</span>period,
+<a href=#1186 id=1186 data-nosnippet>1186</a>                is_confirmed = is_confirmed,
+<a href=#1187 id=1187 data-nosnippet>1187</a>                candlestick = <span class="question-mark">?</span>candlestick,
+<a href=#1188 id=1188 data-nosnippet>1188</a>                trade_session = <span class="question-mark">?</span>ts,
+<a href=#1189 id=1189 data-nosnippet>1189</a>                <span class="string">"push candlestick"
+<a href=#1190 id=1190 data-nosnippet>1190</a>            </span>);
+<a href=#1191 id=1191 data-nosnippet>1191</a>            <span class="kw">let _ </span>= tx.send(PushEvent {
+<a href=#1192 id=1192 data-nosnippet>1192</a>                sequence: <span class="number">0</span>,
+<a href=#1193 id=1193 data-nosnippet>1193</a>                symbol: symbol.to_string(),
+<a href=#1194 id=1194 data-nosnippet>1194</a>                detail: PushEventDetail::Candlestick(PushCandlestick {
+<a href=#1195 id=1195 data-nosnippet>1195</a>                    period,
+<a href=#1196 id=1196 data-nosnippet>1196</a>                    candlestick,
+<a href=#1197 id=1197 data-nosnippet>1197</a>                    is_confirmed,
+<a href=#1198 id=1198 data-nosnippet>1198</a>                }),
+<a href=#1199 id=1199 data-nosnippet>1199</a>            });
+<a href=#1200 id=1200 data-nosnippet>1200</a>        }
+<a href=#1201 id=1201 data-nosnippet>1201</a>    }
+<a href=#1202 id=1202 data-nosnippet>1202</a>}
+<a href=#1203 id=1203 data-nosnippet>1203</a>
+<a href=#1204 id=1204 data-nosnippet>1204</a><span class="kw">fn </span>parse_market_from_symbol(symbol: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Market&gt; {
+<a href=#1205 id=1205 data-nosnippet>1205</a>    <span class="kw">let </span>market = symbol.rfind(<span class="string">'.'</span>).map(|idx| <span class="kw-2">&amp;</span>symbol[idx + <span class="number">1</span>..])<span class="question-mark">?</span>;
+<a href=#1206 id=1206 data-nosnippet>1206</a>    <span class="prelude-val">Some</span>(<span class="kw">match </span>market {
+<a href=#1207 id=1207 data-nosnippet>1207</a>        <span class="string">"US" </span>=&gt; Market::US,
+<a href=#1208 id=1208 data-nosnippet>1208</a>        <span class="string">"HK" </span>=&gt; Market::HK,
+<a href=#1209 id=1209 data-nosnippet>1209</a>        <span class="string">"SG" </span>=&gt; Market::SG,
+<a href=#1210 id=1210 data-nosnippet>1210</a>        <span class="string">"SH" </span>| <span class="string">"SZ" </span>=&gt; Market::CN,
+<a href=#1211 id=1211 data-nosnippet>1211</a>        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+<a href=#1212 id=1212 data-nosnippet>1212</a>    })
+<a href=#1213 id=1213 data-nosnippet>1213</a>}
+<a href=#1214 id=1214 data-nosnippet>1214</a>
+<a href=#1215 id=1215 data-nosnippet>1215</a><span class="attr">#[cfg(test)]
+<a href=#1216 id=1216 data-nosnippet>1216</a></span><span class="kw">mod </span>tests {
+<a href=#1217 id=1217 data-nosnippet>1217</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#1218 id=1218 data-nosnippet>1218</a>
+<a href=#1219 id=1219 data-nosnippet>1219</a>    <span class="attr">#[test]
+<a href=#1220 id=1220 data-nosnippet>1220</a>    </span><span class="kw">fn </span>test_parse_market_from_symbol() {
+<a href=#1221 id=1221 data-nosnippet>1221</a>        <span class="macro">assert_eq!</span>(parse_market_from_symbol(<span class="string">"AAPL.US"</span>), <span class="prelude-val">Some</span>(Market::US));
+<a href=#1222 id=1222 data-nosnippet>1222</a>        <span class="macro">assert_eq!</span>(parse_market_from_symbol(<span class="string">"BRK.A.US"</span>), <span class="prelude-val">Some</span>(Market::US));
+<a href=#1223 id=1223 data-nosnippet>1223</a>    }
+<a href=#1224 id=1224 data-nosnippet>1224</a>
+<a href=#1225 id=1225 data-nosnippet>1225</a>    <span class="attr">#[test]
+<a href=#1226 id=1226 data-nosnippet>1226</a>    </span><span class="kw">fn </span>test_merge_type() {
+<a href=#1227 id=1227 data-nosnippet>1227</a>        <span class="kw">use </span>Period::<span class="kw-2">*</span>;
+<a href=#1228 id=1228 data-nosnippet>1228</a>        <span class="kw">use </span>SecurityBoard::<span class="kw-2">*</span>;
+<a href=#1229 id=1229 data-nosnippet>1229</a>        <span class="kw">use </span>TradeSession::<span class="kw-2">*</span>;
+<a href=#1230 id=1230 data-nosnippet>1230</a>
+<a href=#1231 id=1231 data-nosnippet>1231</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Intraday, Day), <span class="prelude-val">Some</span>(MergeType::QuoteDay));
+<a href=#1232 id=1232 data-nosnippet>1232</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Overnight, Day), <span class="prelude-val">None</span>);
+<a href=#1233 id=1233 data-nosnippet>1233</a>        <span class="macro">assert_eq!</span>(
+<a href=#1234 id=1234 data-nosnippet>1234</a>            merge_type(USDJI, Intraday, OneMinute),
+<a href=#1235 id=1235 data-nosnippet>1235</a>            <span class="prelude-val">Some</span>(MergeType::Quote)
+<a href=#1236 id=1236 data-nosnippet>1236</a>        );
+<a href=#1237 id=1237 data-nosnippet>1237</a>        <span class="macro">assert_eq!</span>(
+<a href=#1238 id=1238 data-nosnippet>1238</a>            merge_type(USDJI, Overnight, OneMinute),
+<a href=#1239 id=1239 data-nosnippet>1239</a>            <span class="prelude-val">Some</span>(MergeType::Quote)
+<a href=#1240 id=1240 data-nosnippet>1240</a>        );
+<a href=#1241 id=1241 data-nosnippet>1241</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Intraday, Week), <span class="prelude-val">Some</span>(MergeType::Quote));
+<a href=#1242 id=1242 data-nosnippet>1242</a>        <span class="macro">assert_eq!</span>(merge_type(USDJI, Overnight, Week), <span class="prelude-val">None</span>);
+<a href=#1243 id=1243 data-nosnippet>1243</a>
+<a href=#1244 id=1244 data-nosnippet>1244</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Intraday, Day), <span class="prelude-val">Some</span>(MergeType::QuoteDay));
+<a href=#1245 id=1245 data-nosnippet>1245</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Overnight, Day), <span class="prelude-val">None</span>);
+<a href=#1246 id=1246 data-nosnippet>1246</a>        <span class="macro">assert_eq!</span>(
+<a href=#1247 id=1247 data-nosnippet>1247</a>            merge_type(USMain, Intraday, OneMinute),
+<a href=#1248 id=1248 data-nosnippet>1248</a>            <span class="prelude-val">Some</span>(MergeType::Trade)
+<a href=#1249 id=1249 data-nosnippet>1249</a>        );
+<a href=#1250 id=1250 data-nosnippet>1250</a>        <span class="macro">assert_eq!</span>(
+<a href=#1251 id=1251 data-nosnippet>1251</a>            merge_type(USMain, Overnight, OneMinute),
+<a href=#1252 id=1252 data-nosnippet>1252</a>            <span class="prelude-val">Some</span>(MergeType::Trade)
+<a href=#1253 id=1253 data-nosnippet>1253</a>        );
+<a href=#1254 id=1254 data-nosnippet>1254</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Intraday, Week), <span class="prelude-val">Some</span>(MergeType::Trade));
+<a href=#1255 id=1255 data-nosnippet>1255</a>        <span class="macro">assert_eq!</span>(merge_type(USMain, Overnight, Week), <span class="prelude-val">None</span>);
+<a href=#1256 id=1256 data-nosnippet>1256</a>
+<a href=#1257 id=1257 data-nosnippet>1257</a>        <span class="macro">assert_eq!</span>(merge_type(SPXIndex, Intraday, Year), <span class="prelude-val">Some</span>(MergeType::Quote));
+<a href=#1258 id=1258 data-nosnippet>1258</a>        <span class="macro">assert_eq!</span>(merge_type(VIXIndex, Intraday, Year), <span class="prelude-val">Some</span>(MergeType::Quote));
+<a href=#1259 id=1259 data-nosnippet>1259</a>    }
+<a href=#1260 id=1260 data-nosnippet>1260</a>}</code></pre></div></section></main></body></html>
