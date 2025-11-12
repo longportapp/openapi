@@ -296,6 +296,7 @@ pub(crate) fn get_market(
 
     Some(match market {
         Market::US if board == SecurityBoard::USOptionS => &US_OPTION,
+        Market::US if board == SecurityBoard::VIXIndex => &US_VIX,
         Market::US => &US,
         Market::HK => &HK,
         Market::SG => &SG,

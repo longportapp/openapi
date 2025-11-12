@@ -91,3 +91,22 @@ pub const US_OPTION: Market = Market {
     ],
     lot_size: 1,
 };
+
+pub const US_VIX: Market = Market {
+    timezone: db::america::NEW_YORK,
+    trade_sessions: &[
+        // Intraday
+        &[
+            TradeSession::new(time!(3:15:00), time!(9:25:00)),
+            TradeSession::new(time!(9:30:00), time!(16:15:00)),
+        ],
+    ],
+    half_trade_sessions: &[
+        // Intraday
+        &[
+            TradeSession::new(time!(3:15:00), time!(9:25:00)),
+            TradeSession::new(time!(9:30:00), time!(13:15:00)),
+        ],
+    ],
+    lot_size: 1,
+};
