@@ -46,7 +46,6 @@ public:
   /// Subscribe
   void subscribe(const std::vector<std::string>& symbols,
                  SubFlags sub_flags,
-                 bool is_first_push,
                  AsyncCallback<QuoteContext, void> callback) const;
 
   /// Unsubscribe

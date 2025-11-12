@@ -206,7 +206,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, false)
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
     /// while let Some(msg) = receiver.recv().await {
     ///     println!("{:?}", msg);
@@ -214,12 +214,7 @@ impl QuoteContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn subscribe<I, T>(
-        &self,
-        symbols: I,
-        sub_types: impl Into<SubFlags>,
-        is_first_push: bool,
-    ) -> Result<()>
+    pub async fn subscribe<I, T>(&self, symbols: I, sub_types: impl Into<SubFlags>) -> Result<()>
     where
         I: IntoIterator<Item = T>,
         T: AsRef<str>,
@@ -233,7 +228,6 @@ impl QuoteContext {
                     .map(|symbol| normalize_symbol(symbol.as_ref()).to_string())
                     .collect(),
                 sub_types: sub_types.into(),
-                is_first_push,
                 reply_tx,
             })
             .map_err(|_| WsClientError::ClientClosed)?;
@@ -258,7 +252,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, false)
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
     /// ctx.unsubscribe(["AAPL.US"], SubFlags::QUOTE).await?;
     /// # Ok::<_, Box<dyn std::error::Error>>(())
@@ -363,7 +357,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, false)
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
     /// let resp = ctx.subscriptions().await?;
     /// println!("{:?}", resp);
@@ -1594,7 +1588,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, true)
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)
     ///     .await?;
     /// tokio::time::sleep(Duration::from_secs(5)).await;
     ///
@@ -1638,7 +1632,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH, true)
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH)
     ///     .await?;
     /// tokio::time::sleep(Duration::from_secs(5)).await;
     ///
@@ -1678,7 +1672,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE, false)
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE)
     ///     .await?;
     /// tokio::time::sleep(Duration::from_secs(5)).await;
     ///
@@ -1724,7 +1718,7 @@ impl QuoteContext {
     /// let config = Arc::new(Config::from_env()?);
     /// let (ctx, _) = QuoteContext::try_new(config).await?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER, true)
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER)
     ///     .await?;
     /// tokio::time::sleep(Duration::from_secs(5)).await;
     ///

@@ -92,7 +92,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (ctx, mut receiver) = QuoteContext::try_new(config).await?;
 
     // Subscribe
-    ctx.subscribe(["700.HK"], SubFlags::QUOTE, true).await?;
+    ctx.subscribe(["700.HK"], SubFlags::QUOTE).await?;
 
     // Receive push events
     while let Some(event) = receiver.recv().await {

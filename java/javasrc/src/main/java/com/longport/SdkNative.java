@@ -55,8 +55,7 @@ public class SdkNative {
 
         public static native void quoteContextSetOnCandlestick(long context, CandlestickHandler handler);
 
-        public static native void quoteContextSubscribe(long context, String[] symbols, int flags, boolean isFirstPush,
-                        AsyncCallback callback);
+        public static native void quoteContextSubscribe(long context, String[] symbols, int flags, AsyncCallback callback);
 
         public static native void quoteContextUnsubscribe(long context, String[] symbols, int flags,
                         AsyncCallback callback);

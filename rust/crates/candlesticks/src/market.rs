@@ -176,7 +176,12 @@ impl Market {
                     .assume_timezone(self.timezone)
                     .take_first()?
             }
-            Month => t.replace_day(1).ok()?.replace_time(time!(00:00:00)),
+            Month => PrimitiveDateTime::new(
+                Date::from_calendar_date(t.year(), t.month(), 1).ok()?,
+                time!(00:00:00),
+            )
+            .assume_timezone(self.timezone)
+            .take_first()?,
             Quarter => {
                 let month = t.month();
                 let quarter = (month as u8 - 1) / 3;
@@ -231,6 +236,9 @@ impl Market {
         ) else {
             return UpdateAction::None;
         };
+
+        dbg!(time);
+        dbg!(input.as_ref().map(|c| c.time()));
 
         match input {
             Some(prev) if time == prev.time() => {
