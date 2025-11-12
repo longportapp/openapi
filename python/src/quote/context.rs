@@ -130,15 +130,10 @@ impl QuoteContext {
     }
 
     /// Subscribe
-    #[pyo3(signature = (symbols, sub_types, is_first_push = false))]
-    fn subscribe(
-        &self,
-        symbols: Vec<String>,
-        sub_types: Vec<SubType>,
-        is_first_push: bool,
-    ) -> PyResult<()> {
+    #[pyo3(signature = (symbols, sub_types))]
+    fn subscribe(&self, symbols: Vec<String>, sub_types: Vec<SubType>) -> PyResult<()> {
         self.ctx
-            .subscribe(symbols, SubTypes(sub_types), is_first_push)
+            .subscribe(symbols, SubTypes(sub_types))
             .map_err(ErrorNewType)?;
         Ok(())
     }

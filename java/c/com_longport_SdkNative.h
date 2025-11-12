@@ -162,10 +162,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextSetOnCandlestick
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextSubscribe
- * Signature: (J[Ljava/lang/String;IZLcom/longport/AsyncCallback;)V
+ * Signature: (J[Ljava/lang/String;ILcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextSubscribe
-  (JNIEnv *, jclass, jlong, jobjectArray, jint, jboolean, jobject);
+  (JNIEnv *, jclass, jlong, jobjectArray, jint, jobject);
 
 /*
  * Class:     com_longport_SdkNative

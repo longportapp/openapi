@@ -233,18 +233,13 @@ impl QuoteContext {
     /// QuoteContext.new(config)
     ///   .then((ctx) => {
     ///     ctx.setOnQuote((_, event) => console.log(event.toString()));
-    ///     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true);
+    ///     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
     ///   });
     /// ```
     #[napi]
-    pub async fn subscribe(
-        &self,
-        symbols: Vec<String>,
-        sub_types: Vec<SubType>,
-        is_first_push: bool,
-    ) -> Result<()> {
+    pub async fn subscribe(&self, symbols: Vec<String>, sub_types: Vec<SubType>) -> Result<()> {
         self.ctx
-            .subscribe(symbols, SubTypes(sub_types), is_first_push)
+            .subscribe(symbols, SubTypes(sub_types))
             .await
             .map_err(ErrorNewType)?;
         Ok(())

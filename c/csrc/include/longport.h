@@ -47,6 +47,242 @@
 #define LB_WATCHLIST_GROUP_SECURITIES 2
 
 /**
+ * Language identifer
+ */
+typedef enum lb_language_t {
+  /**
+   * zh-CN
+   */
+  Language_ZH_CN,
+  /**
+   * zh-HK
+   */
+  Language_ZH_HK,
+  /**
+   * en
+   */
+  Language_EN,
+} lb_language_t;
+
+/**
+ * Language identifer
+ */
+typedef enum lb_push_candlestick_mode_t {
+  /**
+   * Real-time
+   */
+  PushCandlestickMode_Realtime,
+  /**
+   * Confirmed
+   */
+  PushCandlestickMode_Confirmed,
+} lb_push_candlestick_mode_t;
+
+/**
+ * Error kind
+ */
+typedef enum lb_error_kind_t {
+  /**
+   * HTTP error
+   */
+  ErrorKindHttp,
+  /**
+   * OpenAPI error
+   */
+  ErrorKindOpenApi,
+  /**
+   * Other error
+   */
+  ErrorKindOther,
+} lb_error_kind_t;
+
+/**
+ * Trade status
+ */
+typedef enum lb_trade_status_t {
+  /**
+   * Normal
+   */
+  TradeStatusNormal,
+  /**
+   * Suspension
+   */
+  TradeStatusHalted,
+  /**
+   * Delisted
+   */
+  TradeStatusDelisted,
+  /**
+   * Fuse
+   */
+  TradeStatusFuse,
+  /**
+   * Papare List
+   */
+  TradeStatusPrepareList,
+  /**
+   * Code Moved
+   */
+  TradeStatusCodeMoved,
+  /**
+   * To Be Opened
+   */
+  TradeStatusToBeOpened,
+  /**
+   * Split Stock Halts
+   */
+  TradeStatusSplitStockHalts,
+  /**
+   * Expired
+   */
+  TradeStatusExpired,
+  /**
+   * Warrant To BeListed
+   */
+  TradeStatusWarrantPrepareList,
+  /**
+   * Suspend
+   */
+  TradeStatusSuspendTrade,
+} lb_trade_status_t;
+
+/**
+ * Trade session
+ */
+typedef enum lb_trade_session_t {
+  /**
+   * Trading
+   */
+  TradeSessionIntraday,
+  /**
+   * Pre-Trading
+   */
+  TradeSessionPre,
+  /**
+   * Post-Trading
+   */
+  TradeSessionPost,
+  /**
+   * Post-Trading
+   */
+  TradeSessionOvernight,
+} lb_trade_session_t;
+
+/**
+ * Trade direction
+ */
+typedef enum lb_trade_direction_t {
+  /**
+   * Neutral
+   */
+  TradeDirectionNeutral,
+  /**
+   * Down
+   */
+  TradeDirectionDown,
+  /**
+   * Up
+   */
+  TradeDirectionUp,
+} lb_trade_direction_t;
+
+/**
+ * Candlestick period
+ */
+typedef enum lb_period_t {
+  /**
+   * Unknown
+   */
+  PeriodUnknown,
+  /**
+   * One Minute
+   */
+  PeriodMin1,
+  /**
+   * Two Minutes
+   */
+  PeriodMin2,
+  /**
+   * Three Minutes
+   */
+  PeriodMin3,
+  /**
+   * Five Minutes
+   */
+  PeriodMin5,
+  /**
+   * Ten Minutes
+   */
+  PeriodMin10,
+  /**
+   * Fifteen Minutes
+   */
+  PeriodMin15,
+  /**
+   * Twenty Minutes
+   */
+  PeriodMin20,
+  /**
+   * Thirty Minutes
+   */
+  PeriodMin30,
+  /**
+   * Forty-Five Minutes
+   */
+  PeriodMin45,
+  /**
+   * One Hour
+   */
+  PeriodMin60,
+  /**
+   * Two Hours
+   */
+  PeriodMin120,
+  /**
+   * Three Hours
+   */
+  PeriodMin180,
+  /**
+   * Four Hours
+   */
+  PeriodMin240,
+  /**
+   * Daily
+   */
+  PeriodDay,
+  /**
+   * Weekly
+   */
+  PeriodWeek,
+  /**
+   * Monthly
+   */
+  PeriodMonth,
+  /**
+   * Quarterly
+   */
+  PeriodQuarter,
+  /**
+   * Yearly
+   */
+  PeriodYear,
+} lb_period_t;
+
+/**
+ * Trade sessions
+ */
+typedef enum lb_trade_sessions_t {
+  /**
+   * Intraday
+   */
+  TradeSessionsIntraday = 0,
+  /**
+   * All
+   */
+  TradeSessionsAll = 100,
+} lb_trade_sessions_t;
+
+/**
  * Adjust type
  */
 typedef enum lb_adjust_type_t {
@@ -61,26 +297,226 @@ typedef enum lb_adjust_type_t {
 } lb_adjust_type_t;
 
 /**
- * Balance type
+ * Warrant sort by
  */
-typedef enum lb_balance_type_t {
+typedef enum lb_warrant_sort_by_t {
+  /**
+   * Last done
+   */
+  WarrantSortByLastDone,
+  /**
+   * Change rate
+   */
+  WarrantSortByChangeRate,
+  /**
+   * Change value
+   */
+  WarrantSortByChangeValue,
+  /**
+   * Volume
+   */
+  WarrantSortByVolume,
+  /**
+   * Turnover
+   */
+  WarrantSortByTurnover,
+  /**
+   * Expiry date
+   */
+  WarrantSortByExpiryDate,
+  /**
+   * Strike price
+   */
+  WarrantSortByStrikePrice,
+  /**
+   * Upper strike price
+   */
+  WarrantSortByUpperStrikePrice,
+  /**
+   * Lower strike price
+   */
+  WarrantSortByLowerStrikePrice,
+  /**
+   * Outstanding quantity
+   */
+  WarrantSortByOutstandingQuantity,
+  /**
+   * Outstanding ratio
+   */
+  WarrantSortByOutstandingRatio,
+  /**
+   * Premium
+   */
+  WarrantSortByPremium,
+  /**
+   * In/out of the bound
+   */
+  WarrantSortByItmOtm,
+  /**
+   * Implied volatility
+   */
+  WarrantSortByImpliedVolatility,
+  /**
+   * Greek value delta
+   */
+  WarrantSortByDelta,
+  /**
+   * Call price
+   */
+  WarrantSortByCallPrice,
+  /**
+   * Price interval from the call price
+   */
+  WarrantSortByToCallPrice,
+  /**
+   * Effective leverage
+   */
+  WarrantSortByEffectiveLeverage,
+  /**
+   * Leverage ratio
+   */
+  WarrantSortByLeverageRatio,
+  /**
+   * Conversion ratio
+   */
+  WarrantSortByConversionRatio,
+  /**
+   * Breakeven point
+   */
+  WarrantSortByBalancePoint,
+  /**
+   * Status
+   */
+  WarrantSortByStatus,
+} lb_warrant_sort_by_t;
+
+/**
+ * Sort order type
+ */
+typedef enum lb_sort_order_type_t {
+  /**
+   * Ascending
+   */
+  SortOrderAscending,
+  /**
+   * Descending
+   */
+  SortOrderDescending,
+} lb_sort_order_type_t;
+
+/**
+ * Warrant type
+ */
+typedef enum lb_warrant_type_t {
   /**
    * Unknown
    */
-  BalanceTypeUnknown,
+  WarrantTypeUnknown,
   /**
-   * Cash
+   * Put
    */
-  BalanceTypeCash,
+  WarrantTypePut,
   /**
-   * Stock
+   * Call
    */
-  BalanceTypeStock,
+  WarrantTypeCall,
   /**
-   * Fund
+   * Bull
    */
-  BalanceTypeFund,
-} lb_balance_type_t;
+  WarrantTypeBull,
+  /**
+   * Bear
+   */
+  WarrantTypeBear,
+  /**
+   * Inline
+   */
+  WarrantTypeInline,
+} lb_warrant_type_t;
+
+/**
+ * Filter warrant expiry date type
+ */
+typedef enum lb_filter_warrant_expiry_date_t {
+  /**
+   * Less than 3 months
+   */
+  WarrantExpiryDate_LT_3,
+  /**
+   * 3 - 6 months
+   */
+  WarrantExpiryDate_Between_3_6,
+  /**
+   * 6 - 12 months
+   */
+  WarrantExpiryDate_Between_6_12,
+  /**
+   * Greater than 12 months
+   */
+  WarrantExpiryDate_GT_12,
+} lb_filter_warrant_expiry_date_t;
+
+/**
+ * Filter warrant in/out of the bounds type
+ */
+typedef enum lb_filter_warrant_in_out_bounds_type_t {
+  /**
+   * In bounds
+   */
+  WarrantInOutBoundsType_In,
+  /**
+   * Out bounds
+   */
+  WarrantInOutBoundsType_Out,
+} lb_filter_warrant_in_out_bounds_type_t;
+
+/**
+ * Warrant status
+ */
+typedef enum lb_warrant_status_t {
+  /**
+   * Suspend
+   */
+  WarrantStatusSuspend,
+  /**
+   * Prepare List
+   */
+  WarrantStatusPrepareList,
+  /**
+   * Normal
+   */
+  WarrantStatusNormal,
+} lb_warrant_status_t;
+
+/**
+ * Market type
+ */
+typedef enum lb_market_t {
+  /**
+   * Unknown
+   */
+  MarketUnknown,
+  /**
+   * US market
+   */
+  MarketUS,
+  /**
+   * HK market
+   */
+  MarketHK,
+  /**
+   * CN market
+   */
+  MarketCN,
+  /**
+   * SG market
+   */
+  MarketSG,
+  /**
+   * Crypto market
+   */
+  MarketCrypto,
+} lb_market_t;
 
 /**
  * Calc index
@@ -249,252 +685,32 @@ typedef enum lb_calc_index_t {
 } lb_calc_index_t;
 
 /**
- * Cash flow direction
+ * Trade session
  */
-typedef enum lb_cash_flow_direction_t {
+typedef enum lb_securities_update_mode_t {
   /**
-   * Unknown
+   * Add securities
    */
-  CashFlowDirectionUnknown,
+  SecuritiesUpdateModeAdd,
   /**
-   * Out
+   * Remove securities
    */
-  CashFlowDirectionOut,
+  SecuritiesUpdateModeRemove,
   /**
-   * In
+   * Replace securities
    */
-  CashFlowDirectionIn,
-} lb_cash_flow_direction_t;
+  SecuritiesUpdateModeReplace,
+} lb_securities_update_mode_t;
 
 /**
- * Charge category code
+ * Security list category
  */
-typedef enum lb_charge_category_code_t {
+typedef enum lb_security_list_category_t {
   /**
-   * Unknown
+   * Overnight
    */
-  ChargeCategoryCodeUnknown,
-  /**
-   * Broker
-   */
-  ChargeCategoryCodeBroker,
-  /**
-   * Third
-   */
-  ChargeCategoryCodeThird,
-} lb_charge_category_code_t;
-
-/**
- * Commission-free Status
- */
-typedef enum lb_commission_free_status_t {
-  /**
-   * Unknown
-   */
-  CommissionFreeStatusUnknown,
-  /**
-   * None
-   */
-  CommissionFreeStatusNone,
-  /**
-   * Commission-free amount to be calculated
-   */
-  CommissionFreeStatusCalculated,
-  /**
-   * Pending commission-free
-   */
-  CommissionFreeStatusPending,
-  /**
-   * Commission-free applied
-   */
-  CommissionFreeStatusReady,
-} lb_commission_free_status_t;
-
-/**
- * Deduction status
- */
-typedef enum lb_deduction_status_t {
-  /**
-   * Unknown
-   */
-  DeductionStatusUnknown,
-  /**
-   * Pending Settlement
-   */
-  DeductionStatusNone,
-  /**
-   * Commission-free amount to be calculated
-   */
-  DeductionStatusNoData,
-  /**
-   * Pending commission-free
-   */
-  DeductionStatusPending,
-  /**
-   * Commission-free applied
-   */
-  DeductionStatusDone,
-} lb_deduction_status_t;
-
-/**
- * Error kind
- */
-typedef enum lb_error_kind_t {
-  /**
-   * HTTP error
-   */
-  ErrorKindHttp,
-  /**
-   * OpenAPI error
-   */
-  ErrorKindOpenApi,
-  /**
-   * Other error
-   */
-  ErrorKindOther,
-} lb_error_kind_t;
-
-/**
- * Filter warrant expiry date type
- */
-typedef enum lb_filter_warrant_expiry_date_t {
-  /**
-   * Less than 3 months
-   */
-  WarrantExpiryDate_LT_3,
-  /**
-   * 3 - 6 months
-   */
-  WarrantExpiryDate_Between_3_6,
-  /**
-   * 6 - 12 months
-   */
-  WarrantExpiryDate_Between_6_12,
-  /**
-   * Greater than 12 months
-   */
-  WarrantExpiryDate_GT_12,
-} lb_filter_warrant_expiry_date_t;
-
-/**
- * Filter warrant in/out of the bounds type
- */
-typedef enum lb_filter_warrant_in_out_bounds_type_t {
-  /**
-   * In bounds
-   */
-  WarrantInOutBoundsType_In,
-  /**
-   * Out bounds
-   */
-  WarrantInOutBoundsType_Out,
-} lb_filter_warrant_in_out_bounds_type_t;
-
-/**
- * Data granularity
- */
-typedef enum lb_granularity_t {
-  /**
-   * Unknown
-   */
-  GranularityUnknown,
-  /**
-   * Daily
-   */
-  GranularityDaily,
-  /**
-   * Weekly
-   */
-  GranularityWeekly,
-  /**
-   * Monthly
-   */
-  GranularityMonthly,
-} lb_granularity_t;
-
-/**
- * Language identifer
- */
-typedef enum lb_language_t {
-  /**
-   * zh-CN
-   */
-  Language_ZH_CN,
-  /**
-   * zh-HK
-   */
-  Language_ZH_HK,
-  /**
-   * en
-   */
-  Language_EN,
-} lb_language_t;
-
-/**
- * Market type
- */
-typedef enum lb_market_t {
-  /**
-   * Unknown
-   */
-  MarketUnknown,
-  /**
-   * US market
-   */
-  MarketUS,
-  /**
-   * HK market
-   */
-  MarketHK,
-  /**
-   * CN market
-   */
-  MarketCN,
-  /**
-   * SG market
-   */
-  MarketSG,
-  /**
-   * Crypto market
-   */
-  MarketCrypto,
-} lb_market_t;
-
-/**
- * Option direction
- */
-typedef enum lb_option_direction_t {
-  /**
-   * Unknown
-   */
-  OptionDirectionUnknown,
-  /**
-   * Put
-   */
-  OptionDirectionPut,
-  /**
-   * Call
-   */
-  OptionDirectionCall,
-} lb_option_direction_t;
-
-/**
- * Option type
- */
-typedef enum lb_option_type_t {
-  /**
-   * Unknown
-   */
-  OptionTypeUnknown,
-  /**
-   * American
-   */
-  OptionTypeAmerican,
-  /**
-   * Enrope
-   */
-  OptionTypeEurope,
-} lb_option_type_t;
+  SecurityListCategoryOvernight,
+} lb_security_list_category_t;
 
 /**
  * Order side
@@ -513,6 +729,68 @@ typedef enum lb_order_side_t {
    */
   OrderSideSell,
 } lb_order_side_t;
+
+/**
+ * Order type
+ */
+typedef enum lb_order_type_t {
+  /**
+   * Unknown
+   */
+  OrderTypeUnknown,
+  /**
+   * Limit Order
+   */
+  OrderTypeLO,
+  /**
+   * Enhanced Limit Order
+   */
+  OrderTypeELO,
+  /**
+   * Market Order
+   */
+  OrderTypeMO,
+  /**
+   * At-auction Order
+   */
+  OrderTypeAO,
+  /**
+   * At-auction Limit Order
+   */
+  OrderTypeALO,
+  /**
+   * Odd Lots
+   */
+  OrderTypeODD,
+  /**
+   * Limit If Touched
+   */
+  OrderTypeLIT,
+  /**
+   * Market If Touched
+   */
+  OrderTypeMIT,
+  /**
+   * Trailing Limit If Touched (Trailing Amount)
+   */
+  OrderTypeTSLPAMT,
+  /**
+   * Trailing Limit If Touched (Trailing Percent)
+   */
+  OrderTypeTSLPPCT,
+  /**
+   * Trailing Market If Touched (Trailing Amount)
+   */
+  OrderTypeTSMAMT,
+  /**
+   * Trailing Market If Touched (Trailing Percent)
+   */
+  OrderTypeTSMPCT,
+  /**
+   * Special Limit Order
+   */
+  OrderTypeSLO,
+} lb_order_type_t;
 
 /**
  * Order status
@@ -639,66 +917,58 @@ typedef enum lb_order_tag_t {
 } lb_order_tag_t;
 
 /**
- * Order type
+ * Order tag
  */
-typedef enum lb_order_type_t {
+typedef enum lb_trigger_status_t {
   /**
    * Unknown
    */
-  OrderTypeUnknown,
+  TriggerStatusUnknown,
   /**
-   * Limit Order
+   * Deactive
    */
-  OrderTypeLO,
+  TriggerStatusDeactive,
   /**
-   * Enhanced Limit Order
+   * Active
    */
-  OrderTypeELO,
+  TriggerStatusActive,
   /**
-   * Market Order
+   * Released
    */
-  OrderTypeMO,
+  TriggerStatusReleased,
+} lb_trigger_status_t;
+
+/**
+ * Topic type
+ */
+typedef enum lb_topic_type_t {
   /**
-   * At-auction Order
+   * Trading
    */
-  OrderTypeAO,
+  TopicPrivate,
+} lb_topic_type_t;
+
+/**
+ * Time in force Type
+ */
+typedef enum lb_time_in_force_type_t {
   /**
-   * At-auction Limit Order
+   * Unknown
    */
-  OrderTypeALO,
+  TimeInForceUnknown,
   /**
-   * Odd Lots
+   * Day Order
    */
-  OrderTypeODD,
+  TimeInForceDay,
   /**
-   * Limit If Touched
+   * Good Til Canceled Order
    */
-  OrderTypeLIT,
+  TimeInForceGoodTilCanceled,
   /**
-   * Market If Touched
+   * Good Til Date Order
    */
-  OrderTypeMIT,
-  /**
-   * Trailing Limit If Touched (Trailing Amount)
-   */
-  OrderTypeTSLPAMT,
-  /**
-   * Trailing Limit If Touched (Trailing Percent)
-   */
-  OrderTypeTSLPPCT,
-  /**
-   * Trailing Market If Touched (Trailing Amount)
-   */
-  OrderTypeTSMAMT,
-  /**
-   * Trailing Market If Touched (Trailing Percent)
-   */
-  OrderTypeTSMPCT,
-  /**
-   * Special Limit Order
-   */
-  OrderTypeSLO,
-} lb_order_type_t;
+  TimeInForceGoodTilDate,
+} lb_time_in_force_type_t;
 
 /**
  * Enable or disable outside regular trading hours
@@ -723,118 +993,26 @@ typedef enum lb_outside_rth_t {
 } lb_outside_rth_t;
 
 /**
- * Candlestick period
+ * Balance type
  */
-typedef enum lb_period_t {
+typedef enum lb_balance_type_t {
   /**
    * Unknown
    */
-  PeriodUnknown,
+  BalanceTypeUnknown,
   /**
-   * One Minute
+   * Cash
    */
-  PeriodMin1,
+  BalanceTypeCash,
   /**
-   * Two Minutes
+   * Stock
    */
-  PeriodMin2,
+  BalanceTypeStock,
   /**
-   * Three Minutes
+   * Fund
    */
-  PeriodMin3,
-  /**
-   * Five Minutes
-   */
-  PeriodMin5,
-  /**
-   * Ten Minutes
-   */
-  PeriodMin10,
-  /**
-   * Fifteen Minutes
-   */
-  PeriodMin15,
-  /**
-   * Twenty Minutes
-   */
-  PeriodMin20,
-  /**
-   * Thirty Minutes
-   */
-  PeriodMin30,
-  /**
-   * Forty-Five Minutes
-   */
-  PeriodMin45,
-  /**
-   * One Hour
-   */
-  PeriodMin60,
-  /**
-   * Two Hours
-   */
-  PeriodMin120,
-  /**
-   * Three Hours
-   */
-  PeriodMin180,
-  /**
-   * Four Hours
-   */
-  PeriodMin240,
-  /**
-   * Daily
-   */
-  PeriodDay,
-  /**
-   * Weekly
-   */
-  PeriodWeek,
-  /**
-   * Monthly
-   */
-  PeriodMonth,
-  /**
-   * Quarterly
-   */
-  PeriodQuarter,
-  /**
-   * Yearly
-   */
-  PeriodYear,
-} lb_period_t;
-
-/**
- * Language identifer
- */
-typedef enum lb_push_candlestick_mode_t {
-  /**
-   * Real-time
-   */
-  PushCandlestickMode_Realtime,
-  /**
-   * Confirmed
-   */
-  PushCandlestickMode_Confirmed,
-} lb_push_candlestick_mode_t;
-
-/**
- * Trade session
- */
-typedef enum lb_securities_update_mode_t {
-  /**
-   * Add securities
-   */
-  SecuritiesUpdateModeAdd,
-  /**
-   * Remove securities
-   */
-  SecuritiesUpdateModeRemove,
-  /**
-   * Replace securities
-   */
-  SecuritiesUpdateModeReplace,
-} lb_securities_update_mode_t;
+  BalanceTypeFund,
+} lb_balance_type_t;
 
 /**
  * Adjust type
@@ -951,328 +1129,150 @@ typedef enum lb_security_board_t {
 } lb_security_board_t;
 
 /**
- * Security list category
+ * Option type
  */
-typedef enum lb_security_list_category_t {
-  /**
-   * Overnight
-   */
-  SecurityListCategoryOvernight,
-} lb_security_list_category_t;
-
-/**
- * Sort order type
- */
-typedef enum lb_sort_order_type_t {
-  /**
-   * Ascending
-   */
-  SortOrderAscending,
-  /**
-   * Descending
-   */
-  SortOrderDescending,
-} lb_sort_order_type_t;
-
-/**
- * Time in force Type
- */
-typedef enum lb_time_in_force_type_t {
+typedef enum lb_option_type_t {
   /**
    * Unknown
    */
-  TimeInForceUnknown,
+  OptionTypeUnknown,
   /**
-   * Day Order
+   * American
    */
-  TimeInForceDay,
+  OptionTypeAmerican,
   /**
-   * Good Til Canceled Order
+   * Enrope
    */
-  TimeInForceGoodTilCanceled,
-  /**
-   * Good Til Date Order
-   */
-  TimeInForceGoodTilDate,
-} lb_time_in_force_type_t;
+  OptionTypeEurope,
+} lb_option_type_t;
 
 /**
- * Topic type
+ * Option direction
  */
-typedef enum lb_topic_type_t {
-  /**
-   * Trading
-   */
-  TopicPrivate,
-} lb_topic_type_t;
-
-/**
- * Trade direction
- */
-typedef enum lb_trade_direction_t {
-  /**
-   * Neutral
-   */
-  TradeDirectionNeutral,
-  /**
-   * Down
-   */
-  TradeDirectionDown,
-  /**
-   * Up
-   */
-  TradeDirectionUp,
-} lb_trade_direction_t;
-
-/**
- * Trade session
- */
-typedef enum lb_trade_session_t {
-  /**
-   * Trading
-   */
-  TradeSessionIntraday,
-  /**
-   * Pre-Trading
-   */
-  TradeSessionPre,
-  /**
-   * Post-Trading
-   */
-  TradeSessionPost,
-  /**
-   * Post-Trading
-   */
-  TradeSessionOvernight,
-} lb_trade_session_t;
-
-/**
- * Trade sessions
- */
-typedef enum lb_trade_sessions_t {
-  /**
-   * Intraday
-   */
-  TradeSessionsIntraday = 0,
-  /**
-   * All
-   */
-  TradeSessionsAll = 100,
-} lb_trade_sessions_t;
-
-/**
- * Trade status
- */
-typedef enum lb_trade_status_t {
-  /**
-   * Normal
-   */
-  TradeStatusNormal,
-  /**
-   * Suspension
-   */
-  TradeStatusHalted,
-  /**
-   * Delisted
-   */
-  TradeStatusDelisted,
-  /**
-   * Fuse
-   */
-  TradeStatusFuse,
-  /**
-   * Papare List
-   */
-  TradeStatusPrepareList,
-  /**
-   * Code Moved
-   */
-  TradeStatusCodeMoved,
-  /**
-   * To Be Opened
-   */
-  TradeStatusToBeOpened,
-  /**
-   * Split Stock Halts
-   */
-  TradeStatusSplitStockHalts,
-  /**
-   * Expired
-   */
-  TradeStatusExpired,
-  /**
-   * Warrant To BeListed
-   */
-  TradeStatusWarrantPrepareList,
-  /**
-   * Suspend
-   */
-  TradeStatusSuspendTrade,
-} lb_trade_status_t;
-
-/**
- * Order tag
- */
-typedef enum lb_trigger_status_t {
+typedef enum lb_option_direction_t {
   /**
    * Unknown
    */
-  TriggerStatusUnknown,
-  /**
-   * Deactive
-   */
-  TriggerStatusDeactive,
-  /**
-   * Active
-   */
-  TriggerStatusActive,
-  /**
-   * Released
-   */
-  TriggerStatusReleased,
-} lb_trigger_status_t;
-
-/**
- * Warrant sort by
- */
-typedef enum lb_warrant_sort_by_t {
-  /**
-   * Last done
-   */
-  WarrantSortByLastDone,
-  /**
-   * Change rate
-   */
-  WarrantSortByChangeRate,
-  /**
-   * Change value
-   */
-  WarrantSortByChangeValue,
-  /**
-   * Volume
-   */
-  WarrantSortByVolume,
-  /**
-   * Turnover
-   */
-  WarrantSortByTurnover,
-  /**
-   * Expiry date
-   */
-  WarrantSortByExpiryDate,
-  /**
-   * Strike price
-   */
-  WarrantSortByStrikePrice,
-  /**
-   * Upper strike price
-   */
-  WarrantSortByUpperStrikePrice,
-  /**
-   * Lower strike price
-   */
-  WarrantSortByLowerStrikePrice,
-  /**
-   * Outstanding quantity
-   */
-  WarrantSortByOutstandingQuantity,
-  /**
-   * Outstanding ratio
-   */
-  WarrantSortByOutstandingRatio,
-  /**
-   * Premium
-   */
-  WarrantSortByPremium,
-  /**
-   * In/out of the bound
-   */
-  WarrantSortByItmOtm,
-  /**
-   * Implied volatility
-   */
-  WarrantSortByImpliedVolatility,
-  /**
-   * Greek value delta
-   */
-  WarrantSortByDelta,
-  /**
-   * Call price
-   */
-  WarrantSortByCallPrice,
-  /**
-   * Price interval from the call price
-   */
-  WarrantSortByToCallPrice,
-  /**
-   * Effective leverage
-   */
-  WarrantSortByEffectiveLeverage,
-  /**
-   * Leverage ratio
-   */
-  WarrantSortByLeverageRatio,
-  /**
-   * Conversion ratio
-   */
-  WarrantSortByConversionRatio,
-  /**
-   * Breakeven point
-   */
-  WarrantSortByBalancePoint,
-  /**
-   * Status
-   */
-  WarrantSortByStatus,
-} lb_warrant_sort_by_t;
-
-/**
- * Warrant status
- */
-typedef enum lb_warrant_status_t {
-  /**
-   * Suspend
-   */
-  WarrantStatusSuspend,
-  /**
-   * Prepare List
-   */
-  WarrantStatusPrepareList,
-  /**
-   * Normal
-   */
-  WarrantStatusNormal,
-} lb_warrant_status_t;
-
-/**
- * Warrant type
- */
-typedef enum lb_warrant_type_t {
-  /**
-   * Unknown
-   */
-  WarrantTypeUnknown,
+  OptionDirectionUnknown,
   /**
    * Put
    */
-  WarrantTypePut,
+  OptionDirectionPut,
   /**
    * Call
    */
-  WarrantTypeCall,
+  OptionDirectionCall,
+} lb_option_direction_t;
+
+/**
+ * Cash flow direction
+ */
+typedef enum lb_cash_flow_direction_t {
   /**
-   * Bull
+   * Unknown
    */
-  WarrantTypeBull,
+  CashFlowDirectionUnknown,
   /**
-   * Bear
+   * Out
    */
-  WarrantTypeBear,
+  CashFlowDirectionOut,
   /**
-   * Inline
+   * In
    */
-  WarrantTypeInline,
-} lb_warrant_type_t;
+  CashFlowDirectionIn,
+} lb_cash_flow_direction_t;
+
+/**
+ * Commission-free Status
+ */
+typedef enum lb_commission_free_status_t {
+  /**
+   * Unknown
+   */
+  CommissionFreeStatusUnknown,
+  /**
+   * None
+   */
+  CommissionFreeStatusNone,
+  /**
+   * Commission-free amount to be calculated
+   */
+  CommissionFreeStatusCalculated,
+  /**
+   * Pending commission-free
+   */
+  CommissionFreeStatusPending,
+  /**
+   * Commission-free applied
+   */
+  CommissionFreeStatusReady,
+} lb_commission_free_status_t;
+
+/**
+ * Deduction status
+ */
+typedef enum lb_deduction_status_t {
+  /**
+   * Unknown
+   */
+  DeductionStatusUnknown,
+  /**
+   * Pending Settlement
+   */
+  DeductionStatusNone,
+  /**
+   * Commission-free amount to be calculated
+   */
+  DeductionStatusNoData,
+  /**
+   * Pending commission-free
+   */
+  DeductionStatusPending,
+  /**
+   * Commission-free applied
+   */
+  DeductionStatusDone,
+} lb_deduction_status_t;
+
+/**
+ * Charge category code
+ */
+typedef enum lb_charge_category_code_t {
+  /**
+   * Unknown
+   */
+  ChargeCategoryCodeUnknown,
+  /**
+   * Broker
+   */
+  ChargeCategoryCodeBroker,
+  /**
+   * Third
+   */
+  ChargeCategoryCodeThird,
+} lb_charge_category_code_t;
+
+/**
+ * Data granularity
+ */
+typedef enum lb_granularity_t {
+  /**
+   * Unknown
+   */
+  GranularityUnknown,
+  /**
+   * Daily
+   */
+  GranularityDaily,
+  /**
+   * Weekly
+   */
+  GranularityWeekly,
+  /**
+   * Monthly
+   */
+  GranularityMonthly,
+} lb_granularity_t;
 
 /**
  * Configuration options for LongPort sdk
@@ -3998,7 +3998,6 @@ void lb_quote_context_subscribe(const struct lb_quote_context_t *ctx,
                                 const char *const *symbols,
                                 uintptr_t num_symbols,
                                 uint8_t sub_types,
-                                bool is_first_push,
                                 lb_async_callback_t callback,
                                 void *userdata);
 

@@ -129,7 +129,6 @@ QuoteContext::quote_package_details(
 void
 QuoteContext::subscribe(const std::vector<std::string>& symbols,
                         SubFlags sub_flags,
-                        bool is_first_push,
                         AsyncCallback<QuoteContext, void> callback) const
 {
   auto c_symbols = utils::get_cstring_vector(symbols);
@@ -139,7 +138,6 @@ QuoteContext::subscribe(const std::vector<std::string>& symbols,
     c_symbols.data(),
     c_symbols.size(),
     sub_flags,
-    is_first_push,
     [](auto res) {
       auto callback_ptr =
         callback::get_async_callback<QuoteContext, void>(res->userdata);

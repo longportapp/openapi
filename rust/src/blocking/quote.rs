@@ -70,22 +70,20 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, event_handler)?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, false)?;
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
     /// sleep(Duration::from_secs(30));
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subscribe<I, T, F>(&self, symbols: I, sub_types: F, is_first_push: bool) -> Result<()>
+    pub fn subscribe<I, T, F>(&self, symbols: I, sub_types: F) -> Result<()>
     where
         I: IntoIterator<Item = T> + Send + 'static,
         I::IntoIter: Send + 'static,
         T: AsRef<str> + Send + 'static,
         F: Into<SubFlags> + Send + 'static,
     {
-        self.rt.call(move |ctx| async move {
-            ctx.subscribe(symbols, sub_types.into(), is_first_push)
-                .await
-        })
+        self.rt
+            .call(move |ctx| async move { ctx.subscribe(symbols, sub_types.into()).await })
     }
 
     /// Unsubscribe quote
@@ -101,8 +99,8 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, false)?;
-    /// ctx.subscribe(["AAPL.US"], SubFlags::QUOTE, false)?;
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
+    /// ctx.subscribe(["AAPL.US"], SubFlags::QUOTE)?;
     /// # Ok(())
     /// # }
     /// ```
@@ -180,7 +178,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, false)?;
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
     /// let resp = ctx.subscriptions();
     /// println!("{:?}", resp);
     /// # Ok(())
@@ -926,7 +924,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE, true)?;
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::QUOTE)?;
     /// sleep(Duration::from_secs(5));
     ///
     /// let resp = ctx.realtime_quote(["700.HK", "AAPL.US"])?;
@@ -960,7 +958,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH, true)?;
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::DEPTH)?;
     /// sleep(Duration::from_secs(5));
     ///
     /// let resp = ctx.realtime_depth("700.HK")?;
@@ -992,7 +990,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE, false)?;
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::TRADE)?;
     /// sleep(Duration::from_secs(5));
     ///
     /// let resp = ctx.realtime_trades("700.HK", 10)?;
@@ -1025,7 +1023,7 @@ impl QuoteContextSync {
     /// let config = Arc::new(Config::from_env()?);
     /// let ctx = QuoteContextSync::try_new(config, |_| ())?;
     ///
-    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER, false)?;
+    /// ctx.subscribe(["700.HK", "AAPL.US"], SubFlags::BROKER)?;
     /// sleep(Duration::from_secs(5));
     ///
     /// let resp = ctx.realtime_brokers("700.HK")?;

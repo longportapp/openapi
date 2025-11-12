@@ -2747,14 +2747,13 @@ class QuoteContext:
         Set candlestick callback, after receiving the candlestick updated event, it will call back to this function.
         """
 
-    def subscribe(self, symbols: List[str], sub_types: List[Type[SubType]], is_first_push: bool = False) -> None:
+    def subscribe(self, symbols: List[str], sub_types: List[Type[SubType]]) -> None:
         """
         Subscribe
 
         Args:
             symbols: Security codes
             sub_types: Subscribe types
-            is_first_push: Whether to perform a data push immediately after subscribing. (trade not supported)
 
         Examples:
             ::
@@ -2769,8 +2768,7 @@ class QuoteContext:
                 ctx = QuoteContext(config)
                 ctx.set_on_quote(on_quote)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [
-                              SubType.Quote], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                 sleep(30)
         """
 
@@ -3472,8 +3470,7 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [
-                              SubType.Quote], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
                 sleep(5)
                 resp = ctx.realtime_quote(["700.HK", "AAPL.US"])
                 print(resp)
@@ -3500,8 +3497,7 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [
-                              SubType.Depth], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
                 sleep(5)
                 resp = ctx.realtime_depth("700.HK")
                 print(resp)
@@ -3528,8 +3524,7 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [
-                              SubType.Brokers], is_first_push = True)
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
                 sleep(5)
                 resp = ctx.realtime_brokers("700.HK")
                 print(resp)
@@ -3557,8 +3552,7 @@ class QuoteContext:
                 config = Config.from_env()
                 ctx = QuoteContext(config)
 
-                ctx.subscribe(["700.HK", "AAPL.US"], [
-                              SubType.Trade], is_first_push = False)
+                ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
                 sleep(5)
                 resp = ctx.realtime_trades("700.HK", 10)
                 print(resp)

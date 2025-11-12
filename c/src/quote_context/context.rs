@@ -419,7 +419,6 @@ pub unsafe extern "C" fn lb_quote_context_subscribe(
     symbols: *const *const c_char,
     num_symbols: usize,
     sub_types: u8,
-    is_first_push: bool,
     callback: CAsyncCallback,
     userdata: *mut c_void,
 ) {
@@ -430,7 +429,6 @@ pub unsafe extern "C" fn lb_quote_context_subscribe(
             .subscribe(
                 symbols,
                 SubFlags::from_bits(sub_types).unwrap_or_else(SubFlags::empty),
-                is_first_push,
             )
             .await
     });

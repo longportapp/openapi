@@ -46,7 +46,6 @@ pub(crate) enum Command {
     Subscribe {
         symbols: Vec<String>,
         sub_types: SubFlags,
-        is_first_push: bool,
         reply_tx: oneshot::Sender<Result<()>>,
     },
     Unsubscribe {
@@ -425,12 +424,9 @@ impl Core {
             Command::Subscribe {
                 symbols,
                 sub_types,
-                is_first_push,
                 reply_tx,
             } => {
-                let res = self
-                    .handle_subscribe(symbols, sub_types, is_first_push)
-                    .await;
+                let res = self.handle_subscribe(symbols, sub_types).await;
                 let _ = reply_tx.send(res);
                 Ok(())
             }
@@ -510,17 +506,12 @@ impl Core {
         Ok(())
     }
 
-    async fn handle_subscribe(
-        &mut self,
-        symbols: Vec<String>,
-        sub_types: SubFlags,
-        is_first_push: bool,
-    ) -> Result<()> {
+    async fn handle_subscribe(&mut self, symbols: Vec<String>, sub_types: SubFlags) -> Result<()> {
         // send request
         let req = SubscribeRequest {
             symbol: symbols.clone(),
             sub_type: sub_types.into(),
-            is_first_push,
+            is_first_push: true,
         };
         self.ws_cli
             .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)
@@ -700,7 +691,7 @@ impl Core {
         let req = SubscribeRequest {
             symbol: vec![symbol.clone()],
             sub_type: (SubFlags::QUOTE | SubFlags::TRADE).into(),
-            is_first_push: false,
+            is_first_push: true,
         };
         self.ws_cli
             .request::<_, ()>(cmd_code::SUBSCRIBE, None, req)

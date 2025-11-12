@@ -134,14 +134,12 @@ public class QuoteContext implements AutoCloseable {
      * 
      * @param symbols     Security symbols
      * @param flags       Subscription flags
-     * @param isFirstPush Whether to perform a data push immediately after
-     *                    subscribing.
      * @return A Future representing the result of the operation
      * @throws OpenApiException If an error occurs
      */
-    public CompletableFuture<Void> subscribe(String[] symbols, int flags, boolean isFirstPush) throws OpenApiException {
+    public CompletableFuture<Void> subscribe(String[] symbols, int flags) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.quoteContextSubscribe(this.raw, symbols, flags, isFirstPush, callback);
+            SdkNative.quoteContextSubscribe(this.raw, symbols, flags, callback);
         });
     }
 

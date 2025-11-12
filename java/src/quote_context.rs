@@ -302,7 +302,6 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribe(
     context: i64,
     symbols: jobjectArray,
     flags: i32,
-    is_first_push: jboolean,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -311,10 +310,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextSubscribe(
             FromJValue::from_jvalue(env, JObject::from_raw(symbols).into())?;
         let sub_flags = SubFlags::from_bits(flags as u8).unwrap_or(SubFlags::empty());
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
-                .subscribe(symbols.0, sub_flags, is_first_push > 0)
-                .await?)
+            Ok(context.ctx.subscribe(symbols.0, sub_flags).await?)
         })?;
         Ok(())
     })
