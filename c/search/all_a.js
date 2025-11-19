@@ -191,7 +191,7 @@ var searchData=
   ['lb_5fquote_5fcontext_5fset_5fon_5ftrades_360',['lb_quote_context_set_on_trades',['../longport_8h.html#a985063b766c0c154f16a13f5064a0f9b',1,'longport.h']]],
   ['lb_5fquote_5fcontext_5fset_5fuserdata_361',['lb_quote_context_set_userdata',['../longport_8h.html#a955c62b775ff6124637f9725f835dfe8',1,'longport.h']]],
   ['lb_5fquote_5fcontext_5fstatic_5finfo_362',['lb_quote_context_static_info',['../longport_8h.html#a3c5a0b9a2cfb5a6c5f4af52c9d2a2768',1,'longport.h']]],
-  ['lb_5fquote_5fcontext_5fsubscribe_363',['lb_quote_context_subscribe',['../longport_8h.html#adad7a8ae6ee549f85603187ade0d7382',1,'longport.h']]],
+  ['lb_5fquote_5fcontext_5fsubscribe_363',['lb_quote_context_subscribe',['../longport_8h.html#a4a574a687e60afab3aa5dcf2d0c0a0c3',1,'longport.h']]],
   ['lb_5fquote_5fcontext_5fsubscribe_5fcandlesticks_364',['lb_quote_context_subscribe_candlesticks',['../longport_8h.html#ad3e60e4116d7ef1c6317b31d8dea098c',1,'longport.h']]],
   ['lb_5fquote_5fcontext_5fsubscrptions_365',['lb_quote_context_subscrptions',['../longport_8h.html#a17b7138f36a7061f072fbe90c820cdaf',1,'longport.h']]],
   ['lb_5fquote_5fcontext_5ft_366',['lb_quote_context_t',['../longport_8h.html#a2fc8527444c5b89959fe12f79a292603',1,'longport.h']]],
