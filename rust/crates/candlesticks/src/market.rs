@@ -415,4 +415,63 @@ impl Market {
         }
         None
     }
+
+    pub fn is_first<H, TS>(
+        &self,
+        half_days: H,
+        period: Period,
+        ts: TS,
+        candlestick_time: OffsetDateTime,
+    ) -> bool
+    where
+        H: Days,
+        TS: TradeSessionType,
+    {
+        assert!(period.is_minute());
+        if !half_days.contains(candlestick_time.date()) {
+            self.trade_sessions
+        } else {
+            self.half_trade_sessions
+        }
+        .get(ts.kind().0)
+        .and_then(|sessions| sessions.first())
+        .map(|session| session.start)
+            == Some(candlestick_time.to_timezone(self.timezone).time())
+    }
+
+    pub fn is_last<H, TS>(
+        &self,
+        half_days: H,
+        period: Period,
+        ts: TS,
+        candlestick_time: OffsetDateTime,
+    ) -> bool
+    where
+        H: Days,
+        TS: TradeSessionType,
+    {
+        assert!(period.is_minute());
+
+        let Some(mut end) = if !half_days.contains(candlestick_time.date()) {
+            self.trade_sessions
+        } else {
+            self.half_trade_sessions
+        }
+        .get(ts.kind().0)
+        .and_then(|sessions| sessions.last())
+        .map(|session| session.end) else {
+            return false;
+        };
+        end -= Duration::seconds(1);
+        let Some(last_time) = PrimitiveDateTime::new(candlestick_time.date(), end)
+            .assume_timezone(self.timezone)
+            .take_first()
+        else {
+            return false;
+        };
+        let Some(last_time) = self.candlestick_time(ts, half_days, period, last_time) else {
+            return false;
+        };
+        last_time.time() == candlestick_time.to_timezone(self.timezone).time()
+    }
 }

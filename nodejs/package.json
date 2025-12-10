@@ -22,7 +22,7 @@
   },
   "homepage": "https://open.longportapp.com/en/",
   "devDependencies": {
-    "@napi-rs/cli": "^3.0.3"
+    "@napi-rs/cli": "^3.5.0"
   },
   "engines": {
     "node": ">= 10"

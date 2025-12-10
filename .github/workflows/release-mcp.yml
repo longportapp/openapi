@@ -25,10 +25,10 @@ jobs:
             target: x86_64-pc-windows-msvc
             bin: longport-mcp
             bin_suffix: .exe
-          - host: macos-13
+          - host: macos-14
             target: x86_64-apple-darwin
             bin: longport-mcp
-          - host: macos-13
+          - host: macos-14
             target: aarch64-apple-darwin
             bin: longport-mcp
     runs-on: ${{ matrix.settings.host }}

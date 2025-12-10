@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-14]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -53,9 +53,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13]
-        python-version:
-          ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        os: [ubuntu-22.04, windows-latest, macos-14]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -89,13 +88,11 @@ jobs:
   build-python-sdk-macos:
     needs:
       - check-python-sdk
-    runs-on: macos-13
+    runs-on: macos-14
     strategy:
       fail-fast: true
       matrix:
         python:
-          - version: "3.7"
-            universal2: false
           - version: "3.8"
             universal2: true
           - version: "3.9"
@@ -153,8 +150,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version:
-          ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         target: [x64, x86]
     steps:
       - name: Checkout
@@ -191,8 +187,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version:
-          ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         target: [x86_64, i686]
     steps:
       - name: Checkout
@@ -226,8 +221,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python-version:
-          ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
         target: [aarch64]
     steps:
       - name: Checkout
@@ -292,7 +286,7 @@ jobs:
               yarn build:debug --target aarch64-unknown-linux-gnu
               aarch64-unknown-linux-gnu-strip *.node
 
-          - host: macos-13
+          - host: macos-14
             architecture: x64
             build: |
               rustup install 1.89.0
@@ -314,7 +308,7 @@ jobs:
               yarn build:debug
               strip *.node
 
-          - host: macos-13
+          - host: macos-14
             target: aarch64-apple-darwin
             build: |
               sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
@@ -388,7 +382,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-14]
         java-version: ["8"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -397,7 +391,7 @@ jobs:
           submodules: true
 
       - name: Install JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "temurin"
@@ -424,7 +418,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-13]
+        os: [ubuntu-22.04, windows-latest, macos-14]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -467,7 +461,7 @@ jobs:
             platform: OS64
           - target: aarch64-apple-ios-sim
             platform: SIMULATOR64
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
         with:

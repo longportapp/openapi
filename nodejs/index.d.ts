@@ -1016,11 +1016,11 @@ export declare class QuoteContext {
    * QuoteContext.new(config)
    *   .then((ctx) => {
    *     ctx.setOnQuote((_, event) => console.log(event.toString()));
-   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote], true);
+   *     ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote]);
    *   });
    * ```
    */
-  subscribe(symbols: Array<string>, subTypes: Array<SubType>, isFirstPush: boolean): Promise<void>
+  subscribe(symbols: Array<string>, subTypes: Array<SubType>): Promise<void>
   /**
    * Unsubscribe
    *
@@ -3044,7 +3044,11 @@ export declare const enum SecurityBoard {
   /** Singapore Straits Index */
   STI = 23,
   /** SG Industry Board */
-  SGSector = 24
+  SGSector = 24,
+  /** S&P 500 Index */
+  SPXIndex = 25,
+  /** CBOE Volatility Index */
+  VIXIndex = 26
 }
 
 /** Security list category */
