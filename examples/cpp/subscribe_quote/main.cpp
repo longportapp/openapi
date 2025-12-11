@@ -47,7 +47,7 @@ main(int argc, char const* argv[])
       "700.HK", "AAPL.US", "TSLA.US", "NFLX.US"
     };
 
-    res.context().subscribe(symbols, SubFlags::QUOTE(), true, [](auto res) {
+    res.context().subscribe(symbols, SubFlags::QUOTE(), [](auto res) {
       if (!res) {
         std::cout << "failed to subscribe quote: " << *res.status().message()
                   << std::endl;
