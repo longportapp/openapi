@@ -184,6 +184,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build
               strip -x *.node
             artifact-name: linux-x64-musl
@@ -194,6 +195,7 @@ jobs:
               rustup install 1.89.0
               rustup default 1.89.0
               rustup target add aarch64-unknown-linux-gnu
+              yarn install
               yarn build --target aarch64-unknown-linux-gnu
               aarch64-unknown-linux-gnu-strip *.node
             artifact-name: linux-aarch64
@@ -211,6 +213,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build
               strip -x *.node
             artifact-name: macos
@@ -219,6 +222,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build
             architecture: x64
             artifact-name: windows
@@ -227,6 +231,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build
               strip *.node
             artifact-name: linux-x64
@@ -242,6 +247,7 @@ jobs:
               rustup install 1.89.0
               rustup default 1.89.0
               rustup target add aarch64-apple-darwin
+              yarn install
               yarn build --target aarch64-apple-darwin
               strip -x *.node
             artifact-name: macos-aarch64

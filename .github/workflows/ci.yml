@@ -274,6 +274,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build:debug
               strip -x *.node
 
@@ -282,6 +283,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               rustup target add aarch64-unknown-linux-gnu
               yarn build:debug --target aarch64-unknown-linux-gnu
               aarch64-unknown-linux-gnu-strip *.node
@@ -291,6 +293,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build:debug
               strip -x *.node
 
@@ -298,6 +301,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build:debug
             architecture: x64
 
@@ -305,6 +309,7 @@ jobs:
             build: |
               rustup install 1.89.0
               rustup default 1.89.0
+              yarn install
               yarn build:debug
               strip *.node
 
@@ -319,6 +324,7 @@ jobs:
               rustup install 1.89.0
               rustup default 1.89.0
               rustup target add aarch64-apple-darwin
+              yarn install
               yarn build:debug --target aarch64-apple-darwin
               strip -x *.node
 
