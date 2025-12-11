@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-python-sdk-macos:
-    runs-on: macos-14
+    runs-on: macos-latest
     strategy:
       fail-fast: true
       matrix:
@@ -208,7 +208,7 @@ jobs:
           #       /aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip *.node
           #     artifact-name: linux-aarch64-musl
 
-          - host: macos-14
+          - host: macos-latest
             architecture: x64
             build: |
               rustup install 1.89.0
@@ -236,7 +236,7 @@ jobs:
               strip *.node
             artifact-name: linux-x64
 
-          - host: macos-14
+          - host: macos-latest
             target: aarch64-apple-darwin
             build: |
               sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
@@ -315,11 +315,11 @@ jobs:
           - host: windows-latest
             lib_suffix: ".dll"
             target: x86_64-pc-windows-msvc
-          - host: macos-14
+          - host: macos-latest
             lib_prefix: "lib"
             lib_suffix: ".dylib"
             target: x86_64-apple-darwin
-          - host: macos-14
+          - host: macos-latest
             lib_prefix: "lib"
             lib_suffix: ".dylib"
             target: aarch64-apple-darwin
@@ -391,11 +391,11 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
             platform: x86_64_windows
-          - host: macos-14
+          - host: macos-latest
             target: x86_64-apple-darwin
             platform: x86_64_macos
             dylib_ext: dylib
-          - host: macos-14
+          - host: macos-latest
             target: aarch64-apple-darwin
             platform: aarch64_macos
             dylib_ext: dylib
@@ -471,11 +471,11 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
             platform: x86_64_windows
-          - host: macos-14
+          - host: macos-latest
             target: x86_64-apple-darwin
             platform: x86_64_macos
             dylib_ext: dylib
-          - host: macos-14
+          - host: macos-latest
             target: aarch64-apple-darwin
             platform: aarch64_macos
             dylib_ext: dylib
@@ -564,7 +564,7 @@ jobs:
             build-type: Release
             target-dir: release
             cargo-args: -r
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:

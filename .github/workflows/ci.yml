@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +53,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -88,7 +88,7 @@ jobs:
   build-python-sdk-macos:
     needs:
       - check-python-sdk
-    runs-on: macos-14
+    runs-on: macos-latest
     strategy:
       fail-fast: true
       matrix:
@@ -288,7 +288,7 @@ jobs:
               yarn build:debug --target aarch64-unknown-linux-gnu
               aarch64-unknown-linux-gnu-strip *.node
 
-          - host: macos-14
+          - host: macos-latest
             architecture: x64
             build: |
               rustup install 1.89.0
@@ -313,7 +313,7 @@ jobs:
               yarn build:debug
               strip *.node
 
-          - host: macos-14
+          - host: macos-latest
             target: aarch64-apple-darwin
             build: |
               sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
@@ -388,7 +388,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-latest]
         java-version: ["11"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -424,7 +424,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-14]
+        os: [ubuntu-22.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -467,7 +467,7 @@ jobs:
             platform: OS64
           - target: aarch64-apple-ios-sim
             platform: SIMULATOR64
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
