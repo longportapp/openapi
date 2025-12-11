@@ -17,7 +17,7 @@ LongPort OpenAPI provides programmatic quote trading interfaces for investors wi
 | [Rust](rust/README.md)      | [Doc](https://longportapp.github.io/openapi/rust/longport/index.html) | LongPort OpenAPI for Rust `(>= 1.89.0)`           |
 | [Python](python/README.md)  | [Doc](https://longportapp.github.io/openapi/python/index.html)        | LongPort OpenAPI for Python 3 `(>= 3.8)`          |
 | [Node.js](nodejs/README.md) | [Doc](https://longportapp.github.io/openapi/nodejs/index.html)        | LongPort OpenAPI for Node.js `(>= 10)`            |
-| [Java](java/README.md)      | [Doc](https://longportapp.github.io/openapi/java/index.html)          | LongPort OpenAPI for Java `(>= 1.8)`              |
+| [Java](java/README.md)      | [Doc](https://longportapp.github.io/openapi/java/index.html)          | LongPort OpenAPI for Java `(>= 11)`               |
 | [C](c/README.md)            | [Doc](https://longportapp.github.io/openapi/c/index.html)             | LongPort OpenAPI for C `(>= C99)`                 |
 | [C++](cpp/README.md)        | [Doc](https://longportapp.github.io/openapi/cpp/index.html)           | LongPort OpenAPI for C++`(>= C++17)`              |
 | Go                          |                                                                       | https://github.com/longportapp/openapi-go         |

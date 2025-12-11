@@ -12,19 +12,12 @@ jobs:
       matrix:
         python:
           - version: "3.8"
-            universal2: true
           - version: "3.9"
-            universal2: true
           - version: "3.10"
-            universal2: true
           - version: "3.11"
-            universal2: true
           - version: "3.12"
-            universal2: true
           - version: "3.13"
-            universal2: true
           - version: "3.14"
-            universal2: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,21 +31,12 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-      - name: Build wheels - x86_64
+      - name: Build wheels - arm64
         uses: PyO3/maturin-action@v1
         with:
-          target: x86_64
+          target: arm64
           args: -i python --release --out dist -m python/Cargo.toml
-      - name: Install built wheel - x86_64
-        run: |
-          pip install longport --no-index --find-links dist --force-reinstall
-      - name: Build wheels - universal2
-        if: ${{ matrix.python.universal2 }}
-        uses: PyO3/maturin-action@v1
-        with:
-          args: -i python --release --target universal2-apple-darwin --out dist -m python/Cargo.toml
-      - name: Install built wheel - universal2
-        if: ${{ matrix.python.universal2 }}
+      - name: Install built wheel - arm64
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
       - name: Upload wheels
