@@ -394,7 +394,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: "temurin"
+          distribution: "oracle"
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

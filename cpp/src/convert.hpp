@@ -549,7 +549,7 @@ inline TradeSession
 convert(lb_trade_session_t ty)
 {
   switch (ty) {
-    case TradeSessionsIntraday:
+    case TradeSessionIntraday:
       return TradeSession::Intraday;
     case TradeSessionPre:
       return TradeSession::Pre;

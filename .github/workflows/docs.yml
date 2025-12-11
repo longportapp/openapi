@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: "11"
-          distribution: "temurin"
+          distribution: "oracle"
 
       - name: Install Doxygen
         run: |
