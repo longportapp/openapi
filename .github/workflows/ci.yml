@@ -383,7 +383,7 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-22.04, windows-latest, macos-14]
-        java-version: ["8"]
+        java-version: ["11"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -394,7 +394,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: "oracle"
+          distribution: "temurin"
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

@@ -46,7 +46,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           java-version: "11"
-          distribution: "oracle"
+          distribution: "temurin"
       - name: Build Java docs
         working-directory: ./java/javasrc
         run: mvn javadoc:javadoc

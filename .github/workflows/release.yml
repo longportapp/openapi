@@ -871,8 +871,8 @@ jobs:
       - name: Install JDK
         uses: actions/setup-java@v5
         with:
-          java-version: "8"
-          distribution: "oracle"
+          java-version: "11"
+          distribution: "temurin"
 
       - name: Download all artifacts
         uses: actions/download-artifact@v5
