@@ -417,6 +417,12 @@ impl Longport {
         /// - GTC: Good Till Cancel
         /// - GTD: Good Till Date
         time_in_force: String,
+        /// Limit depth level
+        limit_depth_level: Option<i32>,
+        /// Trigger count
+        trigger_count: Option<i32>,
+        /// Monitor price
+        monitor_price: Option<Decimal>,
     ) -> Result<Json<SubmitOrderResponse>, Error> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
@@ -473,6 +479,16 @@ impl Longport {
                     error: err.to_string(),
                 }
             })?);
+        }
+
+        if let Some(limit_depth_level) = limit_depth_level {
+            opts = opts.limit_depth_level(limit_depth_level);
+        }
+        if let Some(trigger_count) = trigger_count {
+            opts = opts.trigger_count(trigger_count);
+        }
+        if let Some(monitor_price) = monitor_price {
+            opts = opts.monitor_price(monitor_price);
         }
 
         self.trade_context.submit_order(opts).await.map(Json)

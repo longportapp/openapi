@@ -11,6 +11,9 @@ public class ReplaceOrderOptions {
     private BigDecimal limitOffset;
     private BigDecimal trailingAmount;
     private BigDecimal trailingPercent;
+    private Integer limitDepthLevel;
+    private Integer triggerCount;
+    private BigDecimal monitorPrice;
     private String remark;
 
     public ReplaceOrderOptions(String orderId, BigDecimal quantity) {
@@ -40,6 +43,21 @@ public class ReplaceOrderOptions {
 
     public ReplaceOrderOptions setTrailingPercent(BigDecimal trailingPercent) {
         this.trailingPercent = trailingPercent;
+        return this;
+    }
+
+    public ReplaceOrderOptions setLimitDepthLevel(Integer limitDepthLevel) {
+        this.limitDepthLevel = limitDepthLevel;
+        return this;
+    }
+
+    public ReplaceOrderOptions setTriggerCount(Integer triggerCount) {
+        this.triggerCount = triggerCount;
+        return this;
+    }
+
+    public ReplaceOrderOptions setMonitorPrice(BigDecimal monitorPrice) {
+        this.monitorPrice = monitorPrice;
         return this;
     }
 

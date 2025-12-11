@@ -1490,6 +1490,12 @@ struct Order
   std::string currency;
   /// Enable or disable outside regular trading hours
   std::optional<OutsideRTH> outside_rth;
+  /// Limit depth level
+  std::optional<int32_t> limit_depth_level;
+  /// Trigger count
+  std::optional<int32_t> trigger_count;
+  /// Monitor price
+  std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
 };
@@ -1598,6 +1604,12 @@ struct ReplaceOrderOptions
   std::optional<Decimal> trailing_amount;
   /// Trailing percent
   std::optional<Decimal> trailing_percent;
+  /// Limit depth level
+  std::optional<int32_t> limit_depth_level;
+  /// Trigger count
+  std::optional<int32_t> trigger_count;
+  /// Monitor price
+  std::optional<Decimal> monitor_price;
   /// Remark
   std::optional<std::string> remark;
 };
@@ -1630,6 +1642,12 @@ struct SubmitOrderOptions
   std::optional<Date> expire_date;
   /// Enable or disable outside regular trading hours
   std::optional<OutsideRTH> outside_rth;
+  /// Limit depth level
+  std::optional<int32_t> limit_depth_level;
+  /// Trigger count
+  std::optional<int32_t> trigger_count;
+  /// Monitor price
+  std::optional<Decimal> monitor_price;
   /// Remark (Maximum 64 characters)
   std::optional<std::string> remark;
 };
@@ -1985,6 +2003,12 @@ struct OrderDetail
   std::string currency;
   /// Enable or disable outside regular trading hours
   std::optional<OutsideRTH> outside_rth;
+  /// Limit depth level
+  std::optional<int32_t> limit_depth_level;
+  /// Trigger count
+  std::optional<int32_t> trigger_count;
+  /// Monitor price
+  std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
   /// Commission-free Status

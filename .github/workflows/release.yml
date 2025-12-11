@@ -5,69 +5,20 @@ on:
       - release
 
 jobs:
-  build-python-sdk-macos:
-    runs-on: macos-14
-    strategy:
-      fail-fast: true
-      matrix:
-        python:
-          - version: "3.8"
-            universal2: true
-          - version: "3.9"
-            universal2: true
-          - version: "3.10"
-            universal2: true
-          - version: "3.11"
-            universal2: true
-          - version: "3.12"
-            universal2: true
-          - version: "3.13"
-            universal2: true
-          - version: "3.14"
-            universal2: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python.version }}
-          architecture: x64
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
-      - name: Build wheels - x86_64
-        uses: PyO3/maturin-action@v1
-        with:
-          target: x86_64
-          args: -i python --release --out dist -m python/Cargo.toml
-      - name: Install built wheel - x86_64
-        run: |
-          pip install longport --no-index --find-links dist --force-reinstall
-      - name: Build wheels - universal2
-        if: ${{ matrix.python.universal2 }}
-        uses: PyO3/maturin-action@v1
-        with:
-          args: -i python --release --target universal2-apple-darwin --out dist -m python/Cargo.toml
-      - name: Install built wheel - universal2
-        if: ${{ matrix.python.universal2 }}
-        run: |
-          pip install longport --no-index --find-links dist --force-reinstall
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-macos-${{ matrix.python.version }}
-          path: dist
-
-  build-python-sdk-windows:
-    runs-on: windows-latest
+  build-python-sdk:
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: true
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        target: [x64, x86]
+        runs-on:
+          [
+            "windows-latest",
+            "ubuntu-24.04",
+            "ubuntu-24.04-arm",
+            "macos-15",
+            "macos-15-intel",
+          ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -76,7 +27,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: ${{ matrix.target }}
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -84,94 +34,14 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          target: ${{ matrix.target }}
           args: -i python --release --out dist -m python/Cargo.toml
       - name: Install built wheel
         run: |
           pip install longport --no-index --find-links dist --force-reinstall
-          python -c "import longport"
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-windows-${{ matrix.target }}-${{ matrix.python-version }}
-          path: dist
-
-  build-python-sdk-linux:
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: true
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        target: [x86_64, i686]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.target }}
-          manylinux: auto
-          args: -i python${{ matrix.python-version }} --release --out dist -m python/Cargo.toml
-      - name: Install built wheel
-        if: matrix.target == 'x86_64'
-        run: |
-          pip install longport --no-index --find-links dist --force-reinstall
-          python -c "import longport"
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-linux-${{ matrix.target }}-${{ matrix.python-version }}
-          path: dist
-
-  build-python-sdk-linux-cross:
-    runs-on: ubuntu-22.04
-    strategy:
-      fail-fast: true
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-        target: [aarch64]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Build wheels
-        uses: PyO3/maturin-action@v1
-        with:
-          target: ${{ matrix.target }}
-          manylinux: 2_28
-          args: -i python${{ matrix.python-version }} --release --out dist -m python/Cargo.toml
-      - uses: uraimo/run-on-arch-action@v3
-        name: Install built wheel
-        with:
-          arch: none
-          distro: none
-          base_image: "--platform=linux/aarch64 ubuntu:22.04"
-          githubToken: ${{ github.token }}
-          dockerRunArgs: |
-            --volume "${PWD}/dist:/artifacts"
-          install: |
-            apt-get update
-            apt-get install -y --no-install-recommends python3 python3-venv software-properties-common gnupg
-            add-apt-repository ppa:deadsnakes/ppa
-            apt-get update
-            apt-get install -y curl python${{ matrix.python-version }}-venv
-          run: |
-            ls -lrth /artifacts
-            PYTHON=python${{ matrix.python-version }}
-            $PYTHON -m venv venv
-            venv/bin/pip install -U pip
-            venv/bin/pip install longport --no-index --find-links /artifacts --force-reinstall
-            venv/bin/python -c 'import longport'
-      - name: Upload wheels
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-linux-${{ matrix.target }}-${{ matrix.python-version }}
+          name: wheels-${{ matrix.runs-on }}-${{ matrix.python-version }}
           path: dist
 
   build-nodejs-sdk:
@@ -179,73 +49,11 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-22.04
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn build
-              strip -x *.node
-            artifact-name: linux-x64-musl
-
-          - host: ubuntu-22.04
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              rustup target add aarch64-unknown-linux-gnu
-              yarn build --target aarch64-unknown-linux-gnu
-              aarch64-unknown-linux-gnu-strip *.node
-            artifact-name: linux-aarch64
-
-          #   - host: ubuntu-22.04
-          #     docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-          #     build: |
-          #       rustup target add aarch64-unknown-linux-musl
-          #       yarn build --target aarch64-unknown-linux-musl
-          #       /aarch64-linux-musl-cross/bin/aarch64-linux-musl-strip *.node
-          #     artifact-name: linux-aarch64-musl
-
-          - host: macos-14
-            architecture: x64
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn build
-              strip -x *.node
-            artifact-name: macos
-
+          - host: ubuntu-24.04
+          - host: ubuntu-24.04-arm
+          - host: macos-15
+          - host: macos-15-intel
           - host: windows-latest
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn build
-            architecture: x64
-            artifact-name: windows
-
-          - host: ubuntu-22.04
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn build
-              strip *.node
-            artifact-name: linux-x64
-
-          - host: macos-14
-            target: aarch64-apple-darwin
-            build: |
-              sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
-              export CC=$(xcrun -f clang);
-              export CXX=$(xcrun -f clang++);
-              SYSROOT=$(xcrun --sdk macosx --show-sdk-path);
-              export CFLAGS="-isysroot $SYSROOT -isystem $SYSROOT";
-              rustup install 1.89.0
-              rustup default 1.89.0
-              rustup target add aarch64-apple-darwin
-              yarn build --target aarch64-apple-darwin
-              strip -x *.node
-            artifact-name: macos-aarch64
-
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -253,12 +61,11 @@ jobs:
           submodules: true
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: 20
+          node-version: 24
           check-latest: true
-          architecture: ${{ matrix.settings.architecture }}
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -273,22 +80,19 @@ jobs:
         run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
 
       - name: Build
-        if: ${{ !matrix.settings.docker }}
+        if: ${{ matrix.settings.host != 'macos-15' }}
         working-directory: nodejs
-        run: ${{ matrix.settings.build }}
+        run: yarn build:debug
 
-      - name: Build in Docker
-        uses: addnab/docker-run-action@v3
-        if: ${{ matrix.settings.docker }}
-        with:
-          image: ${{ matrix.settings.docker }}
-          options: "--user 0:0 -v ${{ github.workspace }}:/build -w /build/nodejs"
-          run: ${{ matrix.settings.build }}
+      - name: Build
+        if: ${{ matrix.settings.host == 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug --target aarch64-apple-darwin
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-${{ matrix.settings.artifact-name }}
+          name: bindings-${{ matrix.settings.host }}
           path: nodejs/longport.*.node
 
   build-java-jni:
@@ -296,24 +100,22 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-22.04
+          - host: ubuntu-24.04
             lib_prefix: "lib"
             lib_suffix: ".so"
             target: x86_64-unknown-linux-gnu
-            cross: true
-          - host: ubuntu-22.04
+          - host: ubuntu-24.04
             lib_prefix: "lib"
             lib_suffix: ".so"
             target: aarch64-unknown-linux-gnu
-            cross: true
           - host: windows-latest
             lib_suffix: ".dll"
             target: x86_64-pc-windows-msvc
-          - host: macos-14
+          - host: macos-15-intel
             lib_prefix: "lib"
             lib_suffix: ".dylib"
             target: x86_64-apple-darwin
-          - host: macos-14
+          - host: macos-15
             lib_prefix: "lib"
             lib_suffix: ".dylib"
             target: aarch64-apple-darwin
@@ -331,17 +133,17 @@ jobs:
           targets: ${{ matrix.settings.target }}
 
       - name: Build
-        if: ${{ !matrix.settings.cross }}
+        if: ${{ !startsWith(matrix.settings.host, 'ubuntu') }}
         run: |
           cargo build -p longport-java --release --target ${{ matrix.settings.target }}
           mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longport_java${{ matrix.settings.lib_suffix }} longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
       - name: Install latest cross binary
-        if: ${{ matrix.settings.cross }}
+        if: ${{ startsWith(matrix.settings.host, 'ubuntu') }}
         uses: st3iny/install-cross-binary@v3
 
       - name: Build with Cross
-        if: ${{ matrix.settings.cross }}
+        if: ${{ startsWith(matrix.settings.host, 'ubuntu') }}
         run: |
           cross build -p longport-java --release --target ${{ matrix.settings.target }}
           mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longport_java${{ matrix.settings.lib_suffix }} longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
@@ -353,7 +155,7 @@ jobs:
           path: longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
 
   copy-cpp-headers:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -378,18 +180,22 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-22.04
+          - host: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
             platform: x86_64_linux
+            dylib_ext: so
+          - host: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            platform: aarch64_linux
             dylib_ext: so
           - host: windows-latest
             target: x86_64-pc-windows-msvc
             platform: x86_64_windows
-          - host: macos-14
+          - host: macos-15-intel
             target: x86_64-apple-darwin
             platform: x86_64_macos
             dylib_ext: dylib
-          - host: macos-14
+          - host: macos-15
             target: aarch64-apple-darwin
             platform: aarch64_macos
             dylib_ext: dylib
@@ -414,7 +220,7 @@ jobs:
         uses: lukka/get-cmake@latest
 
       - name: Install cargo make
-        uses: davidB/rust-cargo-make@v1
+        run: cargo install cargo-make
 
       - name: Build
         if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
@@ -458,18 +264,22 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-22.04
+          - host: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
             platform: x86_64_linux
+            dylib_ext: so
+          - host: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            platform: aarch64_linux
             dylib_ext: so
           - host: windows-latest
             target: x86_64-pc-windows-msvc
             platform: x86_64_windows
-          - host: macos-14
+          - host: macos-15-intel
             target: x86_64-apple-darwin
             platform: x86_64_macos
             dylib_ext: dylib
-          - host: macos-14
+          - host: macos-15
             target: aarch64-apple-darwin
             platform: aarch64_macos
             dylib_ext: dylib
@@ -494,7 +304,7 @@ jobs:
         uses: lukka/get-cmake@latest
 
       - name: Install cargo make
-        uses: davidB/rust-cargo-make@v1
+        run: cargo install cargo-make
 
       - name: Build
         if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
@@ -558,7 +368,7 @@ jobs:
             build-type: Release
             target-dir: release
             cargo-args: -r
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -635,7 +445,7 @@ jobs:
             build-type: Release
             target-dir: release
             cargo-args: -r
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -695,24 +505,21 @@ jobs:
 
   build:
     needs:
-      - build-python-sdk-macos
-      - build-python-sdk-windows
-      - build-python-sdk-linux
-      - build-python-sdk-linux-cross
+      - build-python-sdk
       - build-nodejs-sdk
       - build-java-jni
       - build-cpp-sdk-debug
       - build-cpp-sdk-release
       - build-ios-cpp-sdk
       - build-android-cpp-sdk
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - run: echo "All builds are done"
 
   publish-rust-sdk:
     needs:
       - build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: true
       max-parallel: 1
@@ -765,7 +572,7 @@ jobs:
   publish-cpp-sdk:
     needs:
       - build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -804,7 +611,7 @@ jobs:
           aws --region=${{ secrets.PROD_HK_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
 
   publish-python-sdk:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     environment:
       name: pypi
       url: https://pypi.org/p/longport
@@ -825,7 +632,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
 
   publish-nodejs-sdk:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs:
       - build
     steps:
@@ -843,7 +650,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           path: ./nodejs/artifacts
-          pattern: bindings-*
+          pattern: bindings-*we
           merge-multiple: true
       - name: Move artifacts
         run: napi artifacts
@@ -861,7 +668,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-java-sdk:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - uses: actions/checkout@v4
@@ -871,7 +678,7 @@ jobs:
       - name: Install JDK
         uses: actions/setup-java@v5
         with:
-          java-version: "8"
+          java-version: "11"
           distribution: "temurin"
 
       - name: Download all artifacts

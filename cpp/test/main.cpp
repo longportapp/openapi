@@ -34,7 +34,7 @@ main(int argc, char const* argv[])
     });
 
     res.context().subscribe(
-      { "700.HK" }, quote::SubFlags::QUOTE(), true, [](auto res) {
+      { "700.HK" }, quote::SubFlags::QUOTE(), [](auto res) {
         if (!res) {
           std::cout << "failed to subscribe: " << *res.status().message()
                     << std::endl;

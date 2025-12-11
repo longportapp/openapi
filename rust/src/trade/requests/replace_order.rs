@@ -17,6 +17,12 @@ pub struct ReplaceOrderOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     trailing_percent: Option<Decimal>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    limit_depth_level: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    trigger_count: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    monitor_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     remark: Option<String>,
 }
 
@@ -32,6 +38,9 @@ impl ReplaceOrderOptions {
             limit_offset: None,
             trailing_amount: None,
             trailing_percent: None,
+            limit_depth_level: None,
+            trigger_count: None,
+            monitor_price: None,
             remark: None,
         }
     }
@@ -82,6 +91,36 @@ impl ReplaceOrderOptions {
     pub fn trailing_percent(self, trailing_percent: Decimal) -> Self {
         Self {
             trailing_percent: Some(trailing_percent),
+            ..self
+        }
+    }
+
+    /// Set the limit depth level
+    #[inline]
+    #[must_use]
+    pub fn limit_depth_level(self, limit_depth_level: i32) -> Self {
+        Self {
+            limit_depth_level: Some(limit_depth_level),
+            ..self
+        }
+    }
+
+    /// Set the trigger count
+    #[inline]
+    #[must_use]
+    pub fn trigger_count(self, trigger_count: i32) -> Self {
+        Self {
+            trigger_count: Some(trigger_count),
+            ..self
+        }
+    }
+
+    /// Set the monitor price
+    #[inline]
+    #[must_use]
+    pub fn monitor_price(self, monitor_price: Decimal) -> Self {
+        Self {
+            monitor_price: Some(monitor_price),
             ..self
         }
     }

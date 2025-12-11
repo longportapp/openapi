@@ -31,6 +31,9 @@ public class OrderDetail {
     private TriggerStatus triggerStatus;
     private String currency;
     private OutsideRTH outsideRth;
+    private Integer limitDepthLevel;
+    private Integer triggerCount;
+    private BigDecimal monitorPrice;
     private String remark;
     private CommissionFreeStatus freeStatus;
     private BigDecimal freeAmount;
@@ -144,6 +147,18 @@ public class OrderDetail {
         return outsideRth;
     }
 
+    public Integer getLimitDepthLevel() {
+        return limitDepthLevel;
+    }
+
+    public Integer getTriggerCount() {
+        return triggerCount;
+    }
+
+    public BigDecimal getMonitorPrice() {
+        return monitorPrice;
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -201,7 +216,8 @@ public class OrderDetail {
                 + msg + ", tag=" + tag + ", timeInForce=" + timeInForce + ", expireDate=" + expireDate + ", updatedAt="
                 + updatedAt + ", triggerAt=" + triggerAt + ", trailingAmount=" + trailingAmount + ", trailingPercent="
                 + trailingPercent + ", limitOffset=" + limitOffset + ", triggerStatus=" + triggerStatus + ", currency="
-                + currency + ", outsideRth=" + outsideRth + ", remark=" + remark + ", freeStatus=" + freeStatus
+                + currency + ", outsideRth=" + outsideRth + ", limitDepthLevel=" + limitDepthLevel + ", triggerCount="
+                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", freeStatus=" + freeStatus
                 + ", freeAmount=" + freeAmount + ", freeCurrency=" + freeCurrency + ", deductionsStatus="
                 + deductionsStatus + ", deductionsAmount=" + deductionsAmount + ", deductionsCurrency="
                 + deductionsCurrency + ", platformDeductedStatus=" + platformDeductedStatus

@@ -30,6 +30,12 @@ pub struct SubmitOrderOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     outside_rth: Option<OutsideRTH>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    limit_depth_level: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    trigger_count: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    monitor_price: Option<Decimal>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     remark: Option<String>,
 }
 
@@ -56,6 +62,9 @@ impl SubmitOrderOptions {
             trailing_percent: None,
             expire_date: None,
             outside_rth: None,
+            limit_depth_level: None,
+            trigger_count: None,
+            monitor_price: None,
             remark: None,
         }
     }
@@ -126,6 +135,30 @@ impl SubmitOrderOptions {
     pub fn outside_rth(self, outside_rth: OutsideRTH) -> Self {
         Self {
             outside_rth: Some(outside_rth),
+            ..self
+        }
+    }
+
+    /// Set the limit depth level
+    pub fn limit_depth_level(self, level: i32) -> Self {
+        Self {
+            limit_depth_level: Some(level),
+            ..self
+        }
+    }
+
+    /// Set the trigger count
+    pub fn trigger_count(self, count: i32) -> Self {
+        Self {
+            trigger_count: Some(count),
+            ..self
+        }
+    }
+
+    /// Set the monitor price
+    pub fn monitor_price(self, price: Decimal) -> Self {
+        Self {
+            monitor_price: Some(price),
             ..self
         }
     }

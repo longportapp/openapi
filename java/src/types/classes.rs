@@ -652,6 +652,9 @@ impl_java_class!(
         trigger_status,
         currency,
         outside_rth,
+        limit_depth_level,
+        trigger_count,
+        monitor_price,
         remark
     ]
 );
@@ -912,6 +915,9 @@ impl_java_class!(
         trigger_status,
         currency,
         outside_rth,
+        limit_depth_level,
+        trigger_count,
+        monitor_price,
         remark,
         free_status,
         free_amount,

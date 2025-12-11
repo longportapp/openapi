@@ -46,7 +46,7 @@ on_quote_context_created(const struct lb_async_result_t* res)
 
   const char* symbols[] = { "700.HK", "AAPL.US", "TSLA.US", "NFLX.US" };
   lb_quote_context_subscribe(
-    res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, true, on_subscrbe, NULL);
+    res->ctx, symbols, 4, LB_SUBFLAGS_QUOTE, on_subscrbe, NULL);
 }
 
 int
