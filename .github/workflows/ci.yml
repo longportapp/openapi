@@ -253,64 +253,11 @@ jobs:
       fail-fast: true
       matrix:
         settings:
-          - host: ubuntu-22.04
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn install
-              yarn build:debug
-              strip -x *.node
-
-          - host: ubuntu-22.04
-            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn install
-              rustup target add aarch64-unknown-linux-gnu
-              yarn build:debug --target aarch64-unknown-linux-gnu
-              aarch64-unknown-linux-gnu-strip *.node
-
-          - host: macos-latest
-            architecture: x64
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn install
-              yarn build:debug
-              strip -x *.node
-
+          - host: ubuntu-24.04
+          - host: ubuntu-24.04-arm
+          - host: macos-15
+          - host: macos-15-intel
           - host: windows-latest
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn install
-              yarn build:debug
-            architecture: x64
-
-          - host: ubuntu-22.04
-            build: |
-              rustup install 1.89.0
-              rustup default 1.89.0
-              yarn install
-              yarn build:debug
-              strip *.node
-
-          - host: macos-latest
-            target: aarch64-apple-darwin
-            build: |
-              sudo rm -Rf /Library/Developer/CommandLineTools/SDKs/*;
-              export CC=$(xcrun -f clang);
-              export CXX=$(xcrun -f clang++);
-              SYSROOT=$(xcrun --sdk macosx --show-sdk-path);
-              export CFLAGS="-isysroot $SYSROOT -isystem $SYSROOT";
-              rustup install 1.89.0
-              rustup default 1.89.0
-              rustup target add aarch64-apple-darwin
-              yarn install
-              yarn build:debug --target aarch64-apple-darwin
-              strip -x *.node
 
     runs-on: ${{ matrix.settings.host }}
     steps:
@@ -319,12 +266,11 @@ jobs:
           submodules: true
 
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         if: ${{ !matrix.settings.docker }}
         with:
-          node-version: 20
+          node-version: 24
           check-latest: true
-          architecture: ${{ matrix.settings.architecture }}
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -342,17 +288,14 @@ jobs:
         run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
 
       - name: Build
-        if: ${{ !matrix.settings.docker }}
+        if: ${{ matrix.settings.host != 'macos-15' }}
         working-directory: nodejs
-        run: ${{ matrix.settings.build }}
+        run: yarn build:debug
 
-      - name: Build in Docker
-        uses: addnab/docker-run-action@v3
-        if: ${{ matrix.settings.docker }}
-        with:
-          image: ${{ matrix.settings.docker }}
-          options: "--user 0:0 -v ${{ github.workspace }}:/build -w /build/nodejs"
-          run: ${{ matrix.settings.build }}
+      - name: Build
+        if: ${{ matrix.settings.host == 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug --target aarch64-apple-darwin
 
       - name: Move artifacts
         run: |

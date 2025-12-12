@@ -7,63 +7,42 @@ on:
     pull_request: {}
 
 jobs:
-    check-nodejs-sdk:
+    build-python:
+        runs-on: macos-latest
         strategy:
             fail-fast: true
             matrix:
-                settings:
-                    - host: ubuntu-24.04
-                    - host: ubuntu-24.04-arm
-                    - host: macos-15
-                    - host: macos-15-intel
-                    - host: windows-latest
-
-        runs-on: ${{ matrix.settings.host }}
+                python-version:
+                    ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+                runs-on:
+                    [
+                        "windows-latest",
+                        "ubuntu-24.04",
+                        "ubuntu-24.04-arm",
+                        "macos-15",
+                        "macos-15-intel",
+                    ]
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
               with:
                   submodules: true
-
-            - name: Setup node
-              uses: actions/setup-node@v6
-              if: ${{ !matrix.settings.docker }}
+            - uses: actions/setup-python@v5
               with:
-                  node-version: 24
-                  check-latest: true
-
-            - name: Install Rust
+                  python-version: ${{ matrix.python-version }}
+            - name: Install Rust toolchain
               uses: dtolnay/rust-toolchain@stable
-              if: ${{ !matrix.settings.docker }}
               with:
                   toolchain: stable
-                  components: rustfmt, clippy
-                  targets: ${{ matrix.settings.target }}
-
-            - name: Check with clippy
-              run: cargo clippy -p longport-nodejs --all-features
-
-            - name: Install dependencies
-              working-directory: nodejs
-              run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
-
-            - name: Build
-              if: ${{ matrix.settings.host != 'macos-15' }}
-              working-directory: nodejs
-              run: yarn build:debug
-
-            - name: Build
-              if: ${{ matrix.settings.host == 'macos-15' }}
-              working-directory: nodejs
-              run: yarn build:debug --target aarch64-apple-darwin
-
-            - name: Move artifacts
+            - name: Build wheels
+              uses: PyO3/maturin-action@v1
+              with:
+                  args: -i python --out dist -m python/Cargo.toml
+            - name: Install built wheel
               run: |
-                  mkdir -p artifacts
-                  mv longport.*.node artifacts/
-                  yarn artifacts
-              working-directory: ./nodejs
-
-            - name: List packages
-              run: ls -R ./npm
-              shell: bash
-              working-directory: ./nodejs
+                  pip install longport --no-index --find-links dist --force-reinstall
+            - name: Upload wheels
+              uses: actions/upload-artifact@v4
+              with:
+                  name: wheels-${{ matrix.runs-on }}-${{ matrix.python-version }}
+                  path: dist
