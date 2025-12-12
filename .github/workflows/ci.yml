@@ -226,12 +226,17 @@ jobs:
         run: mvn package
 
   check-cpp-sdk:
-    needs:
-      - check-format
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-latest]
+        os:
+          [
+            ubuntu-24.04,
+            ubuntu-24.04-arm64,
+            windows-latest,
+            macos-15,
+            macos-15-intel,
+          ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -258,14 +263,14 @@ jobs:
         run: cargo clippy -p longport-c --all-features
 
       - name: Build with cmake
-        if: ${{ matrix.os != 'macos-latest' }}
+        if: ${{ matrix.os != 'macos-15' }}
         run: |
           cargo make cmake
           cargo make c
           cargo make cpp
 
       - name: Build with cmake
-        if: ${{ matrix.os == 'macos-latest' }}
+        if: ${{ matrix.os == 'macos-15' }}
         run: |
           cargo make cmake-debug-macos-aarch64
           cargo make c
