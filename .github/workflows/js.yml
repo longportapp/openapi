@@ -45,7 +45,15 @@ jobs:
               run: cargo clippy -p longport-c --all-features
 
             - name: Build with cmake
+              if: ${{ matrix.os != 'macos-15' }}
               run: |
                   cargo make cmake
+                  cargo make c
+                  cargo make cpp
+
+            - name: Build with cmake
+              if: ${{ matrix.os == 'macos-15' }}
+              run: |
+                  cargo make cmake-debug-macos-aarch64
                   cargo make c
                   cargo make cpp
