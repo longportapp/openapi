@@ -8,7 +8,7 @@ on:
 
 jobs:
   check-format:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-latest]
+        os: [ubuntu-24.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +53,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-latest]
+        os: [ubuntu-24.04, windows-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -85,7 +85,7 @@ jobs:
           pip install longport --no-index --find-links dist --force-reinstall
           python -c "import longport"
 
-  build-python:
+  build-python-sdk:
     needs:
       - check-python-sdk
     runs-on: ${{ matrix.runs-on }}
@@ -195,7 +195,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-latest]
+        os: [ubuntu-24.04, windows-latest, macos-15, macos-15-intel]
         java-version: ["11"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -332,7 +332,7 @@ jobs:
             cc: aarch64-linux-android28-clang
             cxx: aarch64-linux-android28-clang++
             ar: llvm-ar
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:

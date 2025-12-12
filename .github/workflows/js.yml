@@ -1,59 +1,744 @@
-name: CI
-
+name: Release
 on:
-    push:
-        branches:
-            - napi
-    pull_request: {}
+  push:
+    branches:
+      - napi
 
 jobs:
-    check-cpp-sdk:
-        strategy:
-            fail-fast: true
-            matrix:
-                os:
-                    [
-                        ubuntu-24.04,
-                        ubuntu-24.04-arm64,
-                        windows-latest,
-                        macos-15,
-                        macos-15-intel,
-                    ]
-        runs-on: ${{ matrix.os }}
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  submodules: true
+  build-python-sdk:
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        runs-on:
+          [
+            "windows-latest",
+            "ubuntu-24.04",
+            "ubuntu-24.04-arm",
+            "macos-15",
+            "macos-15-intel",
+          ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          args: -i python --release --out dist -m python/Cargo.toml
+      - name: Install built wheel
+        run: |
+          pip install longport --no-index --find-links dist --force-reinstall
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.runs-on }}-${{ matrix.python-version }}
+          path: dist
 
-            - name: Install MSBuild
-              if: ${{ matrix.os == 'windows-latest' }}
-              uses: microsoft/setup-msbuild@v1.1
+  build-nodejs-sdk:
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - host: ubuntu-24.04
+          - host: ubuntu-24.04-arm
+          - host: macos-15
+          - host: macos-15-intel
+          - host: windows-latest
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-            - name: Install Rust
-              uses: dtolnay/rust-toolchain@stable
-              with:
-                  toolchain: stable
-                  components: rustfmt, clippy
+      - name: Setup node
+        uses: actions/setup-node@v6
+        if: ${{ !matrix.settings.docker }}
+        with:
+          node-version: 24
+          check-latest: true
 
-            - name: Get CMake
-              uses: lukka/get-cmake@latest
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        if: ${{ !matrix.settings.docker }}
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.settings.target }}
 
-            - name: Install cargo make
-              uses: davidB/rust-cargo-make@v1
+      - name: Install dependencies
+        working-directory: nodejs
+        run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
 
-            - name: Check with clippy
-              run: cargo clippy -p longport-c --all-features
+      - name: Build
+        if: ${{ matrix.settings.host != 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug
 
-            - name: Build with cmake
-              if: ${{ matrix.os != 'macos-15' }}
-              run: |
-                  cargo make cmake
-                  cargo make c
-                  cargo make cpp
+      - name: Build
+        if: ${{ matrix.settings.host == 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug --target aarch64-apple-darwin
 
-            - name: Build with cmake
-              if: ${{ matrix.os == 'macos-15' }}
-              run: |
-                  cargo make cmake-debug-macos-aarch64
-                  cargo make c
-                  cargo make cpp
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.settings.artifact-name }}
+          path: nodejs/longport.*.node
+
+  build-java-jni:
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - host: ubuntu-24.04
+            lib_prefix: "lib"
+            lib_suffix: ".so"
+            target: x86_64-unknown-linux-gnu
+            cross: true
+          - host: ubuntu-24.04
+            lib_prefix: "lib"
+            lib_suffix: ".so"
+            target: aarch64-unknown-linux-gnu
+            cross: true
+          - host: windows-latest
+            lib_suffix: ".dll"
+            target: x86_64-pc-windows-msvc
+          - host: macos-15-intel
+            lib_prefix: "lib"
+            lib_suffix: ".dylib"
+            target: x86_64-apple-darwin
+          - host: macos-15
+            lib_prefix: "lib"
+            lib_suffix: ".dylib"
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.settings.target }}
+
+      - name: Build
+        if: ${{ !matrix.settings.cross }}
+        run: |
+          cargo build -p longport-java --release --target ${{ matrix.settings.target }}
+          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longport_java${{ matrix.settings.lib_suffix }} longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+
+      - name: Install latest cross binary
+        if: ${{ matrix.settings.cross }}
+        uses: st3iny/install-cross-binary@v3
+
+      - name: Build with Cross
+        if: ${{ matrix.settings.cross }}
+        run: |
+          cross build -p longport-java --release --target ${{ matrix.settings.target }}
+          mv target/${{ matrix.settings.target }}/release/${{ matrix.settings.lib_prefix }}longport_java${{ matrix.settings.lib_suffix }} longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jnis-${{ matrix.settings.target }}
+          path: longport_java-${{ matrix.settings.target }}${{ matrix.settings.lib_suffix }}
+
+  copy-cpp-headers:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: include-c
+          path: c/csrc/include
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: include-cpp
+          path: cpp/include
+
+  build-cpp-sdk-debug:
+    needs:
+      - copy-cpp-headers
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - host: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            platform: x86_64_linux
+            dylib_ext: so
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: x86_64_windows
+          - host: macos-15-intel
+            target: x86_64-apple-darwin
+            platform: x86_64_macos
+            dylib_ext: dylib
+          - host: macos-15
+            target: aarch64-apple-darwin
+            platform: aarch64_macos
+            dylib_ext: dylib
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MSBuild
+        if: ${{ matrix.settings.host == 'windows-latest' }}
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.settings.target }}
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Install cargo make
+        uses: davidB/rust-cargo-make@v1
+
+      - name: Build
+        if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
+        run: |
+          cargo make cmake-debug
+          cargo make c
+          cargo make cpp
+
+      - name: Build
+        if: ${{ matrix.settings.target == 'aarch64-apple-darwin' }}
+        run: |
+          cargo make cmake-debug-macos-aarch64
+          cargo make cpp
+
+      - name: Copy files
+        if: ${{ matrix.settings.host == 'windows-latest' }}
+        run: |
+          md dist\lib\${{ matrix.settings.platform }}\debug
+          copy cmake.build\x64\Debug\cargo\build\${{ matrix.settings.target }}\debug\longport_c.dll dist\lib\${{ matrix.settings.platform }}\debug
+          copy cmake.build\x64\Debug\cargo\build\${{ matrix.settings.target }}\debug\longport_c.dll.lib dist\lib\${{ matrix.settings.platform }}\debug\longport_c.lib
+          copy cmake.build\Debug\longport_cpp.dll dist\lib\${{ matrix.settings.platform }}\debug
+          copy cmake.build\cpp\Debug\longport_cpp.lib dist\lib\${{ matrix.settings.platform }}\debug
+
+      - name: Copy files
+        if: ${{ matrix.settings.host != 'windows-latest' }}
+        run: |
+          mkdir -p dist/lib/${{ matrix.settings.platform }}/debug
+          cp cmake.build/cargo/build/${{ matrix.settings.target }}/debug/liblongport_c.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/debug
+          cp cmake.build/liblongport_cpp.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/debug
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-debug-${{ matrix.settings.target }}
+          path: dist/lib
+
+  build-cpp-sdk-release:
+    needs:
+      - copy-cpp-headers
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - host: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            platform: x86_64_linux
+            dylib_ext: so
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: x86_64_windows
+          - host: macos-15-intel
+            target: x86_64-apple-darwin
+            platform: x86_64_macos
+            dylib_ext: dylib
+          - host: macos-15
+            target: aarch64-apple-darwin
+            platform: aarch64_macos
+            dylib_ext: dylib
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MSBuild
+        if: ${{ matrix.settings.host == 'windows-latest' }}
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.settings.target }}
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Install cargo make
+        uses: davidB/rust-cargo-make@v1
+
+      - name: Build
+        if: ${{ matrix.settings.target != 'aarch64-apple-darwin' }}
+        run: |
+          cargo make cmake-release
+          cargo make c-release
+          cargo make cpp-release
+
+      - name: Build
+        if: ${{ matrix.settings.target == 'aarch64-apple-darwin' }}
+        run: |
+          cargo make cmake-release-macos-aarch64
+          cargo make cpp-release
+
+      - name: Copy files
+        if: ${{ matrix.settings.host == 'windows-latest' }}
+        run: |
+          md dist\lib\${{ matrix.settings.platform }}\release
+          copy cmake.build\x64\Release\cargo\build\${{ matrix.settings.target }}\release\longport_c.dll dist\lib\${{ matrix.settings.platform }}\release
+          copy cmake.build\x64\Release\cargo\build\${{ matrix.settings.target }}\release\longport_c.dll.lib dist\lib\${{ matrix.settings.platform }}\release\longport_c.lib
+          copy cmake.build\Release\longport_cpp.dll dist\lib\${{ matrix.settings.platform }}\release
+          copy cmake.build\cpp\Release\longport_cpp.lib dist\lib\${{ matrix.settings.platform }}\release
+
+      - name: Copy files
+        if: ${{ matrix.settings.host != 'windows-latest' }}
+        run: |
+          mkdir -p dist/lib/${{ matrix.settings.platform }}/release
+          cp cmake.build/cargo/build/${{ matrix.settings.target }}/release/liblongport_c.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/release
+          cp cmake.build/liblongport_cpp.${{ matrix.settings.dylib_ext }} dist/lib/${{ matrix.settings.platform }}/release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-release-${{ matrix.settings.target }}
+          path: dist/lib
+
+  build-ios-cpp-sdk:
+    needs:
+      - copy-cpp-headers
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - target: aarch64-apple-ios
+            platform: OS64
+            build-type: Debug
+            target-dir: debug
+            cargo-args: ""
+          - target: aarch64-apple-ios
+            platform: OS64
+            build-type: Release
+            target-dir: release
+            cargo-args: -r
+          - target: aarch64-apple-ios-sim
+            platform: SIMULATOR64
+            build-type: Debug
+            target-dir: debug
+            cargo-args: ""
+          - target: aarch64-apple-ios-sim
+            platform: SIMULATOR64
+            build-type: Release
+            target-dir: release
+            cargo-args: -r
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Install target
+        run: |
+          rustup target install ${{ matrix.settings.target }}
+
+      - name: Build C
+        working-directory: c
+        run: |
+          cargo rustc --crate-type=staticlib --target --target ${{ matrix.settings.target }} ${{ matrix.settings.cargo-args }}
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Build CPP
+        working-directory: cpp
+        run: |
+          mkdir cmake.build
+          cd cmake.build && cmake -DCMAKE_BUILD_TYPE={{ matrix.settings.build-type }} -DCMAKE_TOOLCHAIN_FILE=../static/toolchains/ios.cmake -DPLATFORM=${{ matrix.settings.platform }} -DDENABLE_BITCODE=true ../static && make
+
+      - name: Copy files
+        run: |
+          mkdir -p dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp target/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}/liblongport_c.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp cpp/cmake.build/liblongport_cpp.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-ios-${{ matrix.settings.build-type }}-${{ matrix.settings.target }}
+          path: dist/lib
+
+  build-android-cpp-sdk:
+    needs:
+      - copy-cpp-headers
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - target: armv7-linux-androideabi
+            cc: armv7a-linux-androideabi28-clang
+            cxx: armv7a-linux-androideabi28-clang++
+            ar: llvm-ar
+            build-type: Debug
+            target-dir: debug
+            cargo-args: ""
+          - target: armv7-linux-androideabi
+            cc: armv7a-linux-androideabi28-clang
+            cxx: armv7a-linux-androideabi28-clang++
+            ar: llvm-ar
+            build-type: Release
+            target-dir: release
+            cargo-args: -r
+          - target: aarch64-linux-android
+            cc: aarch64-linux-android28-clang
+            cxx: aarch64-linux-android28-clang++
+            ar: llvm-ar
+            build-type: Debug
+            target-dir: debug
+            cargo-args: ""
+          - target: aarch64-linux-android
+            cc: aarch64-linux-android28-clang
+            cxx: aarch64-linux-android28-clang++
+            ar: llvm-ar
+            build-type: Release
+            target-dir: release
+            cargo-args: -r
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Install target
+        run: |
+          rustup target install ${{ matrix.settings.target }}
+
+      - name: Setup NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
+          add-to-path: true
+
+      - name: Build C
+        working-directory: c
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          CC: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cc }}
+          AR: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.ar }}
+        run: |
+          cargo rustc --crate-type=staticlib --target ${{ matrix.settings.target }} ${{ matrix.settings.cargo-args }}
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Build CPP
+        working-directory: cpp
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          CC: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cc }}
+          CXX: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cxx }}
+          AR: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.ar }}
+        run: |
+          mkdir cmake.build
+          cd cmake.build && cmake -DCMAKE_BUILD_TYPE=Debug ../static && make
+
+      - name: Copy files
+        run: |
+          mkdir -p dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp target/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}/liblongport_c.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+          cp cpp/cmake.build/liblongport_cpp.a dist/lib/${{ matrix.settings.target }}/${{ matrix.settings.target-dir }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libs-android-${{ matrix.settings.build-type }}-${{ matrix.settings.target }}
+          path: dist/lib
+
+  build:
+    needs:
+      - build-python-sdk
+      - build-nodejs-sdk
+      - build-java-jni
+      - build-cpp-sdk-debug
+      - build-cpp-sdk-release
+      - build-ios-cpp-sdk
+      - build-android-cpp-sdk
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "All builds are done"
+
+  # publish-rust-sdk:
+  #   needs:
+  #     - build
+  #   runs-on: ubuntu-24.04
+  #   strategy:
+  #     fail-fast: true
+  #     max-parallel: 1
+  #     matrix:
+  #       package:
+  #         - name: longport-proto
+  #           registryName: longport-proto
+  #           path: rust/crates/proto
+  #         - name: longport-httpcli
+  #           registryName: longport-httpcli
+  #           path: rust/crates/httpclient
+  #         - name: longport-wscli
+  #           registryName: longport-wscli
+  #           path: rust/crates/wsclient
+  #         - name: longport-candlesticks
+  #           registryName: longport-candlesticks
+  #           path: rust/crates/candlesticks
+  #         - name: longport
+  #           registryName: longport
+  #           path: rust
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+  #     - uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         toolchain: stable
+  #     - name: get version
+  #       run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
+  #     - name: check published version
+  #       run: echo PUBLISHED_VERSION=$(cargo search ${{ matrix.package.registryName }} --limit 1 | sed -nE 's/^[^"]*"//; s/".*//1p' -) >> $GITHUB_ENV
+  #     - name: cargo login
+  #       if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
+  #       run: cargo login ${{ secrets.CRATES_TOKEN }}
+  #     - name: cargo package
+  #       if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
+  #       working-directory: ${{ matrix.package.path }}
+  #       run: |
+  #         cargo package
+  #         echo "We will publish:" $PACKAGE_VERSION
+  #         echo "This is current latest:" $PUBLISHED_VERSION
+  #     - name: Publish ${{ matrix.package.name }}
+  #       if: env.PACKAGE_VERSION != env.PUBLISHED_VERSION
+  #       working-directory: ${{ matrix.package.path }}
+  #       run: |
+  #         echo "# Cargo Publish"
+  #         cargo publish --no-verify
+
+  # publish-cpp-sdk:
+  #   needs:
+  #     - build
+  #   runs-on: ubuntu-24.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Download includes
+  #       uses: actions/download-artifact@v5
+  #       with:
+  #         path: ./sdk/libs
+  #         pattern: libs-*
+  #         merge-multiple: true
+
+  #     - name: Download includes
+  #       uses: actions/download-artifact@v5
+  #       with:
+  #         path: ./sdk/include
+  #         pattern: include-*
+  #         merge-multiple: true
+
+  #     - name: Get Version
+  #       run: echo SDK_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
+
+  #     - name: Package
+  #       run: tar czvf openapi-cpp-sdk-$SDK_VERSION.tar.gz ./sdk
+
+  #     - name: Upload SDK to BJ
+  #       env:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_ACCESS_KEY_SECRET }}
+  #       run: |
+  #         aws --region=${{ secrets.PROD_BJ_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_BJ_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
+
+  #     - name: Upload SDK to HK
+  #       env:
+  #         AWS_ACCESS_KEY_ID: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_ID }}
+  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_ACCESS_KEY_SECRET }}
+  #       run: |
+  #         aws --region=${{ secrets.PROD_HK_AWS_DEFAULT_REGION }} s3 cp openapi-cpp-sdk-$SDK_VERSION.tar.gz s3://${{ secrets.FE_S3_OPEN_STATIC_PROD_HK_BUCKET }}/openapi-sdk/ --cache-control max-age=31536000
+
+  # publish-python-sdk:
+  #   runs-on: ubuntu-24.04
+  #   environment:
+  #     name: pypi
+  #     url: https://pypi.org/p/longport
+  #   permissions:
+  #     id-token: write
+  #   needs:
+  #     - build
+  #   steps:
+  #     - uses: actions/download-artifact@v5
+  #       with:
+  #         path: dist
+  #         pattern: wheels-*
+  #         merge-multiple: true
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: 3.8
+  #     - name: Publish to PyPi
+  #       uses: pypa/gh-action-pypi-publish@release/v1
+
+  # publish-nodejs-sdk:
+  #   runs-on: ubuntu-24.04
+  #   needs:
+  #     - build
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Update versions
+  #       run: node ./.github/misc/update_jssdk_version.mjs $(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml)
+  #     - name: Setup node
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         check-latest: true
+  #     - name: Install napi-rs/cli
+  #       run: npm install -g @napi-rs/cli
+  #     - name: Download all artifacts
+  #       uses: actions/download-artifact@v5
+  #       with:
+  #         path: ./nodejs/artifacts
+  #         pattern: bindings-*
+  #         merge-multiple: true
+  #     - name: Move artifacts
+  #       run: napi artifacts
+  #       working-directory: ./nodejs
+  #     - name: List packages
+  #       run: ls -R ./npm
+  #       shell: bash
+  #       working-directory: ./nodejs
+  #     - name: Publish
+  #       run: |
+  #         echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+  #         npm publish --access public
+  #       working-directory: ./nodejs
+  #       env:
+  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # publish-java-sdk:
+  #   runs-on: ubuntu-24.04
+  #   needs: build
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         submodules: true
+
+  #     - name: Install JDK
+  #       uses: actions/setup-java@v5
+  #       with:
+  #         java-version: "11"
+  #         distribution: "temurin"
+
+  #     - name: Download all artifacts
+  #       uses: actions/download-artifact@v5
+  #       with:
+  #         path: ./java/jnis
+  #         pattern: jnis-*
+  #         merge-multiple: true
+
+  #     - name: Configure Maven settings.xml
+  #       run: |
+  #         mkdir -p ~/.m2
+  #         cat > ~/.m2/settings.xml << EOF
+  #         <settings>
+  #           <profiles>
+  #             <profile>
+  #               <id>gpg</id>
+  #               <activation>
+  #                 <activeByDefault>true</activeByDefault>
+  #               </activation>
+  #               <properties>
+  #                 <gpg.executable>gpg</gpg.executable>
+  #                 <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
+  #               </properties>
+  #             </profile>
+  #           </profiles>
+  #             <servers>
+  #             <server>
+  #               <id>central</id>
+  #               <username>${{ secrets.CENTRAL_USERNAME }}</username>
+  #               <password>${{ secrets.CENTRAL_PASSWORD }}</password>
+  #             </server>
+  #           </servers>
+  #         </settings>
+  #         EOF
+
+  #     - name: Copy jnis
+  #       working-directory: java
+  #       run: |
+  #         mkdir -p javasrc/target/natives/linux_64
+  #         mkdir -p javasrc/target/natives/linux_arm64
+  #         mkdir -p javasrc/target/natives/windows_64
+  #         mkdir -p javasrc/target/natives/osx_64
+  #         mkdir -p javasrc/target/natives/osx_arm64
+  #         mv jnis/longport_java-x86_64-unknown-linux-gnu.so javasrc/target/natives/linux_64/liblongport_java.so
+  #         mv jnis/longport_java-aarch64-unknown-linux-gnu.so javasrc/target/natives/linux_arm64/liblongport_java.so
+  #         mv jnis/longport_java-x86_64-pc-windows-msvc.dll javasrc/target/natives/windows_64/longport_java.dll
+  #         mv jnis/longport_java-x86_64-apple-darwin.dylib javasrc/target/natives/osx_64/liblongport_java.dylib
+  #         mv jnis/longport_java-aarch64-apple-darwin.dylib javasrc/target/natives/osx_arm64/liblongport_java.dylib
+
+  #     - name: Get version
+  #       run: echo PACKAGE_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_ENV
+
+  #     - name: Update version
+  #       working-directory: java/javasrc
+  #       run: mvn versions:set -DnewVersion=${PACKAGE_VERSION}
+
+  #     - name: Import GPG private key
+  #       env:
+  #         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+  #         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+  #       run: |
+  #         echo "$GPG_PRIVATE_KEY" > private.key
+  #         gpg --import --batch private.key
+  #         rm private.key
+
+  #     - name: Deploy Maven package
+  #       working-directory: java/javasrc
+  #       run: mvn deploy --activate-profiles release
