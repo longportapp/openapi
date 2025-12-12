@@ -7,42 +7,45 @@ on:
     pull_request: {}
 
 jobs:
-    build-python:
-        runs-on: ${{ matrix.runs-on }}
+    check-cpp-sdk:
         strategy:
             fail-fast: true
             matrix:
-                python-version:
-                    ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
-                runs-on:
+                os:
                     [
-                        "windows-latest",
-                        "ubuntu-24.04",
-                        "ubuntu-24.04-arm",
-                        "macos-15",
-                        "macos-15-intel",
+                        ubuntu-24.04,
+                        ubuntu-24.04-arm64,
+                        windows-latest,
+                        macos-15,
+                        macos-15-intel,
                     ]
+        runs-on: ${{ matrix.os }}
         steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+            - uses: actions/checkout@v4
               with:
                   submodules: true
-            - uses: actions/setup-python@v5
-              with:
-                  python-version: ${{ matrix.python-version }}
-            - name: Install Rust toolchain
+
+            - name: Install MSBuild
+              if: ${{ matrix.os == 'windows-latest' }}
+              uses: microsoft/setup-msbuild@v1.1
+
+            - name: Install Rust
               uses: dtolnay/rust-toolchain@stable
               with:
                   toolchain: stable
-            - name: Build wheels
-              uses: PyO3/maturin-action@v1
-              with:
-                  args: -i python --out dist -m python/Cargo.toml
-            - name: Install built wheel
+                  components: rustfmt, clippy
+
+            - name: Get CMake
+              uses: lukka/get-cmake@latest
+
+            - name: Install cargo make
+              uses: davidB/rust-cargo-make@v1
+
+            - name: Check with clippy
+              run: cargo clippy -p longport-c --all-features
+
+            - name: Build with cmake
               run: |
-                  pip install longport --no-index --find-links dist --force-reinstall
-            - name: Upload wheels
-              uses: actions/upload-artifact@v4
-              with:
-                  name: wheels-${{ matrix.runs-on }}-${{ matrix.python-version }}
-                  path: dist
+                  cargo make cmake
+                  cargo make c
+                  cargo make cpp
