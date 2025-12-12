@@ -13,13 +13,10 @@ jobs:
             matrix:
                 settings:
                     - host: ubuntu-24.04
-                      architecture: x86_64
-                    - host: ubuntu-24.04
-                      architecture: arm64
-                    - host: macos-latest
-                      architecture: aarch64
+                    - host: ubuntu-24.04-arm
+                    - host: macos-15
+                    - host: macos-15-intel
                     - host: windows-latest
-                      architecture: x64
 
         runs-on: ${{ matrix.settings.host }}
         steps:
@@ -50,9 +47,14 @@ jobs:
               run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
 
             - name: Build
-              if: ${{ !matrix.settings.docker }}
+              if: ${{ matrix.settings.host != 'macos-15' }}
               working-directory: nodejs
               run: yarn build:debug
+
+            - name: Build
+              if: ${{ matrix.settings.host == 'macos-15' }}
+              working-directory: nodejs
+              run: yarn build:debug --target aarch64-apple-darwin
 
             - name: Move artifacts
               run: |
