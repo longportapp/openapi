@@ -92,7 +92,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-${{ matrix.settings.artifact-name }}
+          name: bindings-${{ matrix.settings.host }}
           path: nodejs/longport.*.node
 
   build-java-jni:
