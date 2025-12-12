@@ -8,7 +8,7 @@ on:
 
 jobs:
     build-python:
-        runs-on: macos-latest
+        runs-on: ${{ matrix.runs-on }}
         strategy:
             fail-fast: true
             matrix:
