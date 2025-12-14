@@ -215,9 +215,6 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
 
-      - name: Install cargo make
-        uses: davidB/rust-cargo-make@v1
-
       - name: Check with clippy
         run: cargo clippy -p longport-java --all-features
 
@@ -257,7 +254,7 @@ jobs:
         uses: lukka/get-cmake@latest
 
       - name: Install cargo make
-        uses: davidB/rust-cargo-make@v1
+        run: cargo install cargo-make
 
       - name: Check with clippy
         run: cargo clippy -p longport-c --all-features
