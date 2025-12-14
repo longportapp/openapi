@@ -1304,9 +1304,10 @@ convert(const lb_order_t* order)
     order->currency,
     order->outside_rth ? std::optional{ convert(*order->outside_rth) }
                        : std::nullopt,
-    order->limit_depth_level ? std::optional{ order->limit_depth_level }
+    order->limit_depth_level ? std::optional{ *order->limit_depth_level }
                              : std::nullopt,
-    order->trigger_count ? std::optional{ order->trigger_count } : std::nullopt,
+    order->trigger_count ? std::optional{ *order->trigger_count }
+                         : std::nullopt,
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark
