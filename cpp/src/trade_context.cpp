@@ -377,6 +377,9 @@ TradeContext::replace_order(const ReplaceOrderOptions& opts,
     nullptr,
     nullptr,
     nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
   };
 
   opts2.price = opts.price ? (const lb_decimal_t*)opts.price.value() : nullptr;
@@ -391,6 +394,13 @@ TradeContext::replace_order(const ReplaceOrderOptions& opts,
                             : nullptr;
   opts2.trailing_percent =
     opts.trailing_percent ? (const lb_decimal_t*)opts.trailing_percent.value()
+                          : nullptr;
+  opts2.limit_depth_level =
+    opts.limit_depth_level ? &opts.limit_depth_level.value() : nullptr;
+  opts2.trigger_count =
+    opts.trigger_count ? &opts.trigger_count.value() : nullptr;
+  opts2.monitor_price = opts.monitor_price
+                          ? (const lb_decimal_t*)opts.monitor_price.value()
                           : nullptr;
   opts2.remark = opts.remark ? opts.remark->c_str() : nullptr;
 

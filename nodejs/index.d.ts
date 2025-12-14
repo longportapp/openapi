@@ -2985,6 +2985,12 @@ export interface ReplaceOrderOptions {
   trailingAmount?: Decimal
   /** Trailing percent (`TSLPPCT` / `TSMAPCT` Required) */
   trailingPercent?: Decimal
+  /** Limit depth level */
+  limitDepthLevel?: number
+  /** Trigger count */
+  triggerCount?: number
+  /** Monitor price */
+  monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
 }

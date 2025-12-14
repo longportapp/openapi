@@ -1604,6 +1604,12 @@ struct ReplaceOrderOptions
   std::optional<Decimal> trailing_amount;
   /// Trailing percent
   std::optional<Decimal> trailing_percent;
+  /// Limit depth level
+  std::optional<int32_t> limit_depth_level;
+  /// Trigger count
+  std::optional<int32_t> trigger_count;
+  /// Monitor price
+  std::optional<Decimal> monitor_price;
   /// Remark
   std::optional<std::string> remark;
 };

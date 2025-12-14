@@ -677,6 +677,12 @@ pub struct CReplaceOrderOptions {
     pub trailing_amount: *const CDecimal,
     /// Trailing percent (can be null)
     pub trailing_percent: *const CDecimal,
+    /// Limit depth level (can be null)
+    pub limit_depth_level: *const i32,
+    /// Trigger count (can be null)
+    pub trigger_count: *const i32,
+    /// Monitor price (can be null)
+    pub monitor_price: *const CDecimal,
     /// Remark (can be null)
     pub remark: *const c_char,
 }

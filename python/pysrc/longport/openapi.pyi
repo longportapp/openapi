@@ -5168,7 +5168,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, remark: Optional[str] = None) -> None:
+    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> None:
         """
         Replace order
 
@@ -5179,6 +5179,9 @@ class TradeContext:
             limit_offset: Limit offset amount (`TSLPAMT` / `TSLPPCT` Required)
             trailing_amount: Trailing amount (`TSLPAMT` / `TSMAMT` Required)
             trailing_percent: Trailing percent (`TSLPPCT` / `TSMAPCT` Required)
+            limit_depth_level: Limit depth level
+            trigger_count: Trigger count
+            monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
 
         Examples:

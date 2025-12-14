@@ -1929,6 +1929,18 @@ typedef struct lb_replace_order_options_t {
    */
   const struct lb_decimal_t *trailing_percent;
   /**
+   * Limit depth level (can be null)
+   */
+  const int32_t *limit_depth_level;
+  /**
+   * Trigger count (can be null)
+   */
+  const int32_t *trigger_count;
+  /**
+   * Monitor price (can be null)
+   */
+  const struct lb_decimal_t *monitor_price;
+  /**
    * Remark (can be null)
    */
   const char *remark;
