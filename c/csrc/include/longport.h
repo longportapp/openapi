@@ -3436,6 +3436,18 @@ typedef struct lb_order_detail_t {
    */
   const enum lb_outside_rth_t *outside_rth;
   /**
+   * Limit depth level (maybe null)
+   */
+  const int32_t *limit_depth_level;
+  /**
+   * Trigger count (maybe null)
+   */
+  const int32_t *trigger_count;
+  /**
+   * Monitor price (maybe null)
+   */
+  const struct lb_decimal_t *monitor_price;
+  /**
    * Remark
    */
   const char *remark;

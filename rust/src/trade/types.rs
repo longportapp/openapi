@@ -310,10 +310,13 @@ pub struct Order {
     #[serde(with = "serde_utils::outside_rth")]
     pub outside_rth: Option<OutsideRTH>,
     /// Limit depth level
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
     pub limit_depth_level: Option<i32>,
     /// Trigger count
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
     pub trigger_count: Option<i32>,
     /// Monitor price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
@@ -500,6 +503,15 @@ pub struct OrderDetail {
     /// Enable or disable outside regular trading hours
     #[serde(with = "serde_utils::outside_rth")]
     pub outside_rth: Option<OutsideRTH>,
+    /// Limit depth level
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
+    pub limit_depth_level: Option<i32>,
+    /// Trigger count
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
+    pub trigger_count: Option<i32>,
+    /// Monitor price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
     /// Commission-free Status

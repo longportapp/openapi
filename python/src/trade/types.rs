@@ -454,6 +454,15 @@ pub(crate) struct OrderDetail {
     /// Enable or disable outside regular trading hours
     #[py(opt)]
     outside_rth: Option<OutsideRTH>,
+    /// Limit depth level
+    #[py(opt)]
+    limit_depth_level: Option<i32>,
+    /// Trigger count
+    #[py(opt)]
+    trigger_count: Option<i32>,
+    /// Monitor price
+    #[py(opt)]
+    monitor_price: Option<PyDecimal>,
     /// Remark
     remark: String,
     /// Commission-free Status

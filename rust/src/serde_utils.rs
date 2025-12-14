@@ -361,3 +361,30 @@ pub(crate) mod int64_str_empty_is_none {
         }
     }
 }
+
+pub(crate) mod int32_opt_0_is_none {
+
+    use super::*;
+
+    pub(crate) fn serialize<S>(value: &Option<i32>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match value {
+            Some(value) => serializer.serialize_i32(*value),
+            _ => serializer.serialize_none(),
+        }
+    }
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<i32>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = i32::deserialize(deserializer)?;
+        if value == 0 {
+            Ok(None)
+        } else {
+            Ok(Some(value))
+        }
+    }
+}

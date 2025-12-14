@@ -452,6 +452,15 @@ pub struct OrderDetail {
     /// Enable or disable outside regular trading hours
     #[js(opt)]
     outside_rth: Option<OutsideRTH>,
+    /// Limit depth level
+    #[js(opt)]
+    limit_depth_level: Option<i32>,
+    /// Trigger count
+    #[js(opt)]
+    trigger_count: Option<i32>,
+    /// Monitor price
+    #[js(opt)]
+    monitor_price: Option<Decimal>,
     /// Remark
     remark: String,
     /// Commission-free Status
