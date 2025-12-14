@@ -680,6 +680,12 @@ pub struct CSubmitOrderOptions {
     pub expire_date: *const CDate,
     /// Enable or disable outside regular trading hours (can be null)
     pub outside_rth: *const COutsideRTH,
+    /// Limit depth level (can be null)
+    pub limit_depth_level: *const i32,
+    /// Trigger count (can be null)
+    pub trigger_count: *const i32,
+    /// Monitor price (can be null)
+    pub monitor_price: *const CDecimal,
     /// Remark (Maximum 64 characters) (can be null)
     pub remark: *const c_char,
 }

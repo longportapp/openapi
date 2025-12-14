@@ -1988,6 +1988,18 @@ typedef struct lb_submit_order_options_t {
    */
   const enum lb_outside_rth_t *outside_rth;
   /**
+   * Limit depth level (can be null)
+   */
+  const int32_t *limit_depth_level;
+  /**
+   * Trigger count (can be null)
+   */
+  const int32_t *trigger_count;
+  /**
+   * Monitor price (can be null)
+   */
+  const struct lb_decimal_t *monitor_price;
+  /**
    * Remark (Maximum 64 characters) (can be null)
    */
   const char *remark;

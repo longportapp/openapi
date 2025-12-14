@@ -407,6 +407,18 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitOrde
         if let Some(outside_rth) = outside_rth {
             new_opts = new_opts.outside_rth(outside_rth);
         }
+        let limit_depth_level: Option<i32> = get_field(env, &opts, "limitDepthLevel")?;
+        if let Some(limit_depth_level) = limit_depth_level {
+            new_opts = new_opts.limit_depth_level(limit_depth_level);
+        }
+        let trigger_count: Option<i32> = get_field(env, &opts, "triggerCount")?;
+        if let Some(trigger_count) = trigger_count {
+            new_opts = new_opts.trigger_count(trigger_count);
+        }
+        let monitor_price: Option<Decimal> = get_field(env, &opts, "monitorPrice")?;
+        if let Some(monitor_price) = monitor_price {
+            new_opts = new_opts.monitor_price(monitor_price);
+        }
         let remark: Option<String> = get_field(env, &opts, "remark")?;
         if let Some(remark) = remark {
             new_opts = new_opts.remark(remark);

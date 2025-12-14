@@ -3094,6 +3094,12 @@ export interface SubmitOrderOptions {
   expireDate?: NaiveDate
   /** Enable or disable outside regular trading hours */
   outsideRth?: OutsideRTH
+  /** Limit depth level */
+  limitDepthLevel?: number
+  /** Trigger count */
+  triggerCount?: number
+  /** Monitor price */
+  monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
 }

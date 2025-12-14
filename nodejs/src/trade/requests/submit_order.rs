@@ -34,6 +34,12 @@ pub struct SubmitOrderOptions<'env> {
     pub expire_date: Option<ClassInstance<'env, NaiveDate>>,
     /// Enable or disable outside regular trading hours
     pub outside_rth: Option<OutsideRTH>,
+    /// Limit depth level
+    pub limit_depth_level: Option<i32>,
+    /// Trigger count
+    pub trigger_count: Option<i32>,
+    /// Monitor price
+    pub monitor_price: Option<ClassInstance<'env, Decimal>>,
     /// Remark (Maximum 64 characters)
     pub remark: Option<String>,
 }
@@ -68,6 +74,15 @@ impl<'env> From<SubmitOrderOptions<'env>> for longport::trade::SubmitOrderOption
         }
         if let Some(outside_rth) = opts.outside_rth {
             opts2 = opts2.outside_rth(outside_rth.into());
+        }
+        if let Some(limit_depth_level) = opts.limit_depth_level {
+            opts2 = opts2.limit_depth_level(limit_depth_level);
+        }
+        if let Some(trigger_count) = opts.trigger_count {
+            opts2 = opts2.trigger_count(trigger_count);
+        }
+        if let Some(monitor_price) = opts.monitor_price {
+            opts2 = opts2.monitor_price(monitor_price.0);
         }
         if let Some(remark) = opts.remark {
             opts2 = opts2.remark(remark);

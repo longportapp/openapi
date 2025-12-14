@@ -426,6 +426,9 @@ TradeContext::submit_order(
     nullptr,
     nullptr,
     nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
     opts.remark ? opts.remark->c_str() : nullptr,
   };
   lb_date_t expire_date;
@@ -449,6 +452,15 @@ TradeContext::submit_order(
   if (opts.expire_date) {
     expire_date = convert(&opts.expire_date.value());
     opts2.expire_date = &expire_date;
+  }
+  if (opts.limit_depth_level) {
+    opts2.limit_depth_level = &opts.limit_depth_level.value();
+  }
+  if (opts.trigger_count) {
+    opts2.trigger_count = &opts.trigger_count.value();
+  }
+  if (opts.monitor_price) {
+    opts2.monitor_price = (const lb_decimal_t*)opts.monitor_price.value();
   }
   if (opts.outside_rth) {
     outside_rth = convert(*opts.outside_rth);
