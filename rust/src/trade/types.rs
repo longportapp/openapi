@@ -1093,6 +1093,9 @@ mod tests {
                 "trigger_price": "",
                 "trigger_status": "NOT_USED",
                 "updated_at": "1651644898",
+                "limit_depth_level": 0,
+                "trigger_count": 0,
+                "monitor_price": "",
                 "remark": "abc"
               }
             ]
@@ -1167,6 +1170,9 @@ mod tests {
                 "trigger_price": "",
                 "trigger_status": "NOT_USED",
                 "updated_at": "1651644898",
+                "limit_depth_level": 0,
+                "trigger_count": 0,
+                "monitor_price": "",
                 "remark": "abc"
               }
             ]
@@ -1274,6 +1280,9 @@ mod tests {
             "trigger_status": "NOT_USED",
             "outside_rth": "ANY_TIME",
             "currency": "USD",
+            "limit_depth_level": 0,
+            "trigger_count": 0,
+            "monitor_price": "",
             "remark": "1680863603.927165",
             "free_status": "None",
             "free_amount": "",
