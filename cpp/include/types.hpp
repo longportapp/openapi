@@ -1490,6 +1490,12 @@ struct Order
   std::string currency;
   /// Enable or disable outside regular trading hours
   std::optional<OutsideRTH> outside_rth;
+  /// Limit depth level
+  std::optional<int32_t> limit_depth_level;
+  /// Trigger count
+  std::optional<int32_t> trigger_count;
+  /// Monitor price
+  std::optional<Decimal> monitor_price;
   /// Remark
   std::string remark;
 };

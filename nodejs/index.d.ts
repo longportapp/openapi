@@ -638,6 +638,12 @@ export declare class Order {
   get currency(): string
   /** Enable or disable outside regular trading hours */
   get outsideRth(): OutsideRTH | null
+  /** Limit depth level */
+  get limitDepthLevel(): number | null
+  /** Trigger count */
+  get triggerCount(): number | null
+  /** Monitor price */
+  get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
 }

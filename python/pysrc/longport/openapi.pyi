@@ -4212,6 +4212,21 @@ class Order:
     Enable or disable outside regular trading hours
     """
 
+    limit_depth_level: Optional[int]
+    """
+    Limit depth level
+    """
+
+    trigger_count: Optional[int]
+    """
+    Trigger count
+    """
+
+    monitor_price: Optional[Decimal]
+    """
+    Monitor price
+    """
+
     remark: str
     """
     Remark

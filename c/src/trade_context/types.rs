@@ -397,6 +397,12 @@ pub struct COrder {
     pub currency: *const c_char,
     /// Enable or disable outside regular trading hours (maybe null)
     pub outside_rth: *const COutsideRTH,
+    /// Limit depth level (maybe null)
+    pub limit_depth_level: *const i32,
+    /// Trigger count (maybe null)
+    pub trigger_count: *const i32,
+    /// Monitor price (maybe null)
+    pub monitor_price: *const CDecimal,
     /// Remark
     pub remark: *const c_char,
 }
@@ -428,6 +434,9 @@ pub(crate) struct COrderOwned {
     trigger_status: Option<CTriggerStatus>,
     currency: CString,
     outside_rth: Option<COutsideRTH>,
+    limit_depth_level: Option<i32>,
+    trigger_count: Option<i32>,
+    monitor_price: Option<CDecimal>,
     remark: CString,
 }
 
@@ -459,6 +468,9 @@ impl From<Order> for COrderOwned {
             trigger_status,
             currency,
             outside_rth,
+            limit_depth_level,
+            trigger_count,
+            monitor_price,
             remark,
         } = order;
         COrderOwned {
@@ -487,6 +499,9 @@ impl From<Order> for COrderOwned {
             trigger_status: trigger_status.map(Into::into),
             currency: currency.into(),
             outside_rth: outside_rth.map(Into::into),
+            limit_depth_level,
+            trigger_count,
+            monitor_price: monitor_price.map(Into::into),
             remark: remark.into(),
         }
     }
@@ -522,6 +537,9 @@ impl ToFFI for COrderOwned {
             trigger_status,
             currency,
             outside_rth,
+            limit_depth_level,
+            trigger_count,
+            monitor_price,
             remark,
         } = self;
         COrder {
@@ -585,6 +603,18 @@ impl ToFFI for COrderOwned {
             outside_rth: outside_rth
                 .as_ref()
                 .map(|value| value as *const COutsideRTH)
+                .unwrap_or(std::ptr::null()),
+            limit_depth_level: limit_depth_level
+                .as_ref()
+                .map(|value| value as *const i32)
+                .unwrap_or(std::ptr::null()),
+            trigger_count: trigger_count
+                .as_ref()
+                .map(|value| value as *const i32)
+                .unwrap_or(std::ptr::null()),
+            monitor_price: monitor_price
+                .as_ref()
+                .map(ToFFI::to_ffi_type)
                 .unwrap_or(std::ptr::null()),
             remark: remark.to_ffi_type(),
         }

@@ -309,6 +309,12 @@ pub struct Order {
     /// Enable or disable outside regular trading hours
     #[serde(with = "serde_utils::outside_rth")]
     pub outside_rth: Option<OutsideRTH>,
+    /// Limit depth level
+    pub limit_depth_level: Option<i32>,
+    /// Trigger count
+    pub trigger_count: Option<i32>,
+    /// Monitor price
+    pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
 }
