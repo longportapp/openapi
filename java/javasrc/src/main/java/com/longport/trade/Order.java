@@ -30,6 +30,9 @@ public class Order {
     private TriggerStatus triggerStatus;
     private String currency;
     private OutsideRTH outsideRth;
+    private Integer limitDepthLevel;
+    private Integer triggerCount;
+    private BigDecimal monitorPrice;
     private String remark;
 
     public String getOrderId() {
@@ -136,15 +139,29 @@ public class Order {
         return remark;
     }
 
+    public Integer getLimitDepthLevel() {
+        return limitDepthLevel;
+    }
+
+    public Integer getTriggerCount() {
+        return triggerCount;
+    }
+
+    public BigDecimal getMonitorPrice() {
+        return monitorPrice;
+    }
+
     @Override
     public String toString() {
-        return "Order [currency=" + currency + ", executedPrice=" + executedPrice + ", executedQuantity="
-                + executedQuantity + ", expireDate=" + expireDate + ", lastDone=" + lastDone + ", limitOffset="
-                + limitOffset + ", msg=" + msg + ", orderId=" + orderId + ", orderType=" + orderType + ", outsideRth="
-                + outsideRth + ", price=" + price + ", quantity=" + quantity + ", side=" + side + ", status=" + status
-                + ", stockName=" + stockName + ", submittedAt=" + submittedAt + ", symbol=" + symbol + ", tag=" + tag
-                + ", timeInForce=" + timeInForce + ", trailingAmount=" + trailingAmount + ", trailingPercent="
-                + trailingPercent + ", triggerAt=" + triggerAt + ", triggerPrice=" + triggerPrice + ", triggerStatus="
-                + triggerStatus + ", updatedAt=" + updatedAt + ", remark=" + remark + "]";
+        return "Order [orderId=" + orderId + ", status=" + status + ", stockName=" + stockName + ", quantity="
+                + quantity + ", executedQuantity=" + executedQuantity + ", price=" + price + ", executedPrice="
+                + executedPrice + ", submittedAt=" + submittedAt + ", side=" + side + ", symbol=" + symbol
+                + ", orderType=" + orderType + ", lastDone=" + lastDone + ", triggerPrice=" + triggerPrice + ", msg="
+                + msg + ", tag=" + tag + ", timeInForce=" + timeInForce + ", expireDate=" + expireDate + ", updatedAt="
+                + updatedAt + ", triggerAt=" + triggerAt + ", trailingAmount=" + trailingAmount + ", trailingPercent="
+                + trailingPercent + ", limitOffset=" + limitOffset + ", triggerStatus=" + triggerStatus + ", currency="
+                + currency + ", outsideRth=" + outsideRth + ", limitDepthLevel=" + limitDepthLevel + ", triggerCount="
+                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + "]";
     }
+
 }

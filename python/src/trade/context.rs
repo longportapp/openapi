@@ -205,7 +205,7 @@ impl TradeContext {
     }
 
     /// Replace order
-    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, remark = None))]
+    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
     #[allow(clippy::too_many_arguments)]
     fn replace_order(
         &self,
@@ -216,6 +216,9 @@ impl TradeContext {
         limit_offset: Option<PyDecimal>,
         trailing_amount: Option<PyDecimal>,
         trailing_percent: Option<PyDecimal>,
+        limit_depth_level: Option<i32>,
+        trigger_count: Option<i32>,
+        monitor_price: Option<PyDecimal>,
         remark: Option<String>,
     ) -> PyResult<()> {
         let mut opts = ReplaceOrderOptions::new(order_id, quantity.into());
@@ -235,6 +238,15 @@ impl TradeContext {
         if let Some(trailing_percent) = trailing_percent {
             opts = opts.trailing_percent(trailing_percent.into());
         }
+        if let Some(limit_depth_level) = limit_depth_level {
+            opts = opts.limit_depth_level(limit_depth_level);
+        }
+        if let Some(trigger_count) = trigger_count {
+            opts = opts.trigger_count(trigger_count);
+        }
+        if let Some(monitor_price) = monitor_price {
+            opts = opts.monitor_price(monitor_price.into());
+        }
         if let Some(remark) = remark {
             opts = opts.remark(remark);
         }
@@ -244,7 +256,7 @@ impl TradeContext {
     }
 
     /// Submit order
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, remark = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -260,6 +272,9 @@ impl TradeContext {
         trailing_percent: Option<PyDecimal>,
         expire_date: Option<PyDateWrapper>,
         outside_rth: Option<OutsideRTH>,
+        limit_depth_level: Option<i32>,
+        trigger_count: Option<i32>,
+        monitor_price: Option<PyDecimal>,
         remark: Option<String>,
     ) -> PyResult<SubmitOrderResponse> {
         let mut opts = SubmitOrderOptions::new(
@@ -290,6 +305,15 @@ impl TradeContext {
         }
         if let Some(outside_rth) = outside_rth {
             opts = opts.outside_rth(outside_rth.into());
+        }
+        if let Some(limit_depth_level) = limit_depth_level {
+            opts = opts.limit_depth_level(limit_depth_level);
+        }
+        if let Some(trigger_count) = trigger_count {
+            opts = opts.trigger_count(trigger_count);
+        }
+        if let Some(monitor_price) = monitor_price {
+            opts = opts.monitor_price(monitor_price.into());
         }
         if let Some(remark) = remark {
             opts = opts.remark(remark);

@@ -393,6 +393,15 @@ pub unsafe extern "C" fn lb_trade_context_replace_order(
     if !(*opts).trailing_percent.is_null() {
         opts2 = opts2.trailing_percent((*(*opts).trailing_percent).value);
     }
+    if !(*opts).limit_depth_level.is_null() {
+        opts2 = opts2.limit_depth_level(*(*opts).limit_depth_level);
+    }
+    if !(*opts).trigger_count.is_null() {
+        opts2 = opts2.trigger_count(*(*opts).trigger_count);
+    }
+    if !(*opts).monitor_price.is_null() {
+        opts2 = opts2.monitor_price((*(*opts).monitor_price).value);
+    }
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));
     }
@@ -445,6 +454,15 @@ pub unsafe extern "C" fn lb_trade_context_submit_order(
     }
     if !(*opts).outside_rth.is_null() {
         opts2 = opts2.outside_rth((*(*opts).outside_rth).into());
+    }
+    if !(*opts).limit_depth_level.is_null() {
+        opts2 = opts2.limit_depth_level(*(*opts).limit_depth_level);
+    }
+    if !(*opts).trigger_count.is_null() {
+        opts2 = opts2.trigger_count(*(*opts).trigger_count);
+    }
+    if !(*opts).monitor_price.is_null() {
+        opts2 = opts2.monitor_price((*(*opts).monitor_price).value);
     }
     if !(*opts).remark.is_null() {
         opts2 = opts2.remark(cstr_to_rust((*opts).remark));

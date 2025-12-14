@@ -309,6 +309,15 @@ pub struct Order {
     /// Enable or disable outside regular trading hours
     #[serde(with = "serde_utils::outside_rth")]
     pub outside_rth: Option<OutsideRTH>,
+    /// Limit depth level
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
+    pub limit_depth_level: Option<i32>,
+    /// Trigger count
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
+    pub trigger_count: Option<i32>,
+    /// Monitor price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
 }
@@ -494,6 +503,15 @@ pub struct OrderDetail {
     /// Enable or disable outside regular trading hours
     #[serde(with = "serde_utils::outside_rth")]
     pub outside_rth: Option<OutsideRTH>,
+    /// Limit depth level
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
+    pub limit_depth_level: Option<i32>,
+    /// Trigger count
+    #[serde(with = "serde_utils::int32_opt_0_is_none")]
+    pub trigger_count: Option<i32>,
+    /// Monitor price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
     /// Commission-free Status
@@ -1075,6 +1093,9 @@ mod tests {
                 "trigger_price": "",
                 "trigger_status": "NOT_USED",
                 "updated_at": "1651644898",
+                "limit_depth_level": 0,
+                "trigger_count": 0,
+                "monitor_price": "",
                 "remark": "abc"
               }
             ]
@@ -1149,6 +1170,9 @@ mod tests {
                 "trigger_price": "",
                 "trigger_status": "NOT_USED",
                 "updated_at": "1651644898",
+                "limit_depth_level": 0,
+                "trigger_count": 0,
+                "monitor_price": "",
                 "remark": "abc"
               }
             ]
@@ -1256,6 +1280,9 @@ mod tests {
             "trigger_status": "NOT_USED",
             "outside_rth": "ANY_TIME",
             "currency": "USD",
+            "limit_depth_level": 0,
+            "trigger_count": 0,
+            "monitor_price": "",
             "remark": "1680863603.927165",
             "free_status": "None",
             "free_amount": "",

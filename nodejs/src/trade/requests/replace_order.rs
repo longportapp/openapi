@@ -19,6 +19,12 @@ pub struct ReplaceOrderOptions<'env> {
     pub trailing_amount: Option<ClassInstance<'env, Decimal>>,
     /// Trailing percent (`TSLPPCT` / `TSMAPCT` Required)
     pub trailing_percent: Option<ClassInstance<'env, Decimal>>,
+    /// Limit depth level
+    pub limit_depth_level: Option<i32>,
+    /// Trigger count
+    pub trigger_count: Option<i32>,
+    /// Monitor price
+    pub monitor_price: Option<ClassInstance<'env, Decimal>>,
     /// Remark (Maximum 64 characters)
     pub remark: Option<String>,
 }
@@ -41,6 +47,15 @@ impl<'env> From<ReplaceOrderOptions<'env>> for longport::trade::ReplaceOrderOpti
         }
         if let Some(trailing_percent) = opts.trailing_percent {
             opts2 = opts2.trailing_percent(trailing_percent.0);
+        }
+        if let Some(limit_depth_level) = opts.limit_depth_level {
+            opts2 = opts2.limit_depth_level(limit_depth_level);
+        }
+        if let Some(trigger_count) = opts.trigger_count {
+            opts2 = opts2.trigger_count(trigger_count);
+        }
+        if let Some(monitor_price) = opts.monitor_price {
+            opts2 = opts2.monitor_price(monitor_price.0);
         }
         if let Some(remark) = opts.remark {
             opts2 = opts2.remark(remark);

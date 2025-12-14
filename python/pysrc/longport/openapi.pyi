@@ -4212,6 +4212,21 @@ class Order:
     Enable or disable outside regular trading hours
     """
 
+    limit_depth_level: Optional[int]
+    """
+    Limit depth level
+    """
+
+    trigger_count: Optional[int]
+    """
+    Trigger count
+    """
+
+    monitor_price: Optional[Decimal]
+    """
+    Monitor price
+    """
+
     remark: str
     """
     Remark
@@ -4528,6 +4543,21 @@ class OrderDetail:
     outside_rth: Optional[Type[OutsideRTH]]
     """
     Enable or disable outside regular trading hours
+    """
+
+    limit_depth_level: Optional[int]
+    """
+    Limit depth level
+    """
+
+    trigger_count: Optional[int]
+    """
+    Trigger count
+    """
+
+    monitor_price: Optional[Decimal]
+    """
+    Monitor price
     """
 
     remark: str
@@ -5153,7 +5183,7 @@ class TradeContext:
                 print(resp)
         """
 
-    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, remark: Optional[str] = None) -> None:
+    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> None:
         """
         Replace order
 
@@ -5164,6 +5194,9 @@ class TradeContext:
             limit_offset: Limit offset amount (`TSLPAMT` / `TSLPPCT` Required)
             trailing_amount: Trailing amount (`TSLPAMT` / `TSMAMT` Required)
             trailing_percent: Trailing percent (`TSLPPCT` / `TSMAPCT` Required)
+            limit_depth_level: Limit depth level
+            trigger_count: Trigger count
+            monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
 
         Examples:
@@ -5182,7 +5215,7 @@ class TradeContext:
                 )
         """
 
-    def submit_order(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None,  trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None,  outside_rth: Optional[Type[OutsideRTH]] = None,  remark: Optional[str] = None) -> SubmitOrderResponse:
+    def submit_order(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None,  trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None, trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None,  outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> SubmitOrderResponse:
         """
         Submit order
 
@@ -5199,6 +5232,9 @@ class TradeContext:
             trailing_percent: Trailing percent (`TSLPPCT` / `TSMAPCT` Required)
             expire_date: Long term order expire date (Required when `time_in_force` is `GoodTilDate`)
             outside_rth: Enable or disable outside regular trading hours
+            limit_depth_level: Limit depth level
+            trigger_count: Trigger count
+            monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
 
         Returns:

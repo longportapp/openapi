@@ -17,6 +17,9 @@ public class SubmitOrderOptions {
     private BigDecimal trailingPercent;
     private LocalDate expireDate;
     private OutsideRTH outsideRth;
+    private Integer limitDepthLevel;
+    private Integer triggerCount;
+    private BigDecimal monitorPrice;
     private String remark;
 
     public SubmitOrderOptions(
@@ -64,6 +67,21 @@ public class SubmitOrderOptions {
 
     public SubmitOrderOptions setOutsideRth(OutsideRTH outsideRth) {
         this.outsideRth = outsideRth;
+        return this;
+    }
+
+    public SubmitOrderOptions setLimitDepthLevel(Integer limitDepthLevel) {
+        this.limitDepthLevel = limitDepthLevel;
+        return this;
+    }
+
+    public SubmitOrderOptions setTriggerCount(Integer triggerCount) {
+        this.triggerCount = triggerCount;
+        return this;
+    }
+
+    public SubmitOrderOptions setMonitorPrice(BigDecimal monitorPrice) {
+        this.monitorPrice = monitorPrice;
         return this;
     }
 
