@@ -650,7 +650,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           path: ./nodejs/artifacts
-          pattern: bindings-*we
+          pattern: bindings-*
           merge-multiple: true
       - name: Move artifacts
         run: napi artifacts
