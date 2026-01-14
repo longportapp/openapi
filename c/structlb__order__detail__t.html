@@ -122,6 +122,12 @@ Data Fields</h2></td></tr>
 <tr class="separator:ac677610d010638851abb8ebe76fb508c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0c3c2ea1531615a9524809b0cb339d9a"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="longport_8h.html#a17449644fdd0c687757a02335c2f415a">lb_outside_rth_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#a0c3c2ea1531615a9524809b0cb339d9a">outside_rth</a></td></tr>
 <tr class="separator:a0c3c2ea1531615a9524809b0cb339d9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebc43ea7a44b77153d8da0bd15246c5e"><td class="memItemLeft" align="right" valign="top">const int32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#aebc43ea7a44b77153d8da0bd15246c5e">limit_depth_level</a></td></tr>
+<tr class="separator:aebc43ea7a44b77153d8da0bd15246c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa93203e86a45fd16565e814ea54773b6"><td class="memItemLeft" align="right" valign="top">const int32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#aa93203e86a45fd16565e814ea54773b6">trigger_count</a></td></tr>
+<tr class="separator:aa93203e86a45fd16565e814ea54773b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92ab50a8dface7bbd9e7ba54e112b444"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="longport_8h.html#a050557cb28af08567f39a2dac995788c">lb_decimal_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#a92ab50a8dface7bbd9e7ba54e112b444">monitor_price</a></td></tr>
+<tr class="separator:a92ab50a8dface7bbd9e7ba54e112b444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#a9a51a4c0d5faa2f4386a52affa7e12d7">remark</a></td></tr>
 <tr class="separator:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e0fadeb1cc5e64b9572ebb0d035a346"><td class="memItemLeft" align="right" valign="top">enum <a class="el" href="longport_8h.html#ab9b3d869ce8654fce40a5309096c7914">lb_commission_free_status_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__detail__t.html#a3e0fadeb1cc5e64b9572ebb0d035a346">free_status</a></td></tr>
@@ -347,6 +353,21 @@ Data Fields</h2></td></tr>
 
 </div>
 </div>
+<a id="aebc43ea7a44b77153d8da0bd15246c5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebc43ea7a44b77153d8da0bd15246c5e">&#9670;&nbsp;</a></span>limit_depth_level</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int32_t* limit_depth_level</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Limit depth level (maybe null) </p>
+
+</div>
+</div>
 <a id="ab134922e4283bb2f1b30fbddf97fdca3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab134922e4283bb2f1b30fbddf97fdca3">&#9670;&nbsp;</a></span>limit_offset</h2>
 
@@ -359,6 +380,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p><code>TSLPAMT</code> / <code>TSLPPCT</code> order limit offset amount (maybe null) </p>
+
+</div>
+</div>
+<a id="a92ab50a8dface7bbd9e7ba54e112b444"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92ab50a8dface7bbd9e7ba54e112b444">&#9670;&nbsp;</a></span>monitor_price</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="longport_8h.html#a050557cb28af08567f39a2dac995788c">lb_decimal_t</a>* monitor_price</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Monitor price (maybe null) </p>
 
 </div>
 </div>
@@ -674,6 +710,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Conditional order trigger time (maybe null) </p>
+
+</div>
+</div>
+<a id="aa93203e86a45fd16565e814ea54773b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa93203e86a45fd16565e814ea54773b6">&#9670;&nbsp;</a></span>trigger_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int32_t* trigger_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Trigger count (maybe null) </p>
 
 </div>
 </div>

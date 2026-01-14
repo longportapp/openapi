@@ -115,6 +115,15 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:acd1c097297f799bfb25001a248a9ddee"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="namespacelongport_1_1trade.html#a425a8c66a030b1edf8ec3fe20a788660">OutsideRTH</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_submit_order_options.html#acd1c097297f799bfb25001a248a9ddee">outside_rth</a></td></tr>
 <tr class="memdesc:acd1c097297f799bfb25001a248a9ddee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable outside regular trading hours.  <a href="structlongport_1_1trade_1_1_submit_order_options.html#acd1c097297f799bfb25001a248a9ddee">More...</a><br /></td></tr>
 <tr class="separator:acd1c097297f799bfb25001a248a9ddee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a968934a23aa7d67d4b3a7f2f68a08a75"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_submit_order_options.html#a968934a23aa7d67d4b3a7f2f68a08a75">limit_depth_level</a></td></tr>
+<tr class="memdesc:a968934a23aa7d67d4b3a7f2f68a08a75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Limit depth level.  <a href="structlongport_1_1trade_1_1_submit_order_options.html#a968934a23aa7d67d4b3a7f2f68a08a75">More...</a><br /></td></tr>
+<tr class="separator:a968934a23aa7d67d4b3a7f2f68a08a75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a612a1797fc4cfdec85ee1a6aa0ca4992"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_submit_order_options.html#a612a1797fc4cfdec85ee1a6aa0ca4992">trigger_count</a></td></tr>
+<tr class="memdesc:a612a1797fc4cfdec85ee1a6aa0ca4992"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trigger count.  <a href="structlongport_1_1trade_1_1_submit_order_options.html#a612a1797fc4cfdec85ee1a6aa0ca4992">More...</a><br /></td></tr>
+<tr class="separator:a612a1797fc4cfdec85ee1a6aa0ca4992"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d50ce49a61504bcaca44b9aa3aaa089"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="classlongport_1_1_decimal.html">Decimal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_submit_order_options.html#a5d50ce49a61504bcaca44b9aa3aaa089">monitor_price</a></td></tr>
+<tr class="memdesc:a5d50ce49a61504bcaca44b9aa3aaa089"><td class="mdescLeft">&#160;</td><td class="mdescRight">Monitor price.  <a href="structlongport_1_1trade_1_1_submit_order_options.html#a5d50ce49a61504bcaca44b9aa3aaa089">More...</a><br /></td></tr>
+<tr class="separator:a5d50ce49a61504bcaca44b9aa3aaa089"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a095f9f4c117378a738c53b75fa9d8f9e"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_submit_order_options.html#a095f9f4c117378a738c53b75fa9d8f9e">remark</a></td></tr>
 <tr class="memdesc:a095f9f4c117378a738c53b75fa9d8f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remark (Maximum 64 characters)  <a href="structlongport_1_1trade_1_1_submit_order_options.html#a095f9f4c117378a738c53b75fa9d8f9e">More...</a><br /></td></tr>
 <tr class="separator:a095f9f4c117378a738c53b75fa9d8f9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,6 +146,22 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a968934a23aa7d67d4b3a7f2f68a08a75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a968934a23aa7d67d4b3a7f2f68a08a75">&#9670;&nbsp;</a></span>limit_depth_level</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int32_t&gt; longport::trade::SubmitOrderOptions::limit_depth_level</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Limit depth level. </p>
+
+</div>
+</div>
 <a id="ab5da88563d22de46bd05a2a615392953"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab5da88563d22de46bd05a2a615392953">&#9670;&nbsp;</a></span>limit_offset</h2>
 
@@ -150,6 +175,22 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Limit offset amount (<code>TSLPAMT</code> / <code>TSLPPCT</code> Required) </p>
+
+</div>
+</div>
+<a id="a5d50ce49a61504bcaca44b9aa3aaa089"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d50ce49a61504bcaca44b9aa3aaa089">&#9670;&nbsp;</a></span>monitor_price</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;<a class="el" href="classlongport_1_1_decimal.html">Decimal</a>&gt; longport::trade::SubmitOrderOptions::monitor_price</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Monitor price. </p>
 
 </div>
 </div>
@@ -310,6 +351,22 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Trailing percent (<code>TSLPPCT</code> / <code>TSMAPCT</code> Required) </p>
+
+</div>
+</div>
+<a id="a612a1797fc4cfdec85ee1a6aa0ca4992"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a612a1797fc4cfdec85ee1a6aa0ca4992">&#9670;&nbsp;</a></span>trigger_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int32_t&gt; longport::trade::SubmitOrderOptions::trigger_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Trigger count. </p>
 
 </div>
 </div>
