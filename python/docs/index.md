@@ -15,6 +15,14 @@
 - [TradeContext](reference_all.md#longport.openapi.TradeContext)
 
   The Trade API part of the SDK, e.g.: submit order, get order status...
+
+- [AsyncQuoteContext](reference_all.md#longport.openapi.AsyncQuoteContext)
+
+  Async quote API for use with asyncio; create via `AsyncQuoteContext.create(config)` and await in asyncio.
+
+- [AsyncTradeContext](reference_all.md#longport.openapi.AsyncTradeContext)
+
+  Async trade API for use with asyncio; create via `AsyncTradeContext.create(config)` and await in asyncio.
   
 ## Quickstart
 
@@ -97,6 +105,31 @@ resp = ctx.submit_order("700.HK", OrderType.LO, OrderSide.Buy, Decimal(
     "500"), TimeInForceType.Day, submitted_price=Decimal("50"), remark="Hello from Python SDK")
 print(resp)
 ```
+
+## Asynchronous API
+
+The SDK provides async contexts and an async HTTP client for use with Python's `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API.
+
+```python
+import asyncio
+from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote
+
+def on_quote(symbol: str, event: PushQuote):
+    print(symbol, event)
+
+async def main():
+    config = Config.from_env()
+    ctx = await AsyncQuoteContext.create(config)
+    ctx.set_on_quote(on_quote)
+    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+    quotes = await ctx.quote(["700.HK"])
+    print(quotes)
+    await asyncio.sleep(10)
+
+asyncio.run(main())
+```
+
+See the `*_async.py` examples in the repo and the reference for `AsyncQuoteContext`, `AsyncTradeContext`, and `HttpClient.request_async`.
 
 ## License
 

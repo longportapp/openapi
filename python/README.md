@@ -9,7 +9,9 @@
 
 ## Examples
 
-Runnable examples live in `examples/python/`:
+Runnable examples live in `examples/python/`, grouped as follows.
+
+**Synchronous API** (same as the snippets in this README):
 
 - `examples/python/account_asset.py`
 - `examples/python/history_candlesticks.py`
@@ -18,6 +20,16 @@ Runnable examples live in `examples/python/`:
 - `examples/python/subscribe_quote.py`
 - `examples/python/submit_order.py`
 - `examples/python/today_orders.py`
+
+**Asynchronous API** (`AsyncQuoteContext`, `AsyncTradeContext`, `HttpClient.request_async`):
+
+- `examples/python/account_asset_async.py`
+- `examples/python/history_candlesticks_async.py`
+- `examples/python/http_client_async.py`
+- `examples/python/subscribe_candlesticks_async.py`
+- `examples/python/subscribe_quote_async.py`
+- `examples/python/submit_order_async.py`
+- `examples/python/today_orders_async.py`
 
 ## References
 
@@ -114,6 +126,39 @@ resp = ctx.submit_order("700.HK", OrderType.LO, OrderSide.Buy, Decimal(
     "500"), TimeInForceType.Day, submitted_price=Decimal("50"), remark="Hello from Python SDK")
 print(resp)
 ```
+
+## Asynchronous API
+
+**Note:** The async API is currently in an early experience stage; we welcome feedback.
+
+The SDK provides async contexts and an async HTTP client for use with Python’s `asyncio`. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API and may be invoked from internal threads.
+
+- **Async quote**: create with `ctx = await AsyncQuoteContext.create(config)`, then e.g. `await ctx.quote(["700.HK"])`, `await ctx.subscribe(...)`.
+- **Async trade**: create with `ctx = await AsyncTradeContext.create(config)`, then e.g. `await ctx.today_orders()`, `await ctx.submit_order(...)`.
+- **Async HTTP**: `resp = await http_cli.request_async("get", "/v1/trade/execution/today")`.
+
+Example (async quote):
+
+```python
+import asyncio
+from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote
+
+def on_quote(symbol: str, event: PushQuote):
+    print(symbol, event)
+
+async def main():
+    config = Config.from_env()
+    ctx = await AsyncQuoteContext.create(config)
+    ctx.set_on_quote(on_quote)
+    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+    quotes = await ctx.quote(["700.HK"])
+    print(quotes)
+    await asyncio.sleep(10)
+
+asyncio.run(main())
+```
+
+See the `*_async.py` examples in `examples/python/` for full async flows.
 
 ## Troubleshooting
 

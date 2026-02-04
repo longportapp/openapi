@@ -1,5 +1,13 @@
 from decimal import Decimal
-from longport.openapi import TradeContext, Config, OrderSide, OrderType, TimeInForceType, OutsideRTH
+
+from longport.openapi import (
+    TradeContext,
+    Config,
+    OrderSide,
+    OrderType,
+    TimeInForceType,
+    OutsideRTH,
+)
 
 config = Config.from_env()
 ctx = TradeContext(config)

@@ -1,4 +1,5 @@
 mod context;
+mod context_async;
 mod push;
 mod types;
 
@@ -30,5 +31,6 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::FrozenTransactionFee>()?;
 
     parent.add_class::<context::TradeContext>()?;
+    parent.add_class::<context_async::AsyncTradeContext>()?;
     Ok(())
 }

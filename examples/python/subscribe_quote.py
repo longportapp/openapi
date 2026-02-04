@@ -1,5 +1,6 @@
 from time import sleep
-from longport.openapi import QuoteContext, Config, SubType, PushQuote, Period, AdjustType
+
+from longport.openapi import QuoteContext, Config, SubType, PushQuote
 
 
 def on_quote(symbol: str, event: PushQuote):
@@ -10,5 +11,8 @@ config = Config.from_env()
 ctx = QuoteContext(config)
 ctx.set_on_quote(on_quote)
 ctx.subscribe(
-    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"], [SubType.Quote], is_first_push=True)
+    ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
+    [SubType.Quote],
+    is_first_push=True,
+)
 sleep(10)

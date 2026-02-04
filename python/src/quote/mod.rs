@@ -1,4 +1,5 @@
 mod context;
+mod context_async;
 mod push;
 mod types;
 
@@ -60,5 +61,6 @@ pub(crate) fn register_types(parent: &Bound<PyModule>) -> PyResult<()> {
     parent.add_class::<types::SecurityBoard>()?;
 
     parent.add_class::<context::QuoteContext>()?;
+    parent.add_class::<context_async::AsyncQuoteContext>()?;
     Ok(())
 }

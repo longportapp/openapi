@@ -1,6 +1,6 @@
 from datetime import datetime, date, time
 from decimal import Decimal
-from typing import Any, Callable, List, Optional, Type
+from typing import Any, Awaitable, Callable, List, Optional, Type
 
 
 class ErrorKind:
@@ -95,6 +95,37 @@ class HttpClient:
 
                 # post
                 client.request("get", "/foo/bar", { "foo": 1, "bar": 2 });
+        """
+        ...
+
+    def request_async(self, method: str, path: str, headers: Optional[dict[str, str]] = None, body: Optional[Any] = None) -> Awaitable[Any]:
+        """
+        Performs an async HTTP request. Returns an awaitable; must be awaited inside asyncio.
+
+        Args:
+            method: HTTP method (e.g. "get", "post").
+            path: Request path (e.g. "/v1/trade/execution/today").
+            headers: Optional request headers.
+            body: Optional JSON-serializable request body.
+
+        Returns:
+            An awaitable that resolves to the response body (same as sync request).
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import HttpClient
+
+                async def main():
+                    http_cli = HttpClient.from_env()
+                    resp = await http_cli.request_async(
+                        "get",
+                        "/v1/trade/execution/today",
+                    )
+                    print(resp)
+
+                asyncio.run(main())
         """
         ...
 
@@ -3588,6 +3619,1131 @@ class QuoteContext:
         """
 
 
+class AsyncQuoteContext:
+    """
+    Async quote context for use with asyncio. Create via `AsyncQuoteContext.create(config)` and await inside asyncio.
+    Callbacks (set_on_quote, set_on_depth, etc.) are set the same way as the sync QuoteContext; all I/O methods return awaitables.
+    """
+
+    @classmethod
+    def create(cls: Type["AsyncQuoteContext"],
+               config: Config) -> Awaitable["AsyncQuoteContext"]:
+        """
+        Create an async quote context. Returns an awaitable; must be awaited inside asyncio.
+
+        Args:
+            config: Configuration object (same as sync QuoteContext).
+
+        Returns:
+            An awaitable that resolves to the AsyncQuoteContext instance.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import Config, AsyncQuoteContext
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.quote(["700.HK", "AAPL.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def member_id(self) -> int:
+        """Returns the member ID."""
+        ...
+
+    def quote_level(self) -> str:
+        """Returns the quote level."""
+        ...
+
+    def quote_package_details(self) -> List[QuotePackageDetail]:
+        """Returns the quote package details."""
+        ...
+
+    def set_on_quote(
+            self, callback: Callable[[str, PushQuote], None]) -> None:
+        """Set quote callback; called when quote push is received (same as sync QuoteContext)."""
+        ...
+
+    def set_on_depth(
+            self, callback: Callable[[str, PushDepth], None]) -> None:
+        """Set depth callback; called when depth push is received."""
+        ...
+
+    def set_on_brokers(
+            self, callback: Callable[[str, PushBrokers], None]) -> None:
+        """Set brokers callback; called when brokers push is received."""
+        ...
+
+    def set_on_trades(
+            self, callback: Callable[[str, PushTrades], None]) -> None:
+        """Set trades callback; called when trades push is received."""
+        ...
+
+    def set_on_candlestick(
+            self, callback: Callable[[str, PushCandlestick], None]) -> None:
+        """Set candlestick callback; called when candlestick push is received."""
+        ...
+
+    def subscribe(
+            self, symbols: List[str], sub_types: List[Type[SubType]]) -> Awaitable[None]:
+        """
+        Subscribe to symbols and sub types. Returns an awaitable; must be awaited in asyncio.
+
+        Args:
+            symbols: Security codes.
+            sub_types: Subscribe types.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SubType, PushQuote
+
+                def on_quote(symbol: str, event: PushQuote):
+                    print(symbol, event)
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    ctx.set_on_quote(on_quote)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    await asyncio.sleep(30)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def unsubscribe(
+            self, symbols: List[str], sub_types: List[Type[SubType]]) -> Awaitable[None]:
+        """
+        Unsubscribe from symbols and sub types. Returns an awaitable.
+
+        Args:
+            symbols: Security codes.
+            sub_types: Subscribe types.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    await ctx.unsubscribe(["AAPL.US"], [SubType.Quote])
+
+                asyncio.run(main())
+        """
+        ...
+
+    def subscribe_candlesticks(
+            self, symbol: str, period: Type[Period], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Subscribe security candlesticks. Returns an awaitable that resolves to initial candlesticks.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    PushCandlestick,
+                    TradeSessions,
+                )
+
+                def on_candlestick(symbol: str, event: PushCandlestick):
+                    print(symbol, event)
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    ctx.set_on_candlestick(on_candlestick)
+                    await ctx.subscribe_candlesticks(
+                        "700.HK",
+                        Period.Min_1,
+                        TradeSessions.Intraday,
+                    )
+                    await asyncio.sleep(30)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def unsubscribe_candlesticks(
+            self, symbol: str, period: Type[Period]) -> Awaitable[None]:
+        """
+        Unsubscribe security candlesticks. Returns an awaitable.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe_candlesticks(
+                        "700.HK",
+                        Period.Min_1,
+                        TradeSessions.Intraday,
+                    )
+                    await ctx.unsubscribe_candlesticks("700.HK", Period.Min_1)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def subscriptions(self) -> Awaitable[List[Subscription]]:
+        """
+        Get subscription information. Returns an awaitable that resolves to subscription list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    resp = await ctx.subscriptions()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def static_info(
+            self, symbols: List[str]) -> Awaitable[List[SecurityStaticInfo]]:
+        """
+        Get basic information of securities. Returns an awaitable that resolves to security info list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.static_info(
+                        ["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"],
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def quote(self, symbols: List[str]) -> Awaitable[List[SecurityQuote]]:
+        """
+        Get quote of securities. Returns an awaitable that resolves to security quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.quote(["700.HK", "AAPL.US", "TSLA.US", "NFLX.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def option_quote(self, symbols: List[str]
+                     ) -> Awaitable[List[OptionQuote]]:
+        """
+        Get quote of option securities. Returns an awaitable that resolves to option quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.option_quote(["AAPL230317P160000.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def warrant_quote(
+            self, symbols: List[str]) -> Awaitable[List[WarrantQuote]]:
+        """
+        Get quote of warrant securities. Returns an awaitable that resolves to warrant quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.warrant_quote(["21125.HK"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def depth(self, symbol: str) -> Awaitable[SecurityDepth]:
+        """
+        Get security depth. Returns an awaitable that resolves to security depth.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.depth("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def brokers(self, symbol: str) -> Awaitable[SecurityBrokers]:
+        """
+        Get security brokers. Returns an awaitable that resolves to security brokers.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.brokers("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def participants(self) -> Awaitable[List[ParticipantInfo]]:
+        """
+        Get participants. Returns an awaitable that resolves to participant list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.participants()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def trades(self, symbol: str, count: int) -> Awaitable[List[Trade]]:
+        """
+        Get security trades. Returns an awaitable that resolves to trades list (max count 1000).
+
+        Args:
+            symbol: Security code.
+            count: Count of trades.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.trades("700.HK", 10)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def intraday(self, symbol: str, trade_sessions: Type[TradeSessions]
+                 = TradeSessions.Intraday) -> Awaitable[List[IntradayLine]]:
+        """
+        Get security intraday lines. Returns an awaitable that resolves to intraday line list.
+
+        Args:
+            symbol: Security code.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, TradeSessions
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.intraday("700.HK", TradeSessions.Intraday)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def candlesticks(self, symbol: str, period: Type[Period], count: int, adjust_type: Type[AdjustType],
+                     trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Get security candlesticks. Returns an awaitable that resolves to candlesticks list (max count 1000).
+
+        Args:
+            symbol: Security code.
+            period: Candlestick period.
+            count: Count of candlesticks.
+            adjust_type: Adjustment type.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    AdjustType,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.candlesticks(
+                        "700.HK",
+                        Period.Day,
+                        10,
+                        AdjustType.NoAdjust,
+                        TradeSessions.Intraday,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_candlesticks_by_offset(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], forward: bool, count: int,
+                                       time: Optional[datetime] = None, trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Get security history candlesticks by offset. Returns an awaitable that resolves to candlesticks list.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            adjust_type: Adjust type.
+            forward: If True, query the latest from the specified time.
+            count: Count of candlesticks.
+            time: Datetime.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longport.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    AdjustType,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.history_candlesticks_by_offset(
+                        "700.HK",
+                        Period.Day,
+                        AdjustType.NoAdjust,
+                        False,
+                        10,
+                        datetime.datetime(2023, 8, 18),
+                        TradeSessions.Intraday,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_candlesticks_by_date(self, symbol: str, period: Type[Period], adjust_type: Type[AdjustType], start: Optional[date],
+                                     end: Optional[date], trade_sessions: Type[TradeSessions] = TradeSessions.Intraday) -> Awaitable[List[Candlestick]]:
+        """
+        Get security history candlesticks by date. Returns an awaitable that resolves to candlesticks list.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            adjust_type: Adjust type.
+            start: Start date.
+            end: End date.
+            trade_sessions: Trade sessions.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longport.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    Period,
+                    AdjustType,
+                    TradeSessions,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.history_candlesticks_by_date(
+                        "700.HK",
+                        Period.Day,
+                        AdjustType.NoAdjust,
+                        datetime.date(2022, 5, 5),
+                        datetime.date(2022, 6, 23),
+                        TradeSessions.Intraday,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def option_chain_expiry_date_list(
+            self, symbol: str) -> Awaitable[List[date]]:
+        """
+        Get option chain expiry date list. Returns an awaitable that resolves to date list.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.option_chain_expiry_date_list("AAPL.US")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def option_chain_info_by_date(
+            self, symbol: str, expiry_date: date) -> Awaitable[List[StrikePriceInfo]]:
+        """
+        Get option chain info by date. Returns an awaitable that resolves to strike price info list.
+
+        Args:
+            symbol: Security code.
+            expiry_date: Expiry date.
+
+        Examples:
+            ::
+
+                import asyncio
+                from datetime import date
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.option_chain_info_by_date(
+                        "AAPL.US",
+                        date(2023, 1, 20),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def warrant_issuers(self) -> Awaitable[List[IssuerInfo]]:
+        """
+        Get warrant issuers. Returns an awaitable that resolves to issuer list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.warrant_issuers()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def warrant_list(self, symbol: str, sort_by: Type[WarrantSortBy], sort_order: Type[SortOrderType], warrant_type: Optional[List[Type[WarrantType]]] = None, issuer: Optional[List[int]] = None, expiry_date: Optional[
+                     List[Type[FilterWarrantExpiryDate]]] = None, price_type: Optional[List[Type[FilterWarrantInOutBoundsType]]] = None, status: Optional[List[Type[WarrantStatus]]] = None) -> Awaitable[List[WarrantInfo]]:
+        """
+        Get warrant list with optional filters. Returns an awaitable that resolves to warrant info list.
+
+        Args:
+            symbol: Security code.
+            sort_by: Sort by field.
+            sort_order: Sort order.
+            warrant_type: Filter by warrant type.
+            issuer: Filter by issuer.
+            expiry_date: Filter by expiry date.
+            price_type: Filter by price type.
+            status: Filter by status.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import (
+                    AsyncQuoteContext,
+                    Config,
+                    WarrantSortBy,
+                    SortOrderType,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.warrant_list(
+                        "700.HK",
+                        WarrantSortBy.LastDone,
+                        SortOrderType.Ascending,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def trading_session(self) -> Awaitable[List[MarketTradingSession]]:
+        """
+        Get trading session of the day. Returns an awaitable that resolves to market trading session list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.trading_session()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def trading_days(self, market: Type[Market], begin: date,
+                     end: date) -> Awaitable[MarketTradingDays]:
+        """
+        Get trading days in the given market and date range. Returns an awaitable (interval must be less than one month).
+
+        Args:
+            market: Market.
+            begin: Begin date.
+            end: End date.
+
+        Examples:
+            ::
+
+                import asyncio
+                from datetime import date
+                from longport.openapi import AsyncQuoteContext, Config, Market
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.trading_days(
+                        Market.HK,
+                        date(2022, 1, 1),
+                        date(2022, 2, 1),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def capital_flow(
+            self, symbol: str) -> Awaitable[List[CapitalFlowLine]]:
+        """
+        Get capital flow intraday. Returns an awaitable that resolves to capital flow line list.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.capital_flow("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def capital_distribution(
+            self, symbol: str) -> Awaitable[CapitalDistributionResponse]:
+        """
+        Get capital distribution. Returns an awaitable that resolves to capital distribution response.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.capital_distribution("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def calc_indexes(
+            self, symbols: List[str], indexes: List[Type[CalcIndex]]) -> Awaitable[List[SecurityCalcIndex]]:
+        """
+        Get calc indexes for symbols. Returns an awaitable that resolves to security calc index list.
+
+        Args:
+            symbols: Security codes.
+            indexes: Calc indexes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, CalcIndex
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.calc_indexes(
+                        ["700.HK", "APPL.US"],
+                        [CalcIndex.LastDone, CalcIndex.ChangeRate],
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def watchlist(self) -> Awaitable[List[WatchlistGroup]]:
+        """
+        Get watch list. Returns an awaitable that resolves to watchlist group list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.watchlist()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def create_watchlist_group(
+            self, name: str, securities: Optional[List[str]] = None) -> Awaitable[int]:
+        """
+        Create watchlist group. Returns an awaitable that resolves to group ID.
+
+        Args:
+            name: Group name.
+            securities: Securities.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    group_id = await ctx.create_watchlist_group(
+                        name="Watchlist1",
+                        securities=["700.HK", "AAPL.US"],
+                    )
+                    print(group_id)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def delete_watchlist_group(
+            self, id: int, purge: bool = False) -> Awaitable[None]:
+        """
+        Delete watchlist group. Returns an awaitable.
+
+        Args:
+            id: Group ID.
+            purge: Move securities in this group to the default group.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.delete_watchlist_group(10086)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def update_watchlist_group(self, id: int, name: Optional[str] = None, securities: Optional[List[str]]
+                               = None, mode: Optional[Type[SecuritiesUpdateMode]] = None) -> Awaitable[None]:
+        """
+        Update watchlist group. Returns an awaitable.
+
+        Args:
+            id: Group ID.
+            name: Group name.
+            securities: Securities.
+            mode: Securities update mode.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SecuritiesUpdateMode
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.update_watchlist_group(
+                        10086,
+                        name="Watchlist2",
+                        securities=["700.HK", "AAPL.US"],
+                        mode=SecuritiesUpdateMode.Replace,
+                    )
+
+                asyncio.run(main())
+        """
+        ...
+
+    def security_list(
+            self, market: Type[Market], category: Optional[Type[SecurityListCategory]] = None) -> Awaitable[List[Security]]:
+        """
+        Get security list. Returns an awaitable that resolves to security list.
+
+        Args:
+            market: Market.
+            category: Security list category.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, Market, SecurityListCategory
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.security_list(
+                        Market.HK,
+                        SecurityListCategory.Overnight,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def market_temperature(
+            self, market: Type[Market]) -> Awaitable[MarketTemperature]:
+        """
+        Get current market temperature. Returns an awaitable that resolves to market temperature.
+
+        Args:
+            market: Market.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, Market
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.market_temperature(Market.HK)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_market_temperature(
+            self, market: Type[Market], start: date, end: date) -> Awaitable[HistoryMarketTemperatureResponse]:
+        """
+        Get historical market temperature. Returns an awaitable that resolves to history market temperature response.
+
+        Args:
+            market: Market.
+            start: Start date.
+            end: End date.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longport.openapi import AsyncQuoteContext, Config, Market
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    resp = await ctx.history_market_temperature(
+                        Market.HK,
+                        datetime.date(2023, 1, 1),
+                        datetime.date(2023, 1, 31),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_quote(
+            self, symbols: List[str]) -> Awaitable[List[RealtimeQuote]]:
+        """
+        Get real-time quote of subscribed symbols from local storage. Returns an awaitable that resolves to realtime quote list.
+
+        Args:
+            symbols: Security codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_quote(["700.HK", "AAPL.US"])
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_depth(self, symbol: str) -> Awaitable[SecurityDepth]:
+        """
+        Get real-time depth of subscribed symbol from local storage. Returns an awaitable that resolves to security depth.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Depth])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_depth("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_brokers(self, symbol: str) -> Awaitable[SecurityBrokers]:
+        """
+        Get real-time brokers of subscribed symbol from local storage. Returns an awaitable that resolves to security brokers.
+
+        Args:
+            symbol: Security code.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Brokers])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_brokers("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_trades(self, symbol: str,
+                        count: int) -> Awaitable[List[Trade]]:
+        """
+        Get real-time trades of subscribed symbol from local storage. Returns an awaitable that resolves to trade list.
+
+        Args:
+            symbol: Security code.
+            count: Count of trades.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, SubType
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Trade])
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_trades("700.HK", 10)
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def realtime_candlesticks(
+            self, symbol: str, period: Type[Period], count: int) -> Awaitable[List[Candlestick]]:
+        """
+        Get real-time candlesticks of subscribed symbol from local storage. Returns an awaitable that resolves to candlestick list.
+
+        Args:
+            symbol: Security code.
+            period: Period type.
+            count: Count of candlesticks.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncQuoteContext, Config, Period
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncQuoteContext.create(config)
+                    await ctx.subscribe_candlesticks(
+                        "AAPL.US",
+                        Period.Min_1,
+                    )
+                    await asyncio.sleep(5)
+                    resp = await ctx.realtime_candlesticks(
+                        "AAPL.US",
+                        Period.Min_1,
+                        10,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+
 class OrderSide:
     """
     Order side
@@ -5451,3 +6607,550 @@ class TradeContext:
                 )
                 print(resp)
         """
+
+
+class AsyncTradeContext:
+    """
+    Async trade context for use with asyncio. Create via `AsyncTradeContext.create(config)` and await inside asyncio.
+    Callbacks (set_on_order_changed) are set the same way as the sync TradeContext; all I/O methods return awaitables.
+    """
+
+    @classmethod
+    def create(cls: Type["AsyncTradeContext"],
+               config: Config) -> Awaitable["AsyncTradeContext"]:
+        """
+        Create an async trade context. Returns an awaitable; must be awaited inside asyncio.
+
+        Args:
+            config: Configuration object (same as sync TradeContext).
+
+        Returns:
+            An awaitable that resolves to the AsyncTradeContext instance.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import Config, AsyncTradeContext
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.today_orders()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def set_on_order_changed(
+            self, callback: Callable[[PushOrderChanged], None]) -> None:
+        """Set order changed callback; called when order changed event is received (same as sync TradeContext)."""
+        ...
+
+    def subscribe(self, topics: List[Type[TopicType]]) -> Awaitable[None]:
+        """
+        Subscribe to topics (e.g. TopicType.Private). Returns an awaitable; must be awaited in asyncio.
+
+        Args:
+            topics: Topic list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longport.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderSide,
+                    OrderType,
+                    TimeInForceType,
+                    PushOrderChanged,
+                    TopicType,
+                )
+
+                def on_order_changed(event: PushOrderChanged):
+                    print(event)
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    ctx.set_on_order_changed(on_order_changed)
+                    await ctx.subscribe([TopicType.Private])
+                    resp = await ctx.submit_order(
+                        symbol="700.HK",
+                        order_type=OrderType.LO,
+                        side=OrderSide.Buy,
+                        submitted_quantity=Decimal(200),
+                        time_in_force=TimeInForceType.Day,
+                        submitted_price=Decimal(50),
+                        remark="Hello from Python SDK",
+                    )
+                    print(resp)
+                    await asyncio.sleep(5)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def unsubscribe(
+            self, topics: List[Type[TopicType]]) -> Awaitable[None]:
+        """
+        Unsubscribe from topics. Returns an awaitable.
+
+        Args:
+            topics: Topic list.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config, TopicType
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    await ctx.subscribe([TopicType.Private])
+                    await ctx.unsubscribe([TopicType.Private])
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_executions(self, symbol: Optional[str] = None, start_at: Optional[datetime]
+                           = None, end_at: Optional[datetime] = None) -> Awaitable[List[Execution]]:
+        """
+        Get history executions. Optional filters: symbol, start_at, end_at. Returns an awaitable that resolves to execution list.
+
+        Args:
+            symbol: Filter by security code.
+            start_at: Start time.
+            end_at: End time.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.history_executions(
+                        symbol="700.HK",
+                        start_at=datetime.datetime(2022, 5, 9),
+                        end_at=datetime.datetime(2022, 5, 12),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def today_executions(
+            self, symbol: Optional[str] = None, order_id: Optional[str] = None) -> Awaitable[List[Execution]]:
+        """
+        Get today executions. Optional filters: symbol, order_id. Returns an awaitable that resolves to execution list.
+
+        Args:
+            symbol: Filter by security code.
+            order_id: Filter by order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.today_executions(symbol="700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def history_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]] = None,
+                       market: Optional[Type[Market]] = None, start_at: Optional[datetime] = None, end_at: Optional[datetime] = None) -> Awaitable[List[Order]]:
+        """
+        Get history orders with optional filters. Returns an awaitable that resolves to order list.
+
+        Args:
+            symbol: Filter by security code.
+            status: Filter by order status.
+            side: Filter by order side.
+            market: Filter by market type.
+            start_at: Start time.
+            end_at: End time.
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longport.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderStatus,
+                    OrderSide,
+                    Market,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.history_orders(
+                        symbol="700.HK",
+                        status=[OrderStatus.Filled, OrderStatus.New],
+                        side=OrderSide.Buy,
+                        market=Market.HK,
+                        start_at=datetime.datetime(2022, 5, 9),
+                        end_at=datetime.datetime(2022, 5, 12),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def today_orders(self, symbol: Optional[str] = None, status: Optional[List[Type[OrderStatus]]] = None, side: Optional[Type[OrderSide]]
+                     = None, market: Optional[Type[Market]] = None, order_id: Optional[str] = None) -> Awaitable[List[Order]]:
+        """
+        Get today orders with optional filters. Returns an awaitable that resolves to order list.
+
+        Args:
+            symbol: Filter by security code.
+            status: Filter by order status.
+            side: Filter by order side.
+            market: Filter by market type.
+            order_id: Filter by order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderStatus,
+                    OrderSide,
+                    Market,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.today_orders(
+                        symbol="700.HK",
+                        status=[OrderStatus.Filled, OrderStatus.New],
+                        side=OrderSide.Buy,
+                        market=Market.HK,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def replace_order(self, order_id: str, quantity: Decimal, price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None,
+                      trailing_percent: Optional[Decimal] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> Awaitable[None]:
+        """
+        Replace order. Returns an awaitable. Same parameters as sync TradeContext.replace_order.
+
+        Args:
+            order_id: Order ID.
+            quantity: Replaced quantity.
+            price: Replaced price.
+            trigger_price: Trigger price (LIT/MIT order).
+            limit_offset: Limit offset amount (TSLPAMT/TSLPPCT).
+            trailing_amount: Trailing amount (TSLPAMT/TSMAMT).
+            trailing_percent: Trailing percent (TSLPPCT/TSMPCT).
+            limit_depth_level: Limit depth level.
+            trigger_count: Trigger count.
+            monitor_price: Monitor price.
+            remark: Remark (max 64 characters).
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    await ctx.replace_order(
+                        order_id="709043056541253632",
+                        quantity=Decimal(100),
+                        price=Decimal(100),
+                    )
+
+                asyncio.run(main())
+        """
+        ...
+
+    def submit_order(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], submitted_quantity: Decimal, time_in_force: Type[TimeInForceType], submitted_price: Optional[Decimal] = None, trigger_price: Optional[Decimal] = None, limit_offset: Optional[Decimal] = None, trailing_amount: Optional[Decimal] = None,
+                     trailing_percent: Optional[Decimal] = None, expire_date: Optional[date] = None, outside_rth: Optional[Type[OutsideRTH]] = None, limit_depth_level: Optional[int] = None, trigger_count: Optional[int] = None, monitor_price: Optional[Decimal] = None, remark: Optional[str] = None) -> Awaitable[SubmitOrderResponse]:
+        """
+        Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
+
+        Args:
+            symbol: Security code.
+            order_type: Order type.
+            side: Order side.
+            submitted_quantity: Submitted quantity.
+            time_in_force: Time in force type.
+            submitted_price: Submitted price.
+            trigger_price: Trigger price (LIT/MIT).
+            limit_offset: Limit offset amount (TSLPAMT/TSLPPCT).
+            trailing_amount: Trailing amount (TSLPAMT/TSMAMT).
+            trailing_percent: Trailing percent (TSLPPCT/TSMPCT).
+            expire_date: Long term order expire date (required when time_in_force is GoodTilDate).
+            outside_rth: Enable or disable outside regular trading hours.
+            limit_depth_level: Limit depth level.
+            trigger_count: Trigger count.
+            monitor_price: Monitor price.
+            remark: Remark (max 64 characters).
+
+        Examples:
+            ::
+
+                import asyncio
+                from decimal import Decimal
+                from longport.openapi import (
+                    AsyncTradeContext,
+                    Config,
+                    OrderSide,
+                    OrderType,
+                    TimeInForceType,
+                )
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.submit_order(
+                        symbol="700.HK",
+                        order_type=OrderType.LO,
+                        side=OrderSide.Buy,
+                        submitted_quantity=Decimal(500),
+                        time_in_force=TimeInForceType.Day,
+                        submitted_price=Decimal(50),
+                        remark="Hello from Python SDK",
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def cancel_order(self, order_id: str) -> Awaitable[None]:
+        """
+        Cancel order by order_id. Returns an awaitable.
+
+        Args:
+            order_id: Order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    await ctx.cancel_order("709043056541253632")
+
+                asyncio.run(main())
+        """
+        ...
+
+    def account_balance(
+            self, currency: Optional[str] = None) -> Awaitable[List[AccountBalance]]:
+        """
+        Get account balance. Optional currency filter. Returns an awaitable that resolves to account balance list.
+
+        Args:
+            currency: Currency filter.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.account_balance()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def cash_flow(self, start_at: datetime, end_at: datetime, business_type: Optional[Type[BalanceType]] = None, symbol: Optional[
+                  str] = None, page: Optional[int] = None, size: Optional[int] = None) -> Awaitable[List[CashFlow]]:
+        """
+        Get cash flow. Required: start_at, end_at. Optional: business_type, symbol, page, size. Returns an awaitable that resolves to cash flow list.
+
+        Args:
+            start_at: Start time.
+            end_at: End time.
+            business_type: Balance type.
+            symbol: Target security code.
+            page: Start page (default 1).
+            size: Page size (default 50).
+
+        Examples:
+            ::
+
+                import asyncio
+                import datetime
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.cash_flow(
+                        start_at=datetime.datetime(2022, 5, 9),
+                        end_at=datetime.datetime(2022, 5, 12),
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def fund_positions(
+            self, symbols: Optional[List[str]] = None) -> Awaitable[FundPositionsResponse]:
+        """
+        Get fund positions. Optional filter: symbols. Returns an awaitable that resolves to fund positions response.
+
+        Args:
+            symbols: Filter by fund codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.fund_positions()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def stock_positions(
+            self, symbols: Optional[List[str]] = None) -> Awaitable[StockPositionsResponse]:
+        """
+        Get stock positions. Optional filter: symbols. Returns an awaitable that resolves to stock positions response.
+
+        Args:
+            symbols: Filter by stock codes.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.stock_positions()
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def margin_ratio(self, symbol: str) -> Awaitable[MarginRatio]:
+        """
+        Get margin ratio for symbol. Returns an awaitable that resolves to margin ratio.
+
+        Args:
+            symbol: Security symbol.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.margin_ratio("700.HK")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def order_detail(self, order_id: str) -> Awaitable[OrderDetail]:
+        """
+        Get order detail by order_id. Returns an awaitable that resolves to order detail.
+
+        Args:
+            order_id: Order ID.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.order_detail("701276261045858304")
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...
+
+    def estimate_max_purchase_quantity(self, symbol: str, order_type: Type[OrderType], side: Type[OrderSide], price: Optional[Decimal] = None, currency: Optional[
+                                       str] = None, order_id: Optional[str] = None, fractional_shares: bool = False) -> Awaitable[EstimateMaxPurchaseQuantityResponse]:
+        """
+        Estimate maximum purchase quantity. Returns an awaitable that resolves to estimate response. order_id required when estimating for replace order.
+
+        Args:
+            symbol: Security symbol.
+            order_type: Order type.
+            side: Order side.
+            price: Estimated order price.
+            currency: Settlement currency.
+            order_id: Order ID (required when estimating for replace order).
+            fractional_shares: Get maximum fractional share buying power.
+
+        Examples:
+            ::
+
+                import asyncio
+                from longport.openapi import AsyncTradeContext, Config, OrderType, OrderSide
+
+                async def main():
+                    config = Config.from_env()
+                    ctx = await AsyncTradeContext.create(config)
+                    resp = await ctx.estimate_max_purchase_quantity(
+                        symbol="700.HK",
+                        order_type=OrderType.LO,
+                        side=OrderSide.Buy,
+                    )
+                    print(resp)
+
+                asyncio.run(main())
+        """
+        ...

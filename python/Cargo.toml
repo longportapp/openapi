@@ -17,6 +17,7 @@ crate-type = ["cdylib"]
 [dependencies]
 longport = { workspace = true, features = ["blocking"] }
 longport-python-macros = { path = "crates/macros" }
+pyo3-async-runtimes = { workspace = true }
 
 parking_lot.workspace = true
 pyo3 = { workspace = true, features = [
@@ -27,7 +28,7 @@ pythonize.workspace = true
 rust_decimal.workspace = true
 serde_json.workspace = true
 time.workspace = true
-tokio = { workspace = true, features = ["rt-multi-thread"] }
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "sync"] }
 
 [build-dependencies]
 pyo3-build-config.workspace = true
