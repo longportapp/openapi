@@ -53,6 +53,8 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#trade-api-submit-order">Trade API (Submit order)</a>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#asynchronous-api">Asynchronous API</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#license">License</a>
     </li>
     </ul>
@@ -101,6 +103,14 @@
 <li><a href="reference_all/#longport.openapi.TradeContext">TradeContext</a></li>
 </ul>
 <p>The Trade API part of the SDK, e.g.: submit order, get order status...</p>
+<ul>
+<li><a href="reference_all/#longport.openapi.AsyncQuoteContext">AsyncQuoteContext</a></li>
+</ul>
+<p>Async quote API for use with asyncio; create via <code>AsyncQuoteContext.create(config)</code> and await in asyncio.</p>
+<ul>
+<li><a href="reference_all/#longport.openapi.AsyncTradeContext">AsyncTradeContext</a></li>
+</ul>
+<p>Async trade API for use with asyncio; create via <code>AsyncTradeContext.create(config)</code> and await in asyncio.</p>
 <h2 id="quickstart">Quickstart</h2>
 <p><em>Install LongPort OpenAPI SDK</em></p>
 <pre class="highlight"><code class="language-bash">pip install longport</code></pre>
@@ -158,6 +168,25 @@ ctx = TradeContext(config)
 resp = ctx.submit_order("700.HK", OrderType.LO, OrderSide.Buy, Decimal(
     "500"), TimeInForceType.Day, submitted_price=Decimal("50"), remark="Hello from Python SDK")
 print(resp)</code></pre>
+<h2 id="asynchronous-api">Asynchronous API</h2>
+<p>The SDK provides async contexts and an async HTTP client for use with Python's <code>asyncio</code>. All I/O methods return awaitables; callbacks (e.g. for push events) are set the same way as in the sync API.</p>
+<pre class="highlight"><code class="language-python">import asyncio
+from longport.openapi import Config, AsyncQuoteContext, SubType, PushQuote
+
+def on_quote(symbol: str, event: PushQuote):
+    print(symbol, event)
+
+async def main():
+    config = Config.from_env()
+    ctx = await AsyncQuoteContext.create(config)
+    ctx.set_on_quote(on_quote)
+    await ctx.subscribe(["700.HK", "AAPL.US"], [SubType.Quote])
+    quotes = await ctx.quote(["700.HK"])
+    print(quotes)
+    await asyncio.sleep(10)
+
+asyncio.run(main())</code></pre>
+<p>See the <code>*_async.py</code> examples in the repo and the reference for <code>AsyncQuoteContext</code>, <code>AsyncTradeContext</code>, and <code>HttpClient.request_async</code>.</p>
 <h2 id="license">License</h2>
 <p>Licensed under either of</p>
 <ul>
@@ -212,5 +241,5 @@ print(resp)</code></pre>
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2026-01-30 10:53:37.713231+00:00
+Build Date UTC : 2026-02-05 10:45:52.712298+00:00
 -->
