@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['sell_2963',['Sell',['../namespacelongport_1_1trade.html#a95c01172ea521fa1e32d91fb20c335afa3068c5a98c003498f1fec0c489212e8b',1,'longport::trade::Sell()'],['../namespacelongport_1_1fundamental.html#ad07abe9b8fc2bb905545dfaf27040704a3068c5a98c003498f1fec0c489212e8b',1,'longport::fundamental::Sell()'],['../namespacelongport_1_1portfolio.html#a9c35d508eb88cbbb2f71cbae953a50bfa3068c5a98c003498f1fec0c489212e8b',1,'longport::portfolio::Sell()']]],
+  ['semiannual_2964',['SemiAnnual',['../namespacelongport_1_1fundamental.html#ac0b53adf5b2ac120ebd00a4b46e1bd1fa717340660d3b4f2f8fa7ffd8227662aa',1,'longport::fundamental']]],
+  ['sg_2965',['SG',['../namespacelongport.html#ac15877688faec3e2d5776a503a55e5a4a0f177369a3b71275d25ab1b44db9f95f',1,'longport']]],
+  ['sgmain_2966',['SGMain',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa82dfe56c6d8c9d736481a78cb4841dc1',1,'longport::quote']]],
+  ['sgsector_2967',['SGSector',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aaba1a8e99b9929a80a5a002c9a824f32c',1,'longport::quote']]],
+  ['shmainconnect_2968',['SHMainConnect',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa9fe6b983c9a6f076e9e0af301cdcc645',1,'longport::quote']]],
+  ['shmainnonconnect_2969',['SHMainNonConnect',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa9fddc9e79655c39d07cc08320478d0de',1,'longport::quote']]],
+  ['shstar_2970',['SHSTAR',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa633cc806fefd1bd92949113e2968416c',1,'longport::quote']]],
+  ['slo_2971',['SLO',['../namespacelongport_1_1trade.html#a70f9925bd2da94a7a5db14cd6b781a27a983dd787ffa3bdc8963a43f230e8aec6',1,'longport::trade']]],
+  ['split_2972',['Split',['../namespacelongport_1_1calendar.html#a6900d573031788c1fe2c517f9c884da2a8a9e64d86ed12ad40de129bc7f4683b2',1,'longport::calendar']]],
+  ['splitstockhalts_2973',['SplitStockHalts',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949ad04a1051555b3a3659574a4b5d6c4ba0',1,'longport::quote']]],
+  ['spxindex_2974',['SPXIndex',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa0b530d754f4a0b1b9160d971d10516a2',1,'longport::quote']]],
+  ['status_2975',['Status',['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001aec53a8c4f07baed5d8825072c89799be',1,'longport::quote']]],
+  ['sti_2976',['STI',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa0d16f3f093a92f734870f943c19d3422',1,'longport::quote']]],
+  ['stock_2977',['Stock',['../namespacelongport_1_1portfolio.html#a207f871991937bcff87a08c59c1d65cba27ce7f8b5623b2e2df568d64cf051607',1,'longport::portfolio::Stock()'],['../namespacelongport_1_1trade.html#ad4e703fdb2ce4e5ef37fc1bb74368507a27ce7f8b5623b2e2df568d64cf051607',1,'longport::trade::Stock()']]],
+  ['strikeprice_2978',['StrikePrice',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea90929997ac23edda68b5dad815b6ee7c',1,'longport::quote::StrikePrice()'],['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001a90929997ac23edda68b5dad815b6ee7c',1,'longport::quote::StrikePrice()']]],
+  ['strongbuy_2979',['StrongBuy',['../namespacelongport_1_1fundamental.html#ad07abe9b8fc2bb905545dfaf27040704add4211d42044888201f95f30838da42c',1,'longport::fundamental']]],
+  ['strongsell_2980',['StrongSell',['../namespacelongport_1_1fundamental.html#ad07abe9b8fc2bb905545dfaf27040704a99ae766548cb379e60079aa4f13d76d5',1,'longport::fundamental']]],
+  ['suspend_2981',['Suspend',['../namespacelongport_1_1quote.html#aa3d52eeb7d82a2a44a3b3b88f5fb776dab3834d6f7a63e5e750e0ca5ecf31e3b9',1,'longport::quote']]],
+  ['suspended_2982',['Suspended',['../namespacelongport_1_1dca.html#a3a10e414eeac5c7dd7518f6680565665a8bf906833cc7aea8084f552217ed9c1d',1,'longport::dca']]],
+  ['suspendtrade_2983',['SuspendTrade',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949a6a61db25a91b8cbf2a65a9d96b51c3e3',1,'longport::quote']]],
+  ['szgemconnect_2984',['SZGEMConnect',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aaa396701f971b20210f45bc140ee43ef8',1,'longport::quote']]],
+  ['szgemnonconnect_2985',['SZGEMNonConnect',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa882de1031f61182736a1c9cc062f58ca',1,'longport::quote']]],
+  ['szmainconnect_2986',['SZMainConnect',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa8f0b8cc4cd54854b487f757b0cee3054',1,'longport::quote']]],
+  ['szmainnonconnect_2987',['SZMainNonConnect',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073aa6afaca0646455ca2e796b58f43743c50',1,'longport::quote']]]
+];

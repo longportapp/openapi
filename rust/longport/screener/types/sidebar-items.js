@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["ScreenerCondition","ScreenerIndicatorsResponse","ScreenerRecommendStrategiesResponse","ScreenerSearchResponse","ScreenerStrategyResponse","ScreenerUserStrategiesResponse"]};
