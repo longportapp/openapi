@@ -1,6 +1,6 @@
 # Longport OpenAPI SDK
 
-[![](https://img.shields.io/crates/v/longport.svg)](https://crates.io/crates/longport) [![PyPI version](https://badge.fury.io/py/longport.svg)](https://badge.fury.io/py/longport) [![npm version](https://badge.fury.io/js/longport.svg)](https://badge.fury.io/js/longport) [![Maven Central](https://img.shields.io/maven-central/v/io.github.longport/openapi-sdk)](https://search.maven.org/artifact/io.github.longport/openapi-sdk)
+[![](https://img.shields.io/crates/v/longport.svg)](https://crates.io/crates/longport) [![PyPI version](https://badge.fury.io/py/longport.svg)](https://badge.fury.io/py/longport) [![npm version](https://badge.fury.io/js/longport.svg)](https://badge.fury.io/js/longport) [![Maven Central](https://img.shields.io/maven-central/v/io.github.longportapp/openapi-sdk)](https://search.maven.org/artifact/io.github.longportapp/openapi-sdk)
 
 
 Longport OpenAPI provides programmatic quote trading interfaces for investors with research and development capabilities and assists them to build trading or quote strategy analysis tools based on their own investment strategies. The functions fall into the following categories:

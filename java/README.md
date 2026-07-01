@@ -38,12 +38,12 @@ Runnable examples live in `examples/java/`:
 
 _Install Longport OpenAPI SDK_
 
-Add `io.github.longport:openapi-sdk` to `pom.xml`
+Add `io.github.longportapp:openapi-sdk` to `pom.xml`
 
 ```xml
 <dependencies>
     <dependency>
-        <groupId>io.github.longport</groupId>
+        <groupId>io.github.longportapp</groupId>
         <artifactId>openapi-sdk</artifactId>
         <version>LATEST</version>
     </dependency>
