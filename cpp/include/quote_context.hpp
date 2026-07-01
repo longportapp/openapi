@@ -1,0 +1,339 @@
+#pragma once
+
+#include "async_result.hpp"
+#include "callback.hpp"
+#include "config.hpp"
+#include "push.hpp"
+#include "types.hpp"
+
+typedef struct lb_quote_context_t lb_quote_context_t;
+
+namespace longport {
+namespace quote {
+
+/// Quote context
+class QuoteContext
+{
+private:
+  const lb_quote_context_t* ctx_;
+
+public:
+  QuoteContext();
+  QuoteContext(const lb_quote_context_t* ctx);
+  QuoteContext(const QuoteContext& ctx);
+  QuoteContext(QuoteContext&& ctx);
+  ~QuoteContext();
+
+  QuoteContext& operator=(const QuoteContext& ctx);
+
+  size_t ref_count() const;
+
+  static QuoteContext create(const Config& config);
+
+  /// Returns the member id
+  void member_id(AsyncCallback<QuoteContext, int64_t> callback) const;
+
+  /// Returns the quote level
+  void quote_level(AsyncCallback<QuoteContext, std::string> callback) const;
+
+  /// Returns the quote package details
+  void quote_package_details(
+    AsyncCallback<QuoteContext, std::vector<QuotePackageDetail>> callback)
+    const;
+
+  /// Subscribe
+  void subscribe(const std::vector<std::string>& symbols,
+                 SubFlags sub_flags,
+                 AsyncCallback<QuoteContext, void> callback) const;
+
+  /// Unsubscribe
+  void unsubscribe(const std::vector<std::string>& symbols,
+                   SubFlags sub_flags,
+                   AsyncCallback<QuoteContext, void> callback) const;
+
+  /// Subscribe security candlesticks
+  void subscribe_candlesticks(
+    const std::string& symbol,
+    Period period,
+    TradeSessions trade_sessions,
+    AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
+
+  /// Unsubscribe security candlesticks
+  void unsubscribe_candlesticks(
+    const std::string& symbol,
+    Period period,
+    AsyncCallback<QuoteContext, void> callback) const;
+
+  /// Get subscription information
+  void subscriptions(
+    AsyncCallback<QuoteContext, std::vector<Subscription>> callback) const;
+
+  /// Set quote callback, after receiving the quote data push, it will call back
+  /// to this function.
+  void set_on_quote(PushCallback<QuoteContext, PushQuote> callback) const;
+
+  /// Set depth callback, after receiving the depth data push, it will call back
+  /// to this function.
+  void set_on_depth(PushCallback<QuoteContext, PushDepth> callback) const;
+
+  /// Set brokers callback, after receiving the brokers data push, it will call
+  /// back to this function.
+  void set_on_brokers(PushCallback<QuoteContext, PushBrokers> callback) const;
+
+  /// Set trades callback, after receiving the trades data push, it will call
+  /// back to this function.
+  void set_on_trades(PushCallback<QuoteContext, PushTrades> callback) const;
+
+  /// Set candlestick callback, after receiving the trades data push, it will
+  /// call back to this function.
+  void set_on_candlestick(
+    PushCallback<QuoteContext, PushCandlestick> callback) const;
+
+  /// Get basic information of securities
+  void static_info(const std::vector<std::string>& symbols,
+                   AsyncCallback<QuoteContext, std::vector<SecurityStaticInfo>>
+                     callback) const;
+
+  /// Get quote of securities
+  void quote(
+    const std::vector<std::string>& symbols,
+    AsyncCallback<QuoteContext, std::vector<SecurityQuote>> callback) const;
+
+  /// Get quote of option securities
+  void option_quote(
+    const std::vector<std::string>& symbols,
+    AsyncCallback<QuoteContext, std::vector<OptionQuote>> callback) const;
+
+  /// Get quote of warrant securities
+  void warrant_quote(
+    const std::vector<std::string>& symbols,
+    AsyncCallback<QuoteContext, std::vector<WarrantQuote>> callback) const;
+
+  /// Get security depth
+  void depth(const std::string& symbol,
+             AsyncCallback<QuoteContext, SecurityDepth> callback) const;
+
+  /// Get security brokers
+  void brokers(const std::string& symbol,
+               AsyncCallback<QuoteContext, SecurityBrokers> callback) const;
+
+  /// Get participants
+  void participants(
+    AsyncCallback<QuoteContext, std::vector<ParticipantInfo>> callback) const;
+
+  /// Get security trades
+  void trades(const std::string& symbol,
+              uintptr_t count,
+              AsyncCallback<QuoteContext, std::vector<Trade>> callback) const;
+
+  /// Get security intraday lines
+  void intraday(
+    const std::string& symbol,
+    TradeSessions trade_sessions,
+    AsyncCallback<QuoteContext, std::vector<IntradayLine>> callback) const;
+
+  /// Get security candlesticks
+  void candlesticks(
+    const std::string& symbol,
+    Period period,
+    uintptr_t count,
+    AdjustType adjust_type,
+    TradeSessions trade_sessions,
+    AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
+
+  /// Get security history candlesticks by offset
+  void history_candlesticks_by_offset(
+    const std::string& symbol,
+    Period period,
+    AdjustType adjust_type,
+    bool forward,
+    std::optional<DateTime> datetime,
+    uintptr_t count,
+    TradeSessions trade_sessions,
+    AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
+
+  /// Get security history candlesticks by date
+  void history_candlesticks_by_date(
+    const std::string& symbol,
+    Period period,
+    AdjustType adjust_type,
+    std::optional<Date> start,
+    std::optional<Date> end,
+    TradeSessions trade_sessions,
+    AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
+
+  /// Get option chain expiry date list
+  void option_chain_expiry_date_list(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, std::vector<Date>> callback) const;
+
+  /// Get option chain expiry date list
+  void option_chain_info_by_date(
+    const std::string& symbol,
+    Date expiry_date,
+    AsyncCallback<QuoteContext, std::vector<StrikePriceInfo>> callback) const;
+
+  /// Get warrant issuers
+  void warrant_issuers(
+    AsyncCallback<QuoteContext, std::vector<IssuerInfo>> callback) const;
+
+  /// Query warrant list
+  void warrant_list(
+    const std::string& symbol,
+    WarrantSortBy sort_by,
+    SortOrderType sort_order,
+    const std::vector<WarrantType>& warrant_type,
+    const std::vector<int32_t>& issuer,
+    const std::vector<FilterWarrantExpiryDate>& expiry_date,
+    const std::vector<FilterWarrantInOutBoundsType>& price_type,
+    const std::vector<WarrantStatus>& status,
+    AsyncCallback<QuoteContext, std::vector<WarrantInfo>> callback) const;
+
+  /// Get trading session of the day
+  void trading_session(
+    AsyncCallback<QuoteContext, std::vector<MarketTradingSession>> callback)
+    const;
+
+  /// Get market trading days
+  ///
+  /// The interval must be less than one month, and only the most recent year is
+  /// supported.
+  void trading_days(Market market,
+                    Date begin,
+                    Date end,
+                    AsyncCallback<QuoteContext, MarketTradingDays> callback);
+
+  /// Get capital flow intraday
+  void capital_flow(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, std::vector<CapitalFlowLine>> callback) const;
+
+  /// Get capital distribution
+  void capital_distribution(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, CapitalDistributionResponse> callback) const;
+
+  /// Get calc indexes
+  void calc_indexes(
+    const std::vector<std::string>& symbols,
+    const std::vector<CalcIndex>& indexes,
+    AsyncCallback<QuoteContext, std::vector<SecurityCalcIndex>> callback) const;
+
+  /// Get watchlist
+  void watchlist(
+    AsyncCallback<QuoteContext, std::vector<WatchlistGroup>> callback) const;
+
+  /// Create watchlist group
+  void create_watchlist_group(
+    const CreateWatchlistGroup& req,
+    AsyncCallback<QuoteContext, int64_t> callback) const;
+
+  /// Delete watchlist group
+  void delete_watchlist_group(int64_t id,
+                              bool purge,
+                              AsyncCallback<QuoteContext, void> callback) const;
+
+  /// Create watchlist group
+  void update_watchlist_group(const UpdateWatchlistGroup& req,
+                              AsyncCallback<QuoteContext, void> callback) const;
+
+  /// Pin or unpin watchlist securities (mode: 0=add/pin, 1=remove/unpin)
+  void update_pinned(int32_t mode,
+                     const std::vector<std::string>& securities,
+                     AsyncCallback<QuoteContext, void> callback) const;
+
+  /// Get filings
+  void filings(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, std::vector<FilingItem>> callback) const;
+
+  /// Get security list
+  void security_list(
+    Market market,
+    SecurityListCategory category,
+    AsyncCallback<QuoteContext, std::vector<Security>> callback) const;
+
+  /// Get security list without category
+  void security_list(
+    Market market,
+    AsyncCallback<QuoteContext, std::vector<Security>> callback) const;
+
+  /// Get current market temperature
+  void market_temperature(
+    Market market,
+    AsyncCallback<QuoteContext, MarketTemperature> callback) const;
+
+  /// Get historical market temperature
+  void history_market_temperature(
+    Market market,
+    Date start,
+    Date end,
+    AsyncCallback<QuoteContext, HistoryMarketTemperatureResponse> callback)
+    const;
+
+  /// Get real-time quotes
+  ///
+  /// Get real-time quotes of the subscribed symbols, it always returns the
+  /// data in the local storage.
+  void realtime_quote(
+    const std::vector<std::string>& symbols,
+    AsyncCallback<QuoteContext, std::vector<RealtimeQuote>> callback) const;
+
+  /// Get real-time depth
+  ///
+  /// Get real-time depth of the subscribed symbols, it always returns the data
+  /// in the local storage.
+  void realtime_depth(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, SecurityDepth> callback) const;
+
+  /// Get real-time trades
+  ///
+  /// Get real-time trades of the subscribed symbols, it always returns the data
+  /// in the local storage.
+  void realtime_trades(
+    const std::string& symbol,
+    uint64_t count,
+    AsyncCallback<QuoteContext, std::vector<Trade>> callback) const;
+
+  /// Get real-time broker queue
+  ///
+  /// Get real-time broker queue of the subscribed symbols, it always returns
+  /// the data in the local storage.
+  void realtime_brokers(
+    const std::string& symbol,
+    AsyncCallback<QuoteContext, SecurityBrokers> callback) const;
+
+  /// Get real-time candlesticks
+  ///
+  /// Get real-time candlesticks of the subscribed symbols, it always returns
+  /// the data in the local storage.
+  void realtime_candlesticks(
+    const std::string& symbol,
+    Period period,
+    uintptr_t count,
+    AsyncCallback<QuoteContext, std::vector<Candlestick>> callback) const;
+
+  /// Get short interest data for a US or HK security (market inferred from symbol suffix)
+  void short_positions(const std::string& symbol,
+                       uint32_t count,
+                       AsyncCallback<QuoteContext, ShortPositionsResponse> callback) const;
+
+  /// Get short trade records for a HK or US security (market inferred from symbol suffix)
+  void short_trades(const std::string& symbol,
+                    uint32_t count,
+                    AsyncCallback<QuoteContext, ShortTradesResponse> callback) const;
+
+  /// Get real-time option call/put volume
+  void option_volume(const std::string& symbol,
+                     AsyncCallback<QuoteContext, OptionVolumeStats> callback) const;
+
+  /// Get daily historical option volume
+  void option_volume_daily(const std::string& symbol,
+                           int64_t timestamp,
+                           uint32_t count,
+                           AsyncCallback<QuoteContext, OptionVolumeDaily> callback) const;
+};
+
+} // namespace quote
+} // namespace longport

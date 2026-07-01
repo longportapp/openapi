@@ -1,0 +1,28 @@
+[package]
+edition.workspace = true
+name = "longport-c"
+version.workspace = true
+description = "Longport OpenAPI SDK for C"
+homepage = "https://open.longportapp.com/en/"
+readme = "README.md"
+repository = "https://github.com/longportapp/openapi"
+license = "MIT OR Apache-2.0"
+keywords = ["longport", "openapi", "sdk"]
+categories = ["api-bindings"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+longport.workspace = true
+longport-c-macros = { path = "crates/macros" }
+
+rust_decimal = { workspace = true, features = ["maths"] }
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread"] }
+parking_lot.workspace = true
+time.workspace = true
+tracing.workspace = true
+
+[build-dependencies]
+cbindgen.workspace = true

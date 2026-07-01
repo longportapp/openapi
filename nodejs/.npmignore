@@ -1,0 +1,15 @@
+target
+Cargo.lock
+.cargo
+.github
+npm
+.eslintrc
+.prettierignore
+rustfmt.toml
+yarn.lock
+*.node
+crates
+src
+tsconfig.json
+build.rs
+Cargo.toml

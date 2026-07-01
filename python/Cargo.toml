@@ -1,0 +1,34 @@
+[package]
+edition.workspace = true
+name = "longport-python"
+version.workspace = true
+description = "Longport OpenAPI SDK for Python"
+homepage = "https://open.longportapp.com/en/"
+readme = "README.md"
+repository = "https://github.com/longportapp/openapi"
+license = "MIT OR Apache-2.0"
+keywords = ["longport", "openapi", "sdk"]
+categories = ["api-bindings"]
+
+[lib]
+name = "longport"
+crate-type = ["cdylib"]
+
+[dependencies]
+longport = { workspace = true, features = ["blocking"] }
+longport-python-macros = { path = "crates/macros" }
+pyo3-async-runtimes = { workspace = true }
+
+parking_lot.workspace = true
+pyo3 = { workspace = true, features = [
+    "extension-module",
+    "experimental-async",
+] }
+pythonize.workspace = true
+rust_decimal.workspace = true
+serde_json.workspace = true
+time.workspace = true
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "sync"] }
+
+[build-dependencies]
+pyo3-build-config.workspace = true

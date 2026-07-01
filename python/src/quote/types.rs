@@ -1,0 +1,1623 @@
+use longport::quote::SubFlags;
+use longport_python_macros::{PyEnum, PyObject};
+use pyo3::prelude::*;
+
+use crate::{
+    decimal::PyDecimal,
+    time::{PyDateWrapper, PyOffsetDateTimeWrapper, PyTimeWrapper},
+    types::Market,
+};
+
+/// Subscription
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::Subscription")]
+pub(crate) struct Subscription {
+    symbol: String,
+    #[py(sub_types)]
+    sub_types: Vec<SubType>,
+    #[py(array)]
+    candlesticks: Vec<Period>,
+}
+
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::TradeStatus")]
+pub(crate) enum TradeStatus {
+    /// Normal
+    Normal,
+    /// Suspension
+    Halted,
+    /// Delisted
+    Delisted,
+    /// Fuse
+    Fuse,
+    /// Prepare List
+    PrepareList,
+    /// Code Moved
+    CodeMoved,
+    /// To Be Opened
+    ToBeOpened,
+    /// Split Stock Halts
+    SplitStockHalts,
+    /// Expired
+    Expired,
+    /// Warrant To BeListed
+    WarrantPrepareList,
+    /// Warrant To BeListed
+    #[py(remote = "SuspendTrade")]
+    Suspend,
+}
+
+/// Trade session
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::TradeSession")]
+pub(crate) enum TradeSession {
+    /// Trading
+    Intraday,
+    /// Pre-Market
+    Pre,
+    /// Post-Market
+    Post,
+    /// Overnight
+    Overnight,
+}
+
+/// Quote type of subscription
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
+pub(crate) enum SubType {
+    /// Quote
+    Quote,
+    /// Depth
+    Depth,
+    /// Brokers
+    Brokers,
+    /// Trade
+    Trade,
+}
+
+pub(crate) struct SubTypes(pub(crate) Vec<SubType>);
+
+impl From<SubTypes> for SubFlags {
+    fn from(types: SubTypes) -> Self {
+        types
+            .0
+            .into_iter()
+            .map(|ty| match ty {
+                SubType::Quote => SubFlags::QUOTE,
+                SubType::Depth => SubFlags::DEPTH,
+                SubType::Brokers => SubFlags::BROKER,
+                SubType::Trade => SubFlags::TRADE,
+            })
+            .fold(SubFlags::empty(), |mut acc, flag| {
+                acc |= flag;
+                acc
+            })
+    }
+}
+
+impl From<SubFlags> for SubTypes {
+    fn from(flags: SubFlags) -> Self {
+        let mut res = Vec::new();
+        if flags.contains(SubFlags::QUOTE) {
+            res.push(SubType::Quote);
+        }
+        if flags.contains(SubFlags::DEPTH) {
+            res.push(SubType::Depth);
+        }
+        if flags.contains(SubFlags::BROKER) {
+            res.push(SubType::Brokers);
+        }
+        if flags.contains(SubFlags::TRADE) {
+            res.push(SubType::Trade);
+        }
+        SubTypes(res)
+    }
+}
+
+/// Trade direction
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::TradeDirection")]
+pub(crate) enum TradeDirection {
+    /// Neutral
+    Neutral,
+    /// Down
+    Down,
+    /// Up
+    Up,
+}
+
+/// Option type
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::OptionType")]
+pub(crate) enum OptionType {
+    /// Unknown
+    Unknown,
+    /// American
+    American,
+    /// Europe
+    Europe,
+}
+
+/// Option direction
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::OptionDirection")]
+pub(crate) enum OptionDirection {
+    /// Unknown
+    Unknown,
+    /// Put
+    Put,
+    /// Call
+    Call,
+}
+
+/// Warrant type
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::WarrantType")]
+pub(crate) enum WarrantType {
+    /// Unknown
+    Unknown,
+    /// Call
+    Call,
+    /// Put
+    Put,
+    /// Bull
+    Bull,
+    /// Bear
+    Bear,
+    /// Inline
+    Inline,
+}
+
+/// Candlestick period
+#[pyclass(eq, eq_int, from_py_object)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::Period")]
+pub(crate) enum Period {
+    /// Unknown
+    #[py(remote = "UnknownPeriod")]
+    Unknown,
+    /// One Minute
+    #[py(remote = "OneMinute")]
+    Min_1,
+    /// Two Minutes
+    #[py(remote = "TwoMinute")]
+    Min_2,
+    /// Three Minutes
+    #[py(remote = "ThreeMinute")]
+    Min_3,
+    /// Five Minutes
+    #[py(remote = "FiveMinute")]
+    Min_5,
+    /// Ten Minutes
+    #[py(remote = "TenMinute")]
+    Min_10,
+    /// Fifteen Minutes
+    #[py(remote = "FifteenMinute")]
+    Min_15,
+    /// Twenty Minutes
+    #[py(remote = "TwentyMinute")]
+    Min_20,
+    /// Thirty Minutes
+    #[py(remote = "ThirtyMinute")]
+    Min_30,
+    /// Forty-Five Minutes
+    #[py(remote = "FortyFiveMinute")]
+    Min_45,
+    /// One Hour
+    #[py(remote = "SixtyMinute")]
+    Min_60,
+    /// Two Hours
+    #[py(remote = "TwoHour")]
+    Min_120,
+    /// Three Hours
+    #[py(remote = "ThreeHour")]
+    Min_180,
+    /// Four Hours
+    #[py(remote = "FourHour")]
+    Min_240,
+    /// Daily
+    Day,
+    /// Weekly
+    Week,
+    /// Monthly
+    Month,
+    /// Quarterly
+    #[py(remote = "Quarter")]
+    Quarter,
+    /// Yearly
+    Year,
+}
+
+/// Candlestick adjustment type
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::AdjustType")]
+pub(crate) enum AdjustType {
+    /// Actual
+    NoAdjust,
+    /// Adjust forward
+    ForwardAdjust,
+}
+
+/// Derivative type
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
+pub(crate) enum DerivativeType {
+    /// US stock options
+    Option,
+    /// HK warrants
+    Warrant,
+}
+
+struct DerivativeTypes(Vec<DerivativeType>);
+
+impl From<longport::quote::DerivativeType> for DerivativeTypes {
+    fn from(ty: longport::quote::DerivativeType) -> Self {
+        let mut res = Vec::new();
+        if ty.contains(longport::quote::DerivativeType::OPTION) {
+            res.push(DerivativeType::Option);
+        }
+        if ty.contains(longport::quote::DerivativeType::WARRANT) {
+            res.push(DerivativeType::Warrant);
+        }
+        DerivativeTypes(res)
+    }
+}
+
+/// Security board
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::SecurityBoard")]
+#[allow(clippy::upper_case_acronyms)]
+pub enum SecurityBoard {
+    /// Unknown
+    Unknown,
+    /// US Main Board
+    USMain,
+    /// US Pink Board
+    USPink,
+    /// Dow Jones Industrial Average
+    USDJI,
+    /// Nasdsaq Index
+    USNSDQ,
+    /// US Industry Board
+    USSector,
+    /// US Option
+    USOption,
+    /// US Sepecial Option
+    USOptionS,
+    /// Hong Kong Equity Securities
+    HKEquity,
+    /// HK PreIPO Security
+    HKPreIPO,
+    /// HK Warrant
+    HKWarrant,
+    /// Hang Seng Index
+    HKHS,
+    /// HK Industry Board
+    HKSector,
+    /// SH Main Board(Connect)
+    SHMainConnect,
+    /// SH Main Board(Non Connect)
+    SHMainNonConnect,
+    /// SH Science and Technology Innovation Board
+    SHSTAR,
+    /// CN Index
+    CNIX,
+    /// CN Industry Board
+    CNSector,
+    /// SZ Main Board(Connect)
+    SZMainConnect,
+    /// SZ Main Board(Non Connect)
+    SZMainNonConnect,
+    /// SZ Gem Board(Connect)
+    SZGEMConnect,
+    /// SZ Gem Board(Non Connect)
+    SZGEMNonConnect,
+    /// SG Main Board
+    SGMain,
+    /// Singapore Straits Index
+    STI,
+    /// SG Industry Board
+    SGSector,
+    /// S&P 500 Index
+    SPXIndex,
+    /// CBOE Volatility Index
+    VIXIndex,
+}
+
+/// The basic information of securities
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::SecurityStaticInfo")]
+pub(crate) struct SecurityStaticInfo {
+    /// Security code
+    symbol: String,
+    /// Security name (zh-CN)
+    name_cn: String,
+    /// Security name (en)
+    name_en: String,
+    /// Security name (zh-HK)
+    name_hk: String,
+    /// Exchange which the security belongs to
+    exchange: String,
+    /// Trading currency
+    currency: String,
+    /// Lot size
+    lot_size: i32,
+    /// Total shares
+    total_shares: i64,
+    /// Circulating shares
+    circulating_shares: i64,
+    /// HK shares (only HK stocks)
+    hk_shares: i64,
+    /// Earnings per share
+    eps: PyDecimal,
+    /// Earnings per share (TTM)
+    eps_ttm: PyDecimal,
+    /// Net assets per share
+    bps: PyDecimal,
+    /// Dividend (per share), **not** the dividend yield (ratio).
+    dividend_yield: PyDecimal,
+    /// Types of supported derivatives
+    #[py(derivative_types)]
+    stock_derivatives: Vec<DerivativeType>,
+    /// Board
+    board: SecurityBoard,
+}
+
+/// Quote of US pre/post market
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Copy, Clone)]
+#[py(remote = "longport::quote::PrePostQuote")]
+pub(crate) struct PrePostQuote {
+    /// Latest price
+    last_done: PyDecimal,
+    /// Time of latest price
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// High
+    high: PyDecimal,
+    /// Low
+    low: PyDecimal,
+    /// Close of the last trade session
+    prev_close: PyDecimal,
+}
+
+/// Quote of securitity
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::SecurityQuote")]
+pub(crate) struct SecurityQuote {
+    /// Security code
+    symbol: String,
+    /// Latest price
+    last_done: PyDecimal,
+    /// Yesterday's close
+    prev_close: PyDecimal,
+    /// Open
+    open: PyDecimal,
+    /// High
+    high: PyDecimal,
+    /// Low
+    low: PyDecimal,
+    /// Time of latest price
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Security trading status
+    trade_status: TradeStatus,
+    /// Quote of US pre market
+    #[py(opt)]
+    pre_market_quote: Option<PrePostQuote>,
+    /// Quote of US post market
+    #[py(opt)]
+    post_market_quote: Option<PrePostQuote>,
+    /// Quote of US overnight market
+    #[py(opt)]
+    overnight_quote: Option<PrePostQuote>,
+}
+
+/// Quote of option
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::OptionQuote")]
+pub(crate) struct OptionQuote {
+    /// Security code
+    symbol: String,
+    /// Latest price
+    last_done: PyDecimal,
+    /// Yesterday's close
+    prev_close: PyDecimal,
+    /// Open
+    open: PyDecimal,
+    /// High
+    high: PyDecimal,
+    /// Low
+    low: PyDecimal,
+    /// Time of latest price
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Security trading status
+    trade_status: TradeStatus,
+    /// Implied volatility
+    implied_volatility: PyDecimal,
+    /// Number of open positions
+    open_interest: i64,
+    /// Exprity date
+    expiry_date: PyDateWrapper,
+    /// Strike price
+    strike_price: PyDecimal,
+    /// Contract multiplier
+    contract_multiplier: PyDecimal,
+    /// Option type
+    contract_type: OptionType,
+    /// Contract size
+    contract_size: PyDecimal,
+    /// Option direction
+    direction: OptionDirection,
+    /// Underlying security historical volatility of the option
+    historical_volatility: PyDecimal,
+    /// Underlying security symbol of the option
+    underlying_symbol: String,
+}
+
+/// Quote of warrant
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::WarrantQuote")]
+pub(crate) struct WarrantQuote {
+    /// Security code
+    symbol: String,
+    /// Latest price
+    last_done: PyDecimal,
+    /// Yesterday's close
+    prev_close: PyDecimal,
+    /// Open
+    open: PyDecimal,
+    /// High
+    high: PyDecimal,
+    /// Low
+    low: PyDecimal,
+    /// Time of latest price
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Security trading status
+    trade_status: TradeStatus,
+    /// Implied volatility
+    implied_volatility: PyDecimal,
+    /// Exprity date
+    expiry_date: PyDateWrapper,
+    /// Last tradalbe date
+    last_trade_date: PyDateWrapper,
+    /// Outstanding ratio
+    outstanding_ratio: PyDecimal,
+    /// Outstanding quantity
+    outstanding_quantity: i64,
+    /// Conversion ratio
+    conversion_ratio: PyDecimal,
+    /// Warrant type
+    category: WarrantType,
+    /// Strike price
+    strike_price: PyDecimal,
+    /// Upper bound price
+    upper_strike_price: PyDecimal,
+    /// Lower bound price
+    lower_strike_price: PyDecimal,
+    /// Call price
+    call_price: PyDecimal,
+    /// Underlying security symbol of the warrant
+    underlying_symbol: String,
+}
+
+/// Depth
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Copy, Clone)]
+#[py(remote = "longport::quote::Depth")]
+pub(crate) struct Depth {
+    /// Position
+    position: i32,
+    /// Price
+    #[py(opt)]
+    price: Option<PyDecimal>,
+    /// Volume
+    volume: i64,
+    /// Number of orders
+    order_num: i64,
+}
+
+/// Security depth
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::SecurityDepth")]
+pub(crate) struct SecurityDepth {
+    /// Ask depth
+    #[py(array)]
+    asks: Vec<Depth>,
+    /// Bid depth
+    #[py(array)]
+    bids: Vec<Depth>,
+}
+
+/// Brokers
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::Brokers")]
+pub(crate) struct Brokers {
+    /// Position
+    position: i32,
+    /// Broker IDs
+    broker_ids: Vec<i32>,
+}
+
+/// Security brokers
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::SecurityBrokers")]
+pub(crate) struct SecurityBrokers {
+    /// Ask brokers
+    #[py(array)]
+    ask_brokers: Vec<Brokers>,
+    /// Bid brokers
+    #[py(array)]
+    bid_brokers: Vec<Brokers>,
+}
+
+/// Participant info
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::ParticipantInfo")]
+pub(crate) struct ParticipantInfo {
+    /// Broker IDs
+    broker_ids: Vec<i32>,
+    /// Participant name (zh-CN)
+    name_cn: String,
+    /// Participant name (en)
+    name_en: String,
+    /// Participant name (zh-HK)
+    name_hk: String,
+}
+
+/// Trade
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::Trade")]
+pub(crate) struct Trade {
+    /// Price
+    price: PyDecimal,
+    /// Volume
+    volume: i64,
+    /// Time of trading
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Trade type
+    trade_type: String,
+    /// Trade direction
+    direction: TradeDirection,
+    /// Trade session
+    trade_session: TradeSession,
+}
+
+/// Intraday line
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::IntradayLine")]
+pub(crate) struct IntradayLine {
+    /// Close price of the minute
+    price: PyDecimal,
+    /// Start time of the minute
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Average price
+    avg_price: PyDecimal,
+}
+
+/// Candlestick
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::Candlestick", non_exhaustive)]
+pub(crate) struct Candlestick {
+    /// Close price
+    close: PyDecimal,
+    /// Open price
+    open: PyDecimal,
+    /// Low price
+    low: PyDecimal,
+    /// High price
+    high: PyDecimal,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Timestamp
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Trade session
+    trade_session: TradeSession,
+}
+
+/// Strike price info
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::StrikePriceInfo")]
+pub(crate) struct StrikePriceInfo {
+    /// Strike price
+    price: PyDecimal,
+    /// Security code of call option
+    call_symbol: String,
+    /// Security code of put option
+    put_symbol: String,
+    /// Is standard
+    standard: bool,
+}
+
+/// Issuer info
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::IssuerInfo")]
+pub(crate) struct IssuerInfo {
+    /// Issuer ID
+    issuer_id: i32,
+    /// Issuer name (zh-CN)
+    name_cn: String,
+    /// Issuer name (en)
+    name_en: String,
+    /// Issuer name (zh-HK)
+    name_hk: String,
+}
+
+/// Sort order type
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::SortOrderType")]
+pub enum SortOrderType {
+    /// Ascending
+    Ascending,
+    /// Descending
+    Descending,
+}
+
+/// Warrant sort by
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::WarrantSortBy")]
+pub enum WarrantSortBy {
+    /// Last done
+    LastDone,
+    /// Change rate
+    ChangeRate,
+    /// Change value
+    ChangeValue,
+    /// Volume
+    Volume,
+    /// Turnover
+    Turnover,
+    /// Expiry date
+    ExpiryDate,
+    /// Strike price
+    StrikePrice,
+    /// Upper strike price
+    UpperStrikePrice,
+    /// Lower strike price
+    LowerStrikePrice,
+    /// Outstanding quantity
+    OutstandingQuantity,
+    /// Outstanding ratio
+    OutstandingRatio,
+    /// Premium
+    Premium,
+    /// In/out of the bound
+    ItmOtm,
+    /// Implied volatility
+    ImpliedVolatility,
+    /// Greek value delta
+    Delta,
+    /// Call price
+    CallPrice,
+    /// Price interval from the call price
+    ToCallPrice,
+    /// Effective leverage
+    EffectiveLeverage,
+    /// Leverage ratio
+    LeverageRatio,
+    /// Conversion ratio
+    ConversionRatio,
+    /// Breakeven point
+    BalancePoint,
+    /// Status
+    Status,
+}
+
+/// Filter warrant expiry date type
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::FilterWarrantExpiryDate")]
+#[allow(non_camel_case_types)]
+pub enum FilterWarrantExpiryDate {
+    /// Less than 3 months
+    LT_3,
+    /// 3 - 6 months
+    Between_3_6,
+    /// 6 - 12 months
+    Between_6_12,
+    /// Greater than 12 months
+    GT_12,
+}
+
+/// Filter warrant in/out of the bounds type
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::FilterWarrantInOutBoundsType")]
+pub enum FilterWarrantInOutBoundsType {
+    /// In bounds
+    In,
+    /// Out bounds
+    Out,
+}
+
+/// Warrant info
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, Clone, PyObject)]
+#[py(remote = "longport::quote::WarrantInfo")]
+pub(crate) struct WarrantInfo {
+    /// Security code
+    symbol: String,
+    /// Warrant type
+    warrant_type: WarrantType,
+    /// Security name
+    name: String,
+    /// Latest price
+    last_done: PyDecimal,
+    /// Quote change rate
+    change_rate: PyDecimal,
+    /// Quote change
+    change_value: PyDecimal,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Expiry date
+    expiry_date: PyDateWrapper,
+    /// Strike price
+    #[py(opt)]
+    strike_price: Option<PyDecimal>,
+    /// Upper strike price
+    #[py(opt)]
+    upper_strike_price: Option<PyDecimal>,
+    /// Lower strike price
+    #[py(opt)]
+    lower_strike_price: Option<PyDecimal>,
+    /// Outstanding quantity
+    outstanding_qty: i64,
+    /// Outstanding ratio
+    outstanding_ratio: PyDecimal,
+    /// Premium
+    premium: PyDecimal,
+    /// In/out of the bound
+    #[py(opt)]
+    itm_otm: Option<PyDecimal>,
+    /// Implied volatility
+    #[py(opt)]
+    implied_volatility: Option<PyDecimal>,
+    /// Delta
+    #[py(opt)]
+    delta: Option<PyDecimal>,
+    /// Call price
+    #[py(opt)]
+    call_price: Option<PyDecimal>,
+    /// Price interval from the call price
+    #[py(opt)]
+    to_call_price: Option<PyDecimal>,
+    /// Effective leverage
+    #[py(opt)]
+    effective_leverage: Option<PyDecimal>,
+    /// Leverage ratio
+    leverage_ratio: PyDecimal,
+    /// Conversion ratio
+    #[py(opt)]
+    conversion_ratio: Option<PyDecimal>,
+    /// Breakeven point
+    #[py(opt)]
+    balance_point: Option<PyDecimal>,
+    /// Status
+    status: WarrantStatus,
+}
+
+/// Warrant status
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::WarrantStatus")]
+pub enum WarrantStatus {
+    /// Suspend
+    Suspend,
+    /// Prepare List
+    PrepareList,
+    /// Normal
+    Normal,
+}
+
+/// The information of trading session
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Copy, Clone)]
+#[py(remote = "longport::quote::TradingSessionInfo")]
+pub(crate) struct TradingSessionInfo {
+    /// Being trading time
+    begin_time: PyTimeWrapper,
+    /// End trading time
+    end_time: PyTimeWrapper,
+    /// Trading session
+    trade_session: TradeSession,
+}
+
+/// Market trading session
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::MarketTradingSession")]
+pub(crate) struct MarketTradingSession {
+    /// Market
+    market: Market,
+    /// Trading sessions
+    #[py(array)]
+    trade_sessions: Vec<TradingSessionInfo>,
+}
+
+/// Real-time quote
+#[pyclass(skip_from_py_object)]
+#[derive(PyObject, Debug, Clone)]
+#[py(remote = "longport::quote::RealtimeQuote")]
+pub struct RealtimeQuote {
+    /// Security code
+    symbol: String,
+    /// Latest price
+    last_done: PyDecimal,
+    /// Open
+    open: PyDecimal,
+    /// High
+    high: PyDecimal,
+    /// Low
+    low: PyDecimal,
+    /// Time of latest price
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Security trading status
+    trade_status: TradeStatus,
+}
+
+/// Push real-time quote
+#[pyclass(skip_from_py_object)]
+#[derive(PyObject)]
+#[py(remote = "longport::quote::PushQuote")]
+#[derive(Debug, Clone)]
+pub struct PushQuote {
+    /// Latest price
+    last_done: PyDecimal,
+    /// Open
+    open: PyDecimal,
+    /// High
+    high: PyDecimal,
+    /// Low
+    low: PyDecimal,
+    /// Time of latest price
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Volume
+    volume: i64,
+    /// Turnover
+    turnover: PyDecimal,
+    /// Security trading status
+    trade_status: TradeStatus,
+    /// Trade session,
+    trade_session: TradeSession,
+    /// Increase volume between pushes
+    current_volume: i64,
+    /// Increase turnover between pushes
+    current_turnover: PyDecimal,
+}
+
+/// Push real-time depth
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::PushDepth")]
+pub(crate) struct PushDepth {
+    /// Ask depth
+    #[py(array)]
+    asks: Vec<Depth>,
+    /// Bid depth
+    #[py(array)]
+    bids: Vec<Depth>,
+}
+
+/// Push real-time brokers
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::PushBrokers")]
+pub(crate) struct PushBrokers {
+    /// Ask brokers
+    #[py(array)]
+    ask_brokers: Vec<Brokers>,
+    /// Bid brokers
+    #[py(array)]
+    bid_brokers: Vec<Brokers>,
+}
+
+/// Push real-time trades
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::PushTrades")]
+pub(crate) struct PushTrades {
+    /// Trades data
+    #[py(array)]
+    trades: Vec<Trade>,
+}
+
+/// Push candlestick updated event
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::PushCandlestick")]
+pub struct PushCandlestick {
+    /// Period type
+    period: Period,
+    /// Candlestick
+    candlestick: Candlestick,
+    /// Is confirmed
+    is_confirmed: bool,
+}
+
+/// Market trading days
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::MarketTradingDays")]
+pub(crate) struct MarketTradingDays {
+    /// Trading days
+    #[py(array)]
+    trading_days: Vec<PyDateWrapper>,
+    /// Half trading days
+    #[py(array)]
+    half_trading_days: Vec<PyDateWrapper>,
+}
+
+/// Capital flow line
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::CapitalFlowLine")]
+pub(crate) struct CapitalFlowLine {
+    /// Inflow capital data
+    inflow: PyDecimal,
+    /// Time
+    timestamp: PyOffsetDateTimeWrapper,
+}
+
+/// Capital distribution
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::CapitalDistribution")]
+pub(crate) struct CapitalDistribution {
+    /// Large order
+    large: PyDecimal,
+    /// Medium order
+    medium: PyDecimal,
+    /// Small order
+    small: PyDecimal,
+}
+
+/// Capital distribution response
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::CapitalDistributionResponse")]
+pub(crate) struct CapitalDistributionResponse {
+    /// Time
+    timestamp: PyOffsetDateTimeWrapper,
+    /// Inflow capital data
+    capital_in: CapitalDistribution,
+    /// Outflow capital data
+    capital_out: CapitalDistribution,
+}
+
+/// Watch list group
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::WatchlistGroup")]
+pub(crate) struct WatchlistGroup {
+    /// Group id
+    pub id: i64,
+    /// Group name
+    pub name: String,
+    /// Securities
+    #[py(array)]
+    securities: Vec<WatchlistSecurity>,
+}
+
+/// Watch list security
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::WatchlistSecurity")]
+pub(crate) struct WatchlistSecurity {
+    /// Security symbol
+    symbol: String,
+    /// Market
+    market: Market,
+    /// Security name
+    name: String,
+    /// Watched price
+    #[py(opt)]
+    watched_price: Option<PyDecimal>,
+    /// Watched time
+    watched_at: PyOffsetDateTimeWrapper,
+    /// Whether the security is pinned to the top of the group
+    is_pinned: bool,
+}
+
+/// Securities update mode
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::SecuritiesUpdateMode")]
+pub(crate) enum SecuritiesUpdateMode {
+    /// Add securities
+    Add,
+    /// Remove securities
+    Remove,
+    /// Replace securities
+    Replace,
+}
+
+/// Pinned mode for watchlist securities
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::PinnedMode")]
+pub(crate) enum PinnedMode {
+    /// Pin (add) securities to the top
+    Add,
+    /// Unpin (remove) securities from the top
+    Remove,
+}
+
+/// Calc index
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::CalcIndex")]
+pub(crate) enum CalcIndex {
+    /// Latest price
+    LastDone,
+    /// Change value
+    ChangeValue,
+    /// Change rate
+    ChangeRate,
+    /// Volume
+    Volume,
+    /// Turnover
+    Turnover,
+    /// Year-to-date change ratio
+    YtdChangeRate,
+    /// Turnover rate
+    TurnoverRate,
+    /// Total market value
+    TotalMarketValue,
+    /// Capital flow
+    CapitalFlow,
+    /// Amplitude
+    Amplitude,
+    /// Volume ratio
+    VolumeRatio,
+    /// PE (TTM)
+    PeTtmRatio,
+    /// PB
+    PbRatio,
+    /// Dividend ratio (TTM)
+    DividendRatioTtm,
+    /// Five days change ratio
+    FiveDayChangeRate,
+    /// Ten days change ratio
+    TenDayChangeRate,
+    /// Half year change ratio
+    HalfYearChangeRate,
+    /// Five minutes change ratio
+    FiveMinutesChangeRate,
+    /// Expiry date
+    ExpiryDate,
+    /// Strike price
+    StrikePrice,
+    /// Upper bound price
+    UpperStrikePrice,
+    /// Lower bound price
+    LowerStrikePrice,
+    /// Outstanding quantity
+    OutstandingQty,
+    /// Outstanding ratio
+    OutstandingRatio,
+    /// Premium
+    Premium,
+    /// In/out of the bound
+    ItmOtm,
+    /// Implied volatility
+    ImpliedVolatility,
+    /// Warrant delta
+    WarrantDelta,
+    /// Call price
+    CallPrice,
+    /// Price interval from the call price
+    ToCallPrice,
+    /// Effective leverage
+    EffectiveLeverage,
+    /// Leverage ratio
+    LeverageRatio,
+    /// Conversion ratio
+    ConversionRatio,
+    /// Breakeven point
+    BalancePoint,
+    /// Open interest
+    OpenInterest,
+    /// Delta
+    Delta,
+    /// Gamma
+    Gamma,
+    /// Theta
+    Theta,
+    /// Vega
+    Vega,
+    /// Rho
+    Rho,
+}
+
+/// Security calc index response
+#[pyclass(skip_from_py_object)]
+#[derive(PyObject, Debug, Clone)]
+#[py(remote = "longport::quote::SecurityCalcIndex")]
+pub(crate) struct SecurityCalcIndex {
+    /// Security code
+    symbol: String,
+    /// Latest price
+    #[py(opt)]
+    last_done: Option<PyDecimal>,
+    /// Change value
+    #[py(opt)]
+    change_value: Option<PyDecimal>,
+    /// Change ratio
+    #[py(opt)]
+    change_rate: Option<PyDecimal>,
+    /// Volume
+    #[py(opt)]
+    volume: Option<i64>,
+    /// Turnover
+    #[py(opt)]
+    turnover: Option<PyDecimal>,
+    /// Year-to-date change ratio
+    #[py(opt)]
+    ytd_change_rate: Option<PyDecimal>,
+    /// Turnover rate
+    #[py(opt)]
+    turnover_rate: Option<PyDecimal>,
+    /// Total market value
+    #[py(opt)]
+    total_market_value: Option<PyDecimal>,
+    /// Capital flow
+    #[py(opt)]
+    capital_flow: Option<PyDecimal>,
+    /// Amplitude
+    #[py(opt)]
+    amplitude: Option<PyDecimal>,
+    /// Volume ratio
+    #[py(opt)]
+    volume_ratio: Option<PyDecimal>,
+    /// PE (TTM)
+    #[py(opt)]
+    pe_ttm_ratio: Option<PyDecimal>,
+    /// PB
+    #[py(opt)]
+    pb_ratio: Option<PyDecimal>,
+    /// Dividend ratio (TTM)
+    #[py(opt)]
+    dividend_ratio_ttm: Option<PyDecimal>,
+    /// Five days change ratio
+    #[py(opt)]
+    five_day_change_rate: Option<PyDecimal>,
+    /// Ten days change ratio
+    #[py(opt)]
+    ten_day_change_rate: Option<PyDecimal>,
+    /// Half year change ratio
+    #[py(opt)]
+    half_year_change_rate: Option<PyDecimal>,
+    /// Five minutes change ratio
+    #[py(opt)]
+    five_minutes_change_rate: Option<PyDecimal>,
+    /// Expiry date
+    #[py(opt)]
+    expiry_date: Option<PyDateWrapper>,
+    /// Strike price
+    #[py(opt)]
+    strike_price: Option<PyDecimal>,
+    /// Upper bound price
+    #[py(opt)]
+    upper_strike_price: Option<PyDecimal>,
+    /// Lower bound price
+    #[py(opt)]
+    lower_strike_price: Option<PyDecimal>,
+    /// Outstanding quantity
+    #[py(opt)]
+    outstanding_qty: Option<i64>,
+    /// Outstanding ratio
+    #[py(opt)]
+    outstanding_ratio: Option<PyDecimal>,
+    /// Premium
+    #[py(opt)]
+    premium: Option<PyDecimal>,
+    /// In/out of the bound
+    #[py(opt)]
+    itm_otm: Option<PyDecimal>,
+    /// Implied volatility
+    #[py(opt)]
+    implied_volatility: Option<PyDecimal>,
+    /// Warrant delta
+    #[py(opt)]
+    warrant_delta: Option<PyDecimal>,
+    /// Call price
+    #[py(opt)]
+    call_price: Option<PyDecimal>,
+    /// Price interval from the call price
+    #[py(opt)]
+    to_call_price: Option<PyDecimal>,
+    /// Effective leverage
+    #[py(opt)]
+    effective_leverage: Option<PyDecimal>,
+    /// Leverage ratio
+    #[py(opt)]
+    leverage_ratio: Option<PyDecimal>,
+    /// Conversion ratio
+    #[py(opt)]
+    conversion_ratio: Option<PyDecimal>,
+    /// Breakeven point
+    #[py(opt)]
+    balance_point: Option<PyDecimal>,
+    /// Open interest
+    #[py(opt)]
+    open_interest: Option<i64>,
+    /// Delta
+    #[py(opt)]
+    delta: Option<PyDecimal>,
+    /// Gamma
+    #[py(opt)]
+    gamma: Option<PyDecimal>,
+    /// Theta
+    ///
+    /// The raw value returned by the API is annualized (scaled by 252 trading
+    /// days per year). To obtain the standard per-calendar-day theta, divide
+    /// by 252: `theta / 252`.
+    #[py(opt)]
+    theta: Option<PyDecimal>,
+    /// Vega
+    ///
+    /// The raw value returned by the API is expressed per 1 percentage-point
+    /// change in implied volatility (i.e. the value has been multiplied by
+    /// 100). To obtain the standard vega (per unit change in IV), divide by
+    /// 100: `vega / 100`.
+    #[py(opt)]
+    vega: Option<PyDecimal>,
+    /// Rho
+    ///
+    /// The raw value returned by the API is expressed per 1 percentage-point
+    /// change in the risk-free rate (i.e. the value has been multiplied by
+    /// 100). To obtain the standard rho (per unit change in rate), divide by
+    /// 100: `rho / 100`.
+    #[py(opt)]
+    rho: Option<PyDecimal>,
+}
+
+/// Security list category
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::SecurityListCategory")]
+pub(crate) enum SecurityListCategory {
+    /// Overnight
+    Overnight,
+}
+
+/// Security
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::Security")]
+pub(crate) struct Security {
+    /// Security code
+    symbol: String,
+    /// Security name (zh-CN)
+    name_cn: String,
+    /// Security name (en)
+    name_en: String,
+    /// Security name (zh-HK)
+    name_hk: String,
+}
+
+/// Quote package detail
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::QuotePackageDetail")]
+pub(crate) struct QuotePackageDetail {
+    /// Key
+    pub key: String,
+    /// Name
+    pub name: String,
+    /// Description
+    pub description: String,
+    /// Start time
+    pub start_at: PyOffsetDateTimeWrapper,
+    /// End time
+    pub end_at: PyOffsetDateTimeWrapper,
+}
+
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::TradeSessions")]
+pub(crate) enum TradeSessions {
+    Intraday,
+    All,
+}
+
+/// Filing item
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::FilingItem")]
+pub(crate) struct FilingItem {
+    /// Filing ID
+    id: String,
+    /// Title
+    title: String,
+    /// Description
+    description: String,
+    /// File name
+    file_name: String,
+    /// File URLs
+    file_urls: Vec<String>,
+    /// Published time
+    published_at: PyOffsetDateTimeWrapper,
+}
+
+/// Market temperature
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject, Clone)]
+#[py(remote = "longport::quote::MarketTemperature")]
+pub(crate) struct MarketTemperature {
+    /// Temperature value
+    temperature: i32,
+    /// Temperature description
+    description: String,
+    /// Market valuation
+    valuation: i32,
+    /// Market sentiment
+    sentiment: i32,
+    /// Time
+    timestamp: PyOffsetDateTimeWrapper,
+}
+
+/// Data granularity
+#[pyclass(eq, eq_int, skip_from_py_object)]
+#[derive(Debug, PyEnum, Copy, Clone, Hash, Eq, PartialEq)]
+#[py(remote = "longport::quote::Granularity")]
+pub(crate) enum Granularity {
+    /// Unknown
+    Unknown,
+    /// Daily
+    Daily,
+    /// Weekly
+    Weekly,
+    /// Monthly
+    Monthly,
+}
+
+/// History market temperature response
+#[pyclass(skip_from_py_object)]
+#[derive(Debug, PyObject)]
+#[py(remote = "longport::quote::HistoryMarketTemperatureResponse")]
+pub(crate) struct HistoryMarketTemperatureResponse {
+    /// Granularity
+    granularity: Granularity,
+    /// Records
+    #[py(array)]
+    records: Vec<MarketTemperature>,
+}
+
+// ── Step 3: short_positions / short_trades / option_volume /
+// option_volume_daily
+
+/// One short-position data point (unified for US and HK markets).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortPositionsItem {
+    /// Trading date (RFC 3339)
+    pub timestamp: String,
+    /// Short ratio
+    pub rate: String,
+    /// Closing price
+    pub close: String,
+    /// [US] Number of short shares outstanding
+    pub current_shares_short: String,
+    /// [US] Average daily share volume
+    pub avg_daily_share_volume: String,
+    /// [US] Days to cover ratio
+    pub days_to_cover: String,
+    /// [HK] Short sale amount (HKD)
+    pub amount: String,
+    /// [HK] Short position balance
+    pub balance: String,
+    /// [HK] Cost / closing price
+    pub cost: String,
+}
+
+impl From<longport::quote::ShortPositionsItem> for ShortPositionsItem {
+    fn from(v: longport::quote::ShortPositionsItem) -> Self {
+        Self {
+            timestamp: v.timestamp,
+            rate: v.rate,
+            close: v.close,
+            current_shares_short: v.current_shares_short,
+            avg_daily_share_volume: v.avg_daily_share_volume,
+            days_to_cover: v.days_to_cover,
+            amount: v.amount,
+            balance: v.balance,
+            cost: v.cost,
+        }
+    }
+}
+
+/// Short interest / positions response (HK or US).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortPositionsResponse {
+    /// Short position data points
+    pub data: Vec<ShortPositionsItem>,
+}
+
+impl From<longport::quote::ShortPositionsResponse> for ShortPositionsResponse {
+    fn from(v: longport::quote::ShortPositionsResponse) -> Self {
+        Self {
+            data: v.data.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One short-trade data point (unified for US and HK markets).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortTradesItem {
+    /// Trading date (RFC 3339)
+    pub timestamp: String,
+    /// Short ratio
+    pub rate: String,
+    /// Closing price
+    pub close: String,
+    /// [US] NYSE short amount
+    pub nus_amount: String,
+    /// [US] NY short amount
+    pub ny_amount: String,
+    /// [US] Total short amount
+    pub total_amount: String,
+    /// [HK] Short sale amount
+    pub amount: String,
+    /// [HK] Short position balance
+    pub balance: String,
+}
+
+impl From<longport::quote::ShortTradesItem> for ShortTradesItem {
+    fn from(v: longport::quote::ShortTradesItem) -> Self {
+        Self {
+            timestamp: v.timestamp,
+            rate: v.rate,
+            close: v.close,
+            nus_amount: v.nus_amount,
+            ny_amount: v.ny_amount,
+            total_amount: v.total_amount,
+            amount: v.amount,
+            balance: v.balance,
+        }
+    }
+}
+
+/// Short trade records response (HK or US).
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct ShortTradesResponse {
+    /// Short trade data points
+    pub data: Vec<ShortTradesItem>,
+}
+
+impl From<longport::quote::ShortTradesResponse> for ShortTradesResponse {
+    fn from(v: longport::quote::ShortTradesResponse) -> Self {
+        Self {
+            data: v.data.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Option volume stats response
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct OptionVolumeStats {
+    /// Call volume string
+    pub c: String,
+    /// Put volume string
+    pub p: String,
+}
+
+impl From<longport::quote::OptionVolumeStats> for OptionVolumeStats {
+    fn from(v: longport::quote::OptionVolumeStats) -> Self {
+        Self { c: v.c, p: v.p }
+    }
+}
+
+/// Daily option volume response
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct OptionVolumeDaily {
+    /// Daily stats
+    pub stats: Vec<OptionVolumeDailyStat>,
+}
+
+impl From<longport::quote::OptionVolumeDaily> for OptionVolumeDaily {
+    fn from(v: longport::quote::OptionVolumeDaily) -> Self {
+        Self {
+            stats: v.stats.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One day's option volume stat
+#[pyclass(get_all, skip_from_py_object)]
+#[derive(Debug, Clone)]
+pub(crate) struct OptionVolumeDailyStat {
+    /// Underlying symbol
+    pub symbol: String,
+    /// Date timestamp string
+    pub timestamp: String,
+    /// Total volume
+    pub total_volume: String,
+    /// Put volume
+    pub total_put_volume: String,
+    /// Call volume
+    pub total_call_volume: String,
+    /// Put/call volume ratio
+    pub put_call_volume_ratio: String,
+    /// Total open interest
+    pub total_open_interest: String,
+    /// Put open interest
+    pub total_put_open_interest: String,
+    /// Call open interest
+    pub total_call_open_interest: String,
+    /// Put/call OI ratio
+    pub put_call_open_interest_ratio: String,
+}
+
+impl From<longport::quote::OptionVolumeDailyStat> for OptionVolumeDailyStat {
+    fn from(v: longport::quote::OptionVolumeDailyStat) -> Self {
+        Self {
+            symbol: v.symbol,
+            timestamp: v.timestamp,
+            total_volume: v.total_volume,
+            total_put_volume: v.total_put_volume,
+            total_call_volume: v.total_call_volume,
+            put_call_volume_ratio: v.put_call_volume_ratio,
+            total_open_interest: v.total_open_interest,
+            total_put_open_interest: v.total_put_open_interest,
+            total_call_open_interest: v.total_call_open_interest,
+            put_call_open_interest_ratio: v.put_call_open_interest_ratio,
+        }
+    }
+}

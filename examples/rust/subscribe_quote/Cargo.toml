@@ -1,0 +1,8 @@
+[package]
+name = "subscribe_quote"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+longport = { path = "../../../rust" }
+tokio = { version = "1.19", features = ["rt-multi-thread", "macros"] }

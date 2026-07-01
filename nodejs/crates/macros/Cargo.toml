@@ -1,0 +1,15 @@
+[package]
+name = "longport-nodejs-macros"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+proc-macro = true
+
+[dependencies]
+darling.workspace = true
+proc-macro2.workspace = true
+quote.workspace = true
+syn = { workspace = true, features = [] }
+thiserror.workspace = true
+convert_case.workspace = true

@@ -1,0 +1,58 @@
+extend = [
+    { path = "rust/Makefile.toml" },
+    { path = "python/Makefile.toml" },
+    { path = "java/Makefile.toml" },
+    { path = "c/Makefile.toml" },
+    { path = "cpp/Makefile.toml" },
+]
+
+[config]
+default_to_workspace = false
+skip_core_tasks = true
+
+[tasks.default]
+
+[tasks.cmake]
+command = "cmake"
+args = ["../"]
+cwd = "cmake.build"
+
+[tasks.cmake-release]
+command = "cmake"
+args = ["-DCMAKE_BUILD_TYPE=Release", "../"]
+cwd = "cmake.build"
+
+[tasks.cmake-release.windows]
+command = "cmake"
+args = ["../"]
+cwd = "cmake.build"
+
+[tasks.cmake-release-macos-aarch64]
+command = "cmake"
+args = [
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DRust_CARGO_TARGET=aarch64-apple-darwin",
+    "-DCMAKE_OSX_ARCHITECTURES=arm64",
+    "../",
+]
+cwd = "cmake.build"
+
+[tasks.cmake-debug]
+command = "cmake"
+args = ["-DCMAKE_BUILD_TYPE=Debug", "../"]
+cwd = "cmake.build"
+
+[tasks.cmake-debug.windows]
+command = "cmake"
+args = ["../"]
+cwd = "cmake.build"
+
+[tasks.cmake-debug-macos-aarch64]
+command = "cmake"
+args = [
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DRust_CARGO_TARGET=aarch64-apple-darwin",
+    "-DCMAKE_OSX_ARCHITECTURES=arm64",
+    "../",
+]
+cwd = "cmake.build"

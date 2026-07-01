@@ -1,0 +1,19 @@
+[package]
+edition.workspace = true
+name = "longport-java"
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+longport.workspace = true
+longport-java-macros = { path = "./crates/macros" }
+
+jni.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread"] }
+time.workspace = true
+parking_lot.workspace = true
+serde_json.workspace = true
+serde = { workspace = true, features = ["derive"] }

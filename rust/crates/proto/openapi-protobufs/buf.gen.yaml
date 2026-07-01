@@ -1,0 +1,14 @@
+version: v1
+managed:
+  enabled: true
+  go_package_prefix:
+    default: github.com/longbridge/openapi-protobufs/gen/go
+
+plugins:
+  - name: go
+    out: gen/go
+    opt: paths=source_relative
+  - name: python
+    out: gen/python
+  - name: cpp
+    out: gen/cpp

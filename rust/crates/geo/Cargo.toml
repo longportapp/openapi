@@ -1,0 +1,9 @@
+[package]
+edition.workspace = true
+name = "longport-geo"
+version.workspace = true
+description = "Longport geo-detection helper (CN vs global)"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+reqwest = { workspace = true, features = ["rustls-tls"] }

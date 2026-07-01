@@ -1,0 +1,703 @@
+syntax = "proto3";
+
+package longbridge.quote.v1;
+
+// 协议指令定义
+enum Command {
+  UNKNOWN_COMMAND = 0;
+  HEART_BEAT = 1; //心跳
+  AUTH = 2; //鉴权
+  RECONNECT = 3; //重新连接
+
+  QueryUserQuoteProfile = 4; //查询用户行情信息
+  Subscription = 5; //查询连接的已订阅数据
+  Subscribe = 6; //订阅行情数据
+  Unsubscribe = 7; //取消订阅行情数据
+  QueryMarketTradePeriod = 8; //查询各市场的当日交易时段
+  QueryMarketTradeDay = 9; //查询交易日
+  QuerySecurityStaticInfo = 10; //查询标的基础信息
+  QuerySecurityQuote = 11; //查询标的行情(所有标的通用行情)
+  QueryOptionQuote = 12; //查询期权行情(仅支持期权)
+  QueryWarrantQuote = 13; //查询轮证行情(仅支持轮证)
+  QueryDepth = 14; //查询盘口
+  QueryBrokers = 15; //查询经纪队列
+  QueryParticipantBrokerIds = 16; //查询券商经纪席位
+  QueryTrade = 17; //查询成交明细
+  QueryIntraday = 18; //查询当日分时
+  QueryCandlestick = 19; //查询k线
+  QueryOptionChainDate = 20; //查询标的期权链日期列表
+  QueryOptionChainDateStrikeInfo = 21; //查询标的期权链某日的行权价信息
+  QueryWarrantIssuerInfo = 22; //查询轮证发行商对应Id
+  QueryWarrantFilterList = 23; //查询轮证筛选列表
+  QueryCapitalFlowIntraday = 24; //查询标的的资金流分时
+  QueryCapitalFlowDistribution = 25; //查询标的资金流大小单
+  QuerySecurityCalcIndex = 26; //查询标的指标数据
+  QueryHistoryCandlestick = 27; //查询标的历史 k 线
+
+  PushQuoteData = 101; //推送行情
+  PushDepthData = 102; //推送盘口
+  PushBrokersData = 103; //推送经纪队列
+  PushTradeData = 104; //推送成交明细
+}
+
+message SecurityRequest {
+  string symbol = 1;
+}
+
+message MultiSecurityRequest {
+  repeated string symbol = 1;
+}
+
+message SecurityStaticInfoResponse {
+  repeated StaticInfo secu_static_info = 1;
+}
+
+message StaticInfo {
+  string symbol = 1;
+  string name_cn = 2;
+  string name_en = 3;
+  string name_hk = 4;
+  string listing_date = 5;
+  string exchange = 6;
+  string currency = 7;
+  int32 lot_size = 8;
+  int64 total_shares = 9;
+  int64 circulating_shares = 10;
+  int64 hk_shares = 11;
+  string eps = 12;
+  string eps_ttm = 13;
+  string bps = 14;
+  string dividend_yield = 15;
+  repeated int32 stock_derivatives = 16;
+  string board = 17;
+}
+
+message SecurityQuoteResponse {
+  repeated SecurityQuote secu_quote = 1;
+}
+
+message SecurityQuote {
+  string symbol = 1;
+  string last_done = 2;
+  string prev_close = 3;
+  string open = 4;
+  string high = 5;
+  string low = 6;
+  int64 timestamp = 7;
+  int64 volume = 8;
+  string turnover = 9;
+  TradeStatus trade_status = 10;
+  PrePostQuote pre_market_quote = 11;
+  PrePostQuote post_market_quote = 12;
+  PrePostQuote over_night_quote = 13;
+}
+
+enum TradeStatus {
+  NORMAL = 0;
+  HALTED = 1;
+  DELISTED = 2;
+  FUSE = 3;
+  PREPARE_LIST = 4;
+  CODE_MOVED = 5;
+  TO_BE_OPENED = 6;
+  SPLIT_STOCK_HALTS = 7;
+  EXPIRED = 8;
+  WARRANT_PREPARE_LIST = 9;
+  SUSPEND_TRADE = 10;
+}
+
+enum TradeSession {
+  NORMAL_TRADE = 0;
+  PRE_TRADE = 1;
+  POST_TRADE = 2;
+  OVERNIGHT_TRADE = 3;
+}
+
+message PrePostQuote {
+  string last_done = 1;
+  int64 timestamp = 2;
+  int64 volume = 3;
+  string turnover = 4;
+  string high = 5;
+  string low = 6;
+  string prev_close = 7;
+}
+
+message OptionQuoteResponse {
+  repeated OptionQuote secu_quote = 1;
+}
+
+message OptionQuote {
+  string symbol = 1;
+  string last_done = 2;
+  string prev_close = 3;
+  string open = 4;
+  string high = 5;
+  string low = 6;
+  int64 timestamp = 7;
+  int64 volume = 8;
+  string turnover = 9;
+  TradeStatus trade_status = 10;
+  OptionExtend option_extend = 11;
+}
+
+message OptionExtend {
+  string implied_volatility = 1;
+  int64 open_interest = 2;
+  string expiry_date = 3;
+  string strike_price = 4;
+  string contract_multiplier = 5;
+  string contract_type = 6;
+  string contract_size = 7;
+  string direction = 8;
+  string historical_volatility = 9;
+  string underlying_symbol = 10;
+}
+
+message WarrantQuoteResponse {
+  repeated WarrantQuote secu_quote = 2;
+}
+
+message WarrantQuote {
+  string symbol = 1;
+  string last_done = 2;
+  string prev_close = 3;
+  string open = 4;
+  string high = 5;
+  string low = 6;
+  int64 timestamp = 7;
+  int64 volume = 8;
+  string turnover = 9;
+  TradeStatus trade_status = 10;
+  WarrantExtend warrant_extend = 11;
+}
+
+message WarrantExtend {
+  string implied_volatility = 1;
+  string expiry_date = 2;
+  string last_trade_date = 3;
+  string outstanding_ratio = 4;
+  int64 outstanding_qty = 5;
+  string conversion_ratio = 6;
+  string category = 7;
+  string strike_price = 8;
+  string upper_strike_price = 9;
+  string lower_strike_price = 10;
+  string call_price = 11;
+  string underlying_symbol = 12;
+}
+
+message SecurityDepthResponse {
+  string symbol = 1;
+  repeated Depth ask = 2;
+  repeated Depth bid = 3;
+}
+
+message Depth {
+  int32 position = 1;
+  string price = 2;
+  int64 volume = 3;
+  int64 order_num = 4;
+}
+
+message SecurityBrokersResponse {
+  string symbol = 1;
+  repeated Brokers ask_brokers = 2;
+  repeated Brokers bid_brokers = 3;
+}
+
+message Brokers {
+  int32 position = 1;
+  repeated int32 broker_ids = 2;
+}
+
+message ParticipantBrokerIdsResponse {
+  repeated ParticipantInfo participant_broker_numbers = 1;
+}
+
+message ParticipantInfo {
+  repeated int32 broker_ids = 1;
+  string participant_name_cn = 2;
+  string participant_name_en = 3;
+  string participant_name_hk = 4;
+}
+
+message SecurityTradeRequest {
+  string symbol = 1;
+  int32 count = 2;
+}
+
+message SecurityTradeResponse {
+  string symbol = 1;
+  repeated Trade trades = 2;
+}
+
+message Trade {
+  string price = 1;
+  int64 volume = 2;
+  int64 timestamp = 3;
+  string trade_type = 4;
+  int32 direction = 5;
+  TradeSession trade_session = 6;
+}
+
+message SecurityIntradayRequest {
+  string symbol = 1;
+  int32 trade_session = 2;
+}
+
+message SecurityIntradayResponse {
+  string symbol = 1;
+  repeated Line lines = 2;
+}
+
+message Line {
+  string price = 1;
+  int64 timestamp = 2;
+  int64 volume = 3;
+  string turnover = 4;
+  string avg_price = 5;
+}
+
+message SecurityCandlestickRequest {
+  string symbol = 1;
+  Period period = 2;
+  int32 count = 3;
+  AdjustType adjust_type = 4;
+  int32 trade_session = 5;
+}
+
+enum AdjustType {
+  NO_ADJUST = 0;
+  FORWARD_ADJUST = 1;
+}
+
+enum Period {
+  UNKNOWN_PERIOD = 0;
+  ONE_MINUTE = 1;
+  TWO_MINUTE = 2;
+  THREE_MINUTE = 3;
+  FIVE_MINUTE = 5;
+  TEN_MINUTE = 10;
+  FIFTEEN_MINUTE = 15;
+  TWENTY_MINUTE = 20;
+  THIRTY_MINUTE = 30;
+  FORTY_FIVE_MINUTE = 45;
+  SIXTY_MINUTE = 60;
+  TWO_HOUR = 120;
+  THREE_HOUR = 180;
+  FOUR_HOUR = 240;
+  DAY = 1000;
+  WEEK = 2000;
+  MONTH = 3000;
+  QUARTER = 3500;
+  YEAR = 4000;
+}
+
+message SecurityCandlestickResponse {
+  string symbol = 1;
+  repeated Candlestick candlesticks = 2;
+}
+
+message Candlestick {
+  string close = 1;
+  string open = 2;
+  string low = 3;
+  string high = 4;
+  int64 volume = 5;
+  string turnover = 6;
+  int64 timestamp = 7;
+  TradeSession trade_session = 8;
+}
+
+message OptionChainDateListResponse {
+  repeated string expiry_date = 1;
+}
+
+message OptionChainDateStrikeInfoRequest {
+  string symbol = 1;
+  string expiry_date = 2;
+}
+
+message OptionChainDateStrikeInfoResponse {
+  repeated StrikePriceInfo strike_price_info = 1;
+}
+
+message StrikePriceInfo {
+  string price = 1;
+  string call_symbol = 2;
+  string put_symbol = 3;
+  bool standard = 4;
+}
+
+message IssuerInfoResponse {
+  repeated IssuerInfo issuer_info = 1;
+}
+
+message IssuerInfo {
+  int32 id = 1;
+  string name_cn = 2;
+  string name_en = 3;
+  string name_hk = 4;
+}
+
+message WarrantFilterListRequest {
+  string symbol = 1;
+  FilterConfig filter_config = 2;
+  int32 language = 3;
+}
+
+message FilterConfig {
+  int32 sort_by = 1;
+  int32 sort_order = 2;
+  int32 sort_offset = 3;
+  int32 sort_count = 4;
+  repeated int32 type = 5;
+  repeated int32 issuer = 6;
+  repeated int32 expiry_date = 7;
+  repeated int32 price_type = 8;
+  repeated int32 status = 9;
+}
+
+message WarrantFilterListResponse {
+  repeated FilterWarrant warrant_list = 1;
+  int32 total_count = 2;
+}
+
+message FilterWarrant {
+  string symbol = 1;
+  string name = 2;
+  string last_done = 3;
+  string change_rate = 4;
+  string change_val = 5;
+  int64 volume = 6;
+  string turnover = 7;
+  string expiry_date = 8;
+  string strike_price = 9;
+  string upper_strike_price = 10;
+  string lower_strike_price = 11;
+  string outstanding_qty = 12;
+  string outstanding_ratio = 13;
+  string premium = 14;
+  string itm_otm = 15;
+  string implied_volatility = 16;
+  string delta = 17;
+  string call_price = 18;
+  string to_call_price = 19;
+  string effective_leverage = 20;
+  string leverage_ratio = 21;
+  string conversion_ratio = 22;
+  string balance_point = 23;
+  int32 status = 24;
+  int32 type = 25;
+}
+
+message MarketTradePeriodResponse {
+  repeated MarketTradePeriod market_trade_session = 1;
+}
+
+message MarketTradePeriod {
+  string market = 1;
+  repeated TradePeriod trade_session = 2;
+}
+
+message TradePeriod {
+  int32 beg_time = 1;
+  int32 end_time = 2;
+  TradeSession trade_session = 3;
+}
+
+message SubscriptionRequest {}
+
+message SubscriptionResponse {
+  repeated SubTypeList sub_list = 1;
+}
+
+message SubTypeList {
+  string symbol = 1;
+  repeated SubType sub_type = 2;
+}
+
+enum SubType {
+  UNKNOWN_TYPE = 0;
+  QUOTE = 1;
+  DEPTH = 2;
+  BROKERS = 3;
+  TRADE = 4;
+}
+
+message SubscribeRequest {
+  repeated string symbol = 1;
+  repeated SubType sub_type = 2;
+  bool is_first_push = 3;
+}
+
+message UnsubscribeRequest {
+  repeated string symbol = 1;
+  repeated SubType sub_type = 2;
+  bool unsub_all = 3;
+}
+
+message UnsubscribeResponse {}
+
+enum PushQuoteTag {
+  Normal = 0;
+  Eod = 1;
+}
+
+message PushQuote {
+  string symbol = 1;
+  int64 sequence = 2;
+  string last_done = 3;
+  string open = 4;
+  string high = 5;
+  string low = 6;
+  int64 timestamp = 7;
+  int64 volume = 8;
+  string turnover = 9;
+  TradeStatus trade_status = 10;
+  TradeSession trade_session = 11;
+  int64 current_volume = 12;
+  string current_turnover = 13;
+  PushQuoteTag tag = 14;
+}
+
+message PushDepth {
+  string symbol = 1;
+  int64 sequence = 2;
+  repeated Depth ask = 3;
+  repeated Depth bid = 4;
+}
+
+message PushBrokers {
+  string symbol = 1;
+  int64 sequence = 2;
+  repeated Brokers ask_brokers = 3;
+  repeated Brokers bid_brokers = 4;
+}
+
+message PushTrade {
+  string symbol = 1;
+  int64 sequence = 2;
+  repeated Trade trade = 3;
+}
+
+message MarketTradeDayRequest {
+  string market = 1;
+  string beg_day = 2;
+  string end_day = 3;
+}
+
+message MarketTradeDayResponse {
+  repeated string trade_day = 1;
+  repeated string half_trade_day = 2;
+}
+
+message CapitalFlowIntradayRequest {
+  string symbol = 1;
+}
+
+message CapitalFlowIntradayResponse {
+  message CapitalFlowLine {
+    string inflow = 1;
+    int64 timestamp = 2;
+  }
+  string symbol = 1;
+  repeated CapitalFlowLine capital_flow_lines = 2;
+}
+
+message CapitalDistributionResponse {
+  message CapitalDistribution {
+    string large = 1;
+    string medium = 2;
+    string small = 3;
+  }
+  string symbol = 1;
+  int64 timestamp = 2;
+  CapitalDistribution capital_in = 3;
+  CapitalDistribution capital_out = 4;
+}
+
+enum CalcIndex {
+  CALCINDEX_UNKNOWN = 0;
+  CALCINDEX_LAST_DONE = 1;
+  CALCINDEX_CHANGE_VAL = 2;
+  CALCINDEX_CHANGE_RATE = 3;
+  CALCINDEX_VOLUME = 4;
+  CALCINDEX_TURNOVER = 5;
+  CALCINDEX_YTD_CHANGE_RATE = 6;
+  CALCINDEX_TURNOVER_RATE = 7;
+  CALCINDEX_TOTAL_MARKET_VALUE = 8;
+  CALCINDEX_CAPITAL_FLOW = 9;
+  CALCINDEX_AMPLITUDE = 10;
+  CALCINDEX_VOLUME_RATIO = 11;
+  CALCINDEX_PE_TTM_RATIO = 12;
+  CALCINDEX_PB_RATIO = 13;
+  CALCINDEX_DIVIDEND_RATIO_TTM = 14;
+  CALCINDEX_FIVE_DAY_CHANGE_RATE = 15;
+  CALCINDEX_TEN_DAY_CHANGE_RATE = 16;
+  CALCINDEX_HALF_YEAR_CHANGE_RATE = 17;
+  CALCINDEX_FIVE_MINUTES_CHANGE_RATE = 18;
+  CALCINDEX_EXPIRY_DATE = 19;
+  CALCINDEX_STRIKE_PRICE = 20;
+  CALCINDEX_UPPER_STRIKE_PRICE = 21;
+  CALCINDEX_LOWER_STRIKE_PRICE = 22;
+  CALCINDEX_OUTSTANDING_QTY = 23;
+  CALCINDEX_OUTSTANDING_RATIO = 24;
+  CALCINDEX_PREMIUM = 25;
+  CALCINDEX_ITM_OTM = 26;
+  CALCINDEX_IMPLIED_VOLATILITY = 27;
+  CALCINDEX_WARRANT_DELTA = 28;
+  CALCINDEX_CALL_PRICE = 29;
+  CALCINDEX_TO_CALL_PRICE = 30;
+  CALCINDEX_EFFECTIVE_LEVERAGE = 31;
+  CALCINDEX_LEVERAGE_RATIO = 32;
+  CALCINDEX_CONVERSION_RATIO = 33;
+  CALCINDEX_BALANCE_POINT = 34;
+  CALCINDEX_OPEN_INTEREST = 35;
+  CALCINDEX_DELTA = 36;
+  CALCINDEX_GAMMA = 37;
+  CALCINDEX_THETA = 38;
+  CALCINDEX_VEGA = 39;
+  CALCINDEX_RHO = 40;
+}
+
+message SecurityCalcQuoteRequest {
+  repeated string symbols = 1;
+  repeated CalcIndex calc_index = 2;
+}
+
+message SecurityCalcIndex {
+  string symbol = 1;
+  string last_done = 2;
+  string change_val = 3;
+  string change_rate = 4;
+  int64 volume = 5;
+  string turnover = 6;
+  string ytd_change_rate = 7;
+  string turnover_rate = 8;
+  string total_market_value = 9;
+  string capital_flow = 10;
+  string amplitude = 11;
+  string volume_ratio = 12;
+  string pe_ttm_ratio = 13;
+  string pb_ratio = 14;
+  string dividend_ratio_ttm = 15;
+  string five_day_change_rate = 16;
+  string ten_day_change_rate = 17;
+  string half_year_change_rate = 18;
+  string five_minutes_change_rate = 19;
+  string expiry_date = 20;
+  string strike_price = 21;
+  string upper_strike_price = 22;
+  string lower_strike_price = 23;
+  int64 outstanding_qty = 24;
+  string outstanding_ratio = 25;
+  string premium = 26;
+  string itm_otm = 27;
+  string implied_volatility = 28;
+  string warrant_delta = 29;
+  string call_price = 30;
+  string to_call_price = 31;
+  string effective_leverage = 32;
+  string leverage_ratio = 33;
+  string conversion_ratio = 34;
+  string balance_point = 35;
+  int64 open_interest = 36;
+  string delta = 37;
+  string gamma = 38;
+  string theta = 39;
+  string vega = 40;
+  string rho = 41;
+}
+
+message SecurityCalcQuoteResponse {
+  repeated SecurityCalcIndex security_calc_index = 1;
+}
+
+enum HistoryCandlestickQueryType {
+  UNKNOWN_QUERY_TYPE = 0;
+  QUERY_BY_OFFSET = 1;
+  QUERY_BY_DATE = 2;
+}
+
+enum Direction {
+  // 老数据, 从最新的数据往历史数据翻页
+  BACKWARD = 0;
+  // 新数据, 从当前数据往最新数据翻页
+  FORWARD = 1;
+}
+
+message SecurityHistoryCandlestickRequest {
+  message OffsetQuery {
+    Direction direction = 1;
+    string date = 2;
+    string minute = 3;
+    int32 count = 4;
+  }
+
+  message DateQuery {
+    string start_date = 1;
+    string end_date = 2;
+  }
+
+  string symbol = 1;
+  Period period = 2;
+  AdjustType adjust_type = 3;
+  HistoryCandlestickQueryType query_type = 4;
+  OffsetQuery offset_request = 5;
+  DateQuery date_request = 6;
+  int32 trade_session = 7;
+}
+
+message UserQuoteProfileRequest {
+  string language = 1;
+}
+
+message RateLimit {
+  Command command = 1;
+  int32 limit = 2;
+  int32 burst = 3;
+}
+
+message UserQuoteLevelDetail {
+  message PackageDetail {
+    // 行情包 Key
+    string key = 1;
+    // 行情包名称
+    string name = 2;
+    // 行情包描述, 根据入参 lang 适配多语言
+    string description = 4;
+    // 行情包生效开始时间 Unix 时间戳
+    int64 start = 5;
+    // 行情包生效结束时间 Unix 时间戳
+    int64 end = 6;
+    
+  }
+
+  message MarketPackageDetail {
+    repeated PackageDetail packages = 1;
+    // 当一个包也没有时, 会有如下, 多语言的文案
+    // `您没有访问该市场 Open API 行情的权限，如需请前往行情商店购买`
+    string warning_msg = 4;
+  }
+
+  // 按行情包描述
+  map<string, PackageDetail> by_package_key = 1;
+  // 按市场描述, 目前写死的, 仅有 US HK CN USOption(期权) 4个
+  map<string, MarketPackageDetail> by_market_code = 2;
+}
+
+message UserQuoteProfileResponse {
+  int64 member_id = 1;
+  // 行情权限信息
+  string quote_level = 2;
+  // 订阅数量限制
+  int32 subscribe_limit = 3;
+  // 历史 k 线限制
+  int32 history_candlestick_limit = 4;
+  // command rate limit
+  repeated RateLimit rate_limit = 5;
+  // 用户等级详情
+  UserQuoteLevelDetail quote_level_detail = 6;
+}

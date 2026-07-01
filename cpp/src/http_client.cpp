@@ -1,0 +1,107 @@
+#include <vector>
+
+#include "callback.hpp"
+#include "http_client.hpp"
+#include "longport.h"
+#include "oauth.hpp"
+
+namespace longport {
+
+HttpClient::HttpClient()
+  : http_client_(nullptr)
+{
+}
+
+HttpClient::~HttpClient()
+{
+  if (http_client_) {
+    lb_http_client_free(http_client_);
+  }
+}
+
+HttpClient::HttpClient(HttpClient&& other) noexcept
+  : http_client_(other.http_client_)
+{
+  other.http_client_ = nullptr;
+}
+
+HttpClient
+HttpClient::from_apikey(const std::string& app_key,
+                        const std::string& app_secret,
+                        const std::string& access_token,
+                        const std::optional<std::string>& http_url)
+{
+  HttpClient client;
+  client.http_client_ =
+    lb_http_client_from_apikey(http_url ? http_url->c_str() : nullptr,
+                               app_key.c_str(),
+                               app_secret.c_str(),
+                               access_token.c_str());
+  return client;
+}
+
+HttpClient
+HttpClient::from_apikey_env(Status& status)
+{
+  lb_error_t* err = nullptr;
+  lb_http_client_t* http_client_ptr = lb_http_client_from_apikey_env(&err);
+  status = std::move(Status(err));
+  if (status.is_ok()) {
+    HttpClient client;
+    client.http_client_ = http_client_ptr;
+    return client;
+  }
+  return HttpClient();
+}
+
+HttpClient
+HttpClient::from_oauth(const OAuth& oauth, const std::optional<std::string>& http_url)
+{
+  HttpClient client;
+  client.http_client_ =
+    lb_http_client_from_oauth(oauth, http_url ? http_url->c_str() : nullptr);
+  return client;
+}
+
+void
+HttpClient::request(
+  const std::string& method,
+  const std::string& path,
+  const std::optional<std::map<std::string, std::string>>& headers,
+  const std::optional<std::string>& body,
+  AsyncCallback<NoContext, HttpResult> callback)
+{
+  std::vector<lb_http_header_t> c_headers;
+  if (headers) {
+    for (auto it = headers->begin(); it != headers->end(); it++) {
+      c_headers.push_back(
+        lb_http_header_t{ it->first.c_str(), it->second.c_str() });
+    }
+  }
+  c_headers.push_back(lb_http_header_t{ nullptr, nullptr });
+
+  lb_http_client_request(
+    http_client_,
+    method.c_str(),
+    path.c_str(),
+    c_headers.data(),
+    body ? body->c_str() : nullptr,
+    [](auto res) {
+      auto callback_ptr =
+        callback::get_async_callback<NoContext, HttpResult>(res->userdata);
+      Status status(res->error);
+
+      if (status) {
+        const lb_http_result_t* result = (const lb_http_result_t*)res->data;
+        HttpResult http_res(lb_http_result_response_body(result));
+        (*callback_ptr)(AsyncResult<NoContext, HttpResult>(
+          NoContext{}, std::move(status), &http_res));
+      } else {
+        (*callback_ptr)(
+          AsyncResult<NoContext, HttpResult>(NoContext{}, std::move(status), nullptr));
+      }
+    },
+    new AsyncCallback<NoContext, HttpResult>(callback));
+}
+
+} // namespace longport

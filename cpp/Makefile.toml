@@ -1,0 +1,29 @@
+[tasks.cpp]
+command = "make"
+args = ["longport_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-release]
+command = "make"
+args = ["longport_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp.windows]
+command = "cmake"
+args = ["--build", ".", "--config", "Debug", "--target", "longport_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-release.windows]
+command = "cmake"
+args = ["--build", ".", "--config", "Release", "--target", "longport_cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-test]
+command = "make"
+args = ["test-cpp"]
+cwd = "cmake.build"
+
+[tasks.cpp-test.windows]
+command = "cmake"
+args = ["--build", ".", "--config", "Debug", "--target", "test-cpp"]
+cwd = "cmake.build"

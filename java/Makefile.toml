@@ -1,0 +1,183 @@
+[env]
+CLASSPATH_SEP = { source = "${CARGO_MAKE_RUST_TARGET_OS}", mapping = { "windows" = ";" }, default_value = ":" }
+
+[tasks.java]
+command = "cargo"
+args = ["build", "-p", "longport-java"]
+
+[tasks.compile-java-all]
+script = [
+  "find javasrc/src/main/java -name '*.java' > /tmp/java_all_sources.txt",
+  "javac -cp 'libs/native-lib-loader-2.4.0.jar:libs/slf4j-api-1.7.30.jar:libs/slf4j-nop-1.7.30.jar:libs/gson-2.10.1.jar' -sourcepath javasrc/src/main/java -d classes @/tmp/java_all_sources.txt test/Main.java",
+]
+cwd = "java"
+
+[tasks.javah]
+args = [
+  "--release",
+  "8",
+  "-h",
+  "c",
+  "-cp",
+  "libs/native-lib-loader-2.4.0.jar${CLASSPATH_SEP}libs/slf4j-api-1.7.30.jar${CLASSPATH_SEP}libs/slf4j-nop-1.7.30.jar${CLASSPATH_SEP}libs/gson-2.10.1.jar",
+  "-sourcepath",
+  "javasrc/src/main/java",
+  "-d",
+  "classes",
+  "javasrc/src/main/java/com/longport/SdkNative.java",
+]
+command = "javac"
+cwd = "java"
+
+[tasks.compile-java-test]
+args = [
+  "-cp",
+  "libs/native-lib-loader-2.4.0.jar${CLASSPATH_SEP}libs/slf4j-api-1.7.30.jar${CLASSPATH_SEP}libs/slf4j-nop-1.7.30.jar${CLASSPATH_SEP}libs/gson-2.10.1.jar",
+  "-sourcepath",
+  "javasrc/src/main/java",
+  "-d",
+  "classes",
+
+  "javasrc/src/main/java/com/longport/ErrorKind.java",
+  "javasrc/src/main/java/com/longport/AsyncCallback.java",
+  "javasrc/src/main/java/com/longport/Config.java",
+  "javasrc/src/main/java/com/longport/Language.java",
+  "javasrc/src/main/java/com/longport/Market.java",
+  "javasrc/src/main/java/com/longport/OAuth.java",
+  "javasrc/src/main/java/com/longport/OAuthBuilder.java",
+  "javasrc/src/main/java/com/longport/OpenApiException.java",
+  "javasrc/src/main/java/com/longport/PushCandlestickMode.java",
+  "javasrc/src/main/java/com/longport/SdkNative.java",
+
+  "javasrc/src/main/java/com/longport/HttpClient.java",
+
+  "javasrc/src/main/java/com/longport/quote/AdjustType.java",
+  "javasrc/src/main/java/com/longport/quote/Brokers.java",
+  "javasrc/src/main/java/com/longport/quote/BrokersHandler.java",
+  "javasrc/src/main/java/com/longport/quote/Candlestick.java",
+  "javasrc/src/main/java/com/longport/quote/CandlestickHandler.java",
+  "javasrc/src/main/java/com/longport/quote/CapitalDistribution.java",
+  "javasrc/src/main/java/com/longport/quote/CapitalDistributionResponse.java",
+  "javasrc/src/main/java/com/longport/quote/CapitalFlowLine.java",
+  "javasrc/src/main/java/com/longport/quote/Depth.java",
+  "javasrc/src/main/java/com/longport/quote/DepthHandler.java",
+  "javasrc/src/main/java/com/longport/quote/DerivativeType.java",
+  "javasrc/src/main/java/com/longport/quote/IntradayLine.java",
+  "javasrc/src/main/java/com/longport/quote/IssuerInfo.java",
+  "javasrc/src/main/java/com/longport/quote/MarketTradingDays.java",
+  "javasrc/src/main/java/com/longport/quote/MarketTradingSession.java",
+  "javasrc/src/main/java/com/longport/quote/OptionDirection.java",
+  "javasrc/src/main/java/com/longport/quote/OptionQuote.java",
+  "javasrc/src/main/java/com/longport/quote/OptionType.java",
+  "javasrc/src/main/java/com/longport/quote/ParticipantInfo.java",
+  "javasrc/src/main/java/com/longport/quote/Period.java",
+  "javasrc/src/main/java/com/longport/quote/PrePostQuote.java",
+  "javasrc/src/main/java/com/longport/quote/PushBrokers.java",
+  "javasrc/src/main/java/com/longport/quote/PushCandlestick.java",
+  "javasrc/src/main/java/com/longport/quote/PushDepth.java",
+  "javasrc/src/main/java/com/longport/quote/PushQuote.java",
+  "javasrc/src/main/java/com/longport/quote/PushTrades.java",
+  "javasrc/src/main/java/com/longport/quote/QuoteContext.java",
+  "javasrc/src/main/java/com/longport/quote/QuoteHandler.java",
+  "javasrc/src/main/java/com/longport/quote/RealtimeQuote.java",
+  "javasrc/src/main/java/com/longport/quote/SecurityBoard.java",
+  "javasrc/src/main/java/com/longport/quote/SecurityBrokers.java",
+  "javasrc/src/main/java/com/longport/quote/SecurityDepth.java",
+  "javasrc/src/main/java/com/longport/quote/SecurityQuote.java",
+  "javasrc/src/main/java/com/longport/quote/SecurityStaticInfo.java",
+  "javasrc/src/main/java/com/longport/quote/StrikePriceInfo.java",
+  "javasrc/src/main/java/com/longport/quote/SubFlags.java",
+  "javasrc/src/main/java/com/longport/quote/Subscription.java",
+  "javasrc/src/main/java/com/longport/quote/Trade.java",
+  "javasrc/src/main/java/com/longport/quote/TradeDirection.java",
+  "javasrc/src/main/java/com/longport/quote/TradeSession.java",
+  "javasrc/src/main/java/com/longport/quote/TradeStatus.java",
+  "javasrc/src/main/java/com/longport/quote/TradesHandler.java",
+  "javasrc/src/main/java/com/longport/quote/TradingSessionInfo.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantQuote.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantType.java",
+  "javasrc/src/main/java/com/longport/quote/WatchlistGroup.java",
+  "javasrc/src/main/java/com/longport/quote/CalcIndex.java",
+  "javasrc/src/main/java/com/longport/quote/SecurityCalcIndex.java",
+  "javasrc/src/main/java/com/longport/quote/WatchlistSecurity.java",
+  "javasrc/src/main/java/com/longport/quote/CreateWatchlistGroup.java",
+  "javasrc/src/main/java/com/longport/quote/CreateWatchlistGroupResponse.java",
+  "javasrc/src/main/java/com/longport/quote/DeleteWatchlistGroup.java",
+  "javasrc/src/main/java/com/longport/quote/UpdateWatchlistGroup.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantStatus.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantSortBy.java",
+  "javasrc/src/main/java/com/longport/quote/SortOrderType.java",
+  "javasrc/src/main/java/com/longport/quote/FilterWarrantInOutBoundsType.java",
+  "javasrc/src/main/java/com/longport/quote/FilterWarrantExpiryDate.java",
+  "javasrc/src/main/java/com/longport/quote/WarrantInfo.java",
+  "javasrc/src/main/java/com/longport/quote/QueryWarrantOptions.java",
+  "javasrc/src/main/java/com/longport/quote/SecurityListCategory.java",
+  "javasrc/src/main/java/com/longport/quote/Security.java",
+  "javasrc/src/main/java/com/longport/quote/QuotePackageDetail.java",
+  "javasrc/src/main/java/com/longport/quote/Granularity.java",
+  "javasrc/src/main/java/com/longport/quote/MarketTemperature.java",
+  "javasrc/src/main/java/com/longport/quote/HistoryMarketTemperatureResponse.java",
+
+  "javasrc/src/main/java/com/longport/content/ContentContext.java",
+  "javasrc/src/main/java/com/longport/content/NewsItem.java",
+  "javasrc/src/main/java/com/longport/content/TopicItem.java",
+
+  "javasrc/src/main/java/com/longport/trade/AccountBalance.java",
+  "javasrc/src/main/java/com/longport/trade/BalanceType.java",
+  "javasrc/src/main/java/com/longport/trade/CashFlow.java",
+  "javasrc/src/main/java/com/longport/trade/CashFlowDirection.java",
+  "javasrc/src/main/java/com/longport/trade/CashInfo.java",
+  "javasrc/src/main/java/com/longport/trade/Execution.java",
+  "javasrc/src/main/java/com/longport/trade/FundPosition.java",
+  "javasrc/src/main/java/com/longport/trade/FundPositionChannel.java",
+  "javasrc/src/main/java/com/longport/trade/FundPositionsResponse.java",
+  "javasrc/src/main/java/com/longport/trade/GetCashFlowOptions.java",
+  "javasrc/src/main/java/com/longport/trade/GetFundPositionsOptions.java",
+  "javasrc/src/main/java/com/longport/trade/GetHistoryExecutionsOptions.java",
+  "javasrc/src/main/java/com/longport/trade/GetHistoryOrdersOptions.java",
+  "javasrc/src/main/java/com/longport/trade/GetStockPositionsOptions.java",
+  "javasrc/src/main/java/com/longport/trade/GetTodayExecutionsOptions.java",
+  "javasrc/src/main/java/com/longport/trade/GetTodayOrdersOptions.java",
+  "javasrc/src/main/java/com/longport/trade/MarginRatio.java",
+  "javasrc/src/main/java/com/longport/trade/Order.java",
+  "javasrc/src/main/java/com/longport/trade/OrderChangedHandler.java",
+  "javasrc/src/main/java/com/longport/trade/OrderSide.java",
+  "javasrc/src/main/java/com/longport/trade/OrderStatus.java",
+  "javasrc/src/main/java/com/longport/trade/OrderTag.java",
+  "javasrc/src/main/java/com/longport/trade/OrderType.java",
+  "javasrc/src/main/java/com/longport/trade/OutsideRTH.java",
+  "javasrc/src/main/java/com/longport/trade/PushOrderChanged.java",
+  "javasrc/src/main/java/com/longport/trade/ReplaceOrderOptions.java",
+  "javasrc/src/main/java/com/longport/trade/StockPosition.java",
+  "javasrc/src/main/java/com/longport/trade/StockPositionChannel.java",
+  "javasrc/src/main/java/com/longport/trade/StockPositionsResponse.java",
+  "javasrc/src/main/java/com/longport/trade/SubmitOrderOptions.java",
+  "javasrc/src/main/java/com/longport/trade/SubmitOrderResponse.java",
+  "javasrc/src/main/java/com/longport/trade/TimeInForceType.java",
+  "javasrc/src/main/java/com/longport/trade/TopicType.java",
+  "javasrc/src/main/java/com/longport/trade/TradeContext.java",
+  "javasrc/src/main/java/com/longport/trade/TriggerStatus.java",
+  "javasrc/src/main/java/com/longport/trade/CommissionFreeStatus.java",
+  "javasrc/src/main/java/com/longport/trade/DeductionStatus.java",
+  "javasrc/src/main/java/com/longport/trade/ChargeCategoryCode.java",
+  "javasrc/src/main/java/com/longport/trade/OrderHistoryDetail.java",
+  "javasrc/src/main/java/com/longport/trade/OrderChargeFee.java",
+  "javasrc/src/main/java/com/longport/trade/OrderChargeItem.java",
+  "javasrc/src/main/java/com/longport/trade/OrderChargeDetail.java",
+  "javasrc/src/main/java/com/longport/trade/OrderDetail.java",
+
+  "test/Main.java",
+]
+command = "javac"
+cwd = "java"
+
+[tasks.test-java]
+command = "java"
+args = [
+  "--enable-native-access=ALL-UNNAMED",
+  "-Djava.library.path=target/debug",
+  "-cp",
+  "java/classes${CLASSPATH_SEP}java/libs/native-lib-loader-2.4.0.jar${CLASSPATH_SEP}java/libs/slf4j-api-1.7.30.jar${CLASSPATH_SEP}java/libs/slf4j-nop-1.7.30.jar${CLASSPATH_SEP}java/libs/gson-2.10.1.jar",
+  "Main",
+]
+dependencies = ["java", "compile-java-test"]

@@ -1,0 +1,60 @@
+[package]
+edition.workspace = true
+name = "longport"
+version.workspace = true
+description = "Longport OpenAPI SDK for Rust"
+homepage = "https://open.longportapp.com/en/"
+readme = "README.md"
+repository = "https://github.com/longportapp/openapi"
+license = "MIT OR Apache-2.0"
+keywords = ["longport", "openapi", "sdk"]
+categories = ["api-bindings"]
+
+[features]
+blocking = ["flume", "longport-oauth/blocking"]
+
+[dependencies]
+longport-wscli.workspace = true
+longport-httpcli.workspace = true
+longport-proto.workspace = true
+longport-candlesticks.workspace = true
+longport-oauth.workspace = true
+
+tokio = { workspace = true, features = ["time", "rt", "rt-multi-thread", "macros", "sync", "net"] }
+tokio-tungstenite.workspace = true
+rust_decimal = { workspace = true, features = ["serde-with-str", "maths"] }
+num_enum.workspace = true
+prost.workspace = true
+tracing.workspace = true
+bitflags = { workspace = true, features = ["serde"] }
+futures-util.workspace = true
+time = { workspace = true, features = [
+  "parsing",
+  "macros",
+  "formatting",
+  "serde",
+  "serde-human-readable",
+] }
+flume = { workspace = true, optional = true }
+thiserror.workspace = true
+strum.workspace = true
+strum_macros.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+serde_repr.workspace = true
+dotenv.workspace = true
+http.workspace = true
+comfy-table.workspace = true
+itertools.workspace = true
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
+time-tz.workspace = true
+anyhow = "1.0"
+url.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread"] }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

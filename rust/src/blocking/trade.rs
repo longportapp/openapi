@@ -1,0 +1,459 @@
+use std::sync::Arc;
+
+use crate::{
+    Config, Result,
+    blocking::runtime::BlockingRuntime,
+    trade::{
+        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
+        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
+        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+    },
+};
+
+/// Trade context
+pub struct TradeContextSync {
+    rt: BlockingRuntime<TradeContext>,
+}
+
+impl TradeContextSync {
+    /// Create a `TradeContextSync` object
+    pub fn new<F>(config: Arc<Config>, push_callback: F) -> Self
+    where
+        F: FnMut(PushEvent) + Send + 'static,
+    {
+        let rt = BlockingRuntime::try_new(move || Ok(TradeContext::new(config)), push_callback)
+            .expect("create trade context");
+        Self { rt }
+    }
+
+    /// Subscribe topics
+    pub fn subscribe<I>(&self, topics: I) -> Result<()>
+    where
+        I: IntoIterator<Item = TopicType> + Send + 'static,
+    {
+        self.rt
+            .call(move |ctx| async move { ctx.subscribe(topics).await })
+    }
+
+    /// Unsubscribe topics
+    pub fn unsubscribe<I>(&self, topics: I) -> Result<()>
+    where
+        I: IntoIterator<Item = TopicType> + Send + 'static,
+    {
+        self.rt
+            .call(move |ctx| async move { ctx.unsubscribe(topics).await })
+    }
+
+    /// Get history executions
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{oauth::OAuthBuilder, blocking::TradeContextSync, trade::GetHistoryExecutionsOptions, Config};
+    /// use time::macros::datetime;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let opts = GetHistoryExecutionsOptions::new().symbol("700.HK")
+    ///     .start_at(datetime!(2022-05-09 0:00 UTC))
+    ///     .end_at(datetime!(2022-05-12 0:00 UTC));
+    /// let resp = ctx.history_executions(opts)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn history_executions(
+        &self,
+        options: impl Into<Option<GetHistoryExecutionsOptions>> + Send + 'static,
+    ) -> Result<Vec<Execution>> {
+        self.rt
+            .call(move |ctx| async move { ctx.history_executions(options).await })
+    }
+
+    /// Get today executions
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{
+    ///     Config, blocking::TradeContextSync, oauth::OAuthBuilder, trade::GetTodayExecutionsOptions,
+    /// };
+    /// use time::macros::datetime;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let opts = GetTodayExecutionsOptions::new().symbol("700.HK");
+    /// let resp = ctx.today_executions(opts)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn today_executions(
+        &self,
+        options: impl Into<Option<GetTodayExecutionsOptions>> + Send + 'static,
+    ) -> Result<Vec<Execution>> {
+        self.rt
+            .call(move |ctx| async move { ctx.today_executions(options).await })
+    }
+
+    /// Get history orders
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{
+    ///     oauth::OAuthBuilder,
+    ///     blocking::TradeContextSync,
+    ///     trade::{GetHistoryOrdersOptions, OrderSide, OrderStatus},
+    ///     Config, Market,
+    /// };
+    /// use time::macros::datetime;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let opts = GetHistoryOrdersOptions::new()
+    ///     .symbol("700.HK")
+    ///     .status([OrderStatus::Filled, OrderStatus::New])
+    ///     .side(OrderSide::Buy)
+    ///     .market(Market::HK)
+    ///     .start_at(datetime!(2022-05-09 0:00 UTC))
+    ///     .end_at(datetime!(2022-05-12 0:00 UTC));
+    /// let resp = ctx.history_orders(opts)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn history_orders(
+        &self,
+        options: impl Into<Option<GetHistoryOrdersOptions>> + Send + 'static,
+    ) -> Result<Vec<Order>> {
+        self.rt
+            .call(move |ctx| async move { ctx.history_orders(options).await })
+    }
+
+    /// Get today orders
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{
+    ///     Config, Market,
+    ///     blocking::TradeContextSync,
+    ///     oauth::OAuthBuilder,
+    ///     trade::{GetTodayOrdersOptions, OrderSide, OrderStatus},
+    /// };
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let opts = GetTodayOrdersOptions::new()
+    ///     .symbol("700.HK")
+    ///     .status([OrderStatus::Filled, OrderStatus::New])
+    ///     .side(OrderSide::Buy)
+    ///     .market(Market::HK);
+    /// let resp = ctx.today_orders(opts)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn today_orders(
+        &self,
+        options: impl Into<Option<GetTodayOrdersOptions>> + Send + 'static,
+    ) -> Result<Vec<Order>> {
+        self.rt
+            .call(move |ctx| async move { ctx.today_orders(options).await })
+    }
+
+    /// Replace order
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{
+    ///     Config, blocking::TradeContextSync, decimal, oauth::OAuthBuilder,
+    ///     trade::ReplaceOrderOptions,
+    /// };
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let opts =
+    ///     ReplaceOrderOptions::new("709043056541253632", decimal!(100)).price(decimal!(300i32));
+    /// let resp = ctx.replace_order(opts)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn replace_order(&self, options: ReplaceOrderOptions) -> Result<()> {
+        self.rt
+            .call(move |ctx| async move { ctx.replace_order(options).await })
+    }
+
+    /// Submit order
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{
+    ///     Config,
+    ///     blocking::TradeContextSync,
+    ///     decimal,
+    ///     oauth::OAuthBuilder,
+    ///     trade::{OrderSide, OrderType, SubmitOrderOptions, TimeInForceType},
+    /// };
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let opts = SubmitOrderOptions::new(
+    ///     "700.HK",
+    ///     OrderType::LO,
+    ///     OrderSide::Buy,
+    ///     decimal!(200),
+    ///     TimeInForceType::Day,
+    /// )
+    /// .submitted_price(decimal!(50i32));
+    /// let resp = ctx.submit_order(opts)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn submit_order(&self, options: SubmitOrderOptions) -> Result<SubmitOrderResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.submit_order(options).await })
+    }
+
+    /// Cancel order
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// ctx.cancel_order("709043056541253632")?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn cancel_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
+        self.rt
+            .call(move |ctx| async move { ctx.cancel_order(order_id).await })
+    }
+
+    /// Get account balance
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let resp = ctx.account_balance(None)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn account_balance(&self, currency: Option<&str>) -> Result<Vec<AccountBalance>> {
+        let currency = currency.map(ToString::to_string);
+        self.rt
+            .call(move |ctx| async move { ctx.account_balance(currency.as_deref()).await })
+    }
+
+    /// Get cash flow
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{oauth::OAuthBuilder, blocking::TradeContextSync, trade::GetCashFlowOptions, Config};
+    /// use time::macros::datetime;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let opts = GetCashFlowOptions::new(datetime!(2022-05-09 0:00 UTC), datetime!(2022-05-12 0:00 UTC));
+    /// let resp = ctx.cash_flow(opts)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn cash_flow(&self, options: GetCashFlowOptions) -> Result<Vec<CashFlow>> {
+        self.rt
+            .call(move |ctx| async move { ctx.cash_flow(options).await })
+    }
+
+    /// Get fund positions
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let resp = ctx.fund_positions(None)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn fund_positions(
+        &self,
+        opts: impl Into<Option<GetFundPositionsOptions>> + Send + 'static,
+    ) -> Result<FundPositionsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.fund_positions(opts).await })
+    }
+
+    /// Get stock positions
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let resp = ctx.stock_positions(None)?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn stock_positions(
+        &self,
+        opts: impl Into<Option<GetStockPositionsOptions>> + Send + 'static,
+    ) -> Result<StockPositionsResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.stock_positions(opts).await })
+    }
+
+    /// Get margin ratio
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let resp = ctx.margin_ratio("700.HK")?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn margin_ratio(&self, symbol: impl Into<String> + Send + 'static) -> Result<MarginRatio> {
+        self.rt
+            .call(move |ctx| async move { ctx.margin_ratio(symbol).await })
+    }
+
+    /// Get order detail
+    ///
+    /// Reference: <https://open.longport.com/en/docs/trade/order/order_detail>
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, blocking::TradeContextSync, oauth::OAuthBuilder};
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let oauth =
+    ///     OAuthBuilder::new("your-client-id").build_blocking(|url| println!("Visit: {url}"))?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let ctx = TradeContextSync::new(config, |_| ());
+    ///
+    /// let resp = ctx.order_detail("701276261045858304")?;
+    /// println!("{:?}", resp);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn order_detail(
+        &self,
+        order_id: impl Into<String> + Send + 'static,
+    ) -> Result<OrderDetail> {
+        self.rt
+            .call(move |ctx| async move { ctx.order_detail(order_id).await })
+    }
+
+    /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
+    /// warrants, and options
+    pub fn estimate_max_purchase_quantity(
+        &self,
+        opts: EstimateMaxPurchaseQuantityOptions,
+    ) -> Result<EstimateMaxPurchaseQuantityResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
+    }
+}

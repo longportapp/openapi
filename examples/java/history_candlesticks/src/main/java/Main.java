@@ -1,0 +1,39 @@
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Arrays;
+
+import com.longport.*;
+import com.longport.quote.*;
+
+class Main {
+    public static void main(String[] args) throws Exception {
+        String clientId = "your-client-id";
+        OAuth oauth = new OAuthBuilder(clientId)
+                .build(url -> System.out.println("Open to authorize: " + url))
+                .get();
+        try (oauth;
+             Config config = Config.fromOAuth(oauth);
+             QuoteContext ctx = QuoteContext.create(config)) {
+            System.out.println("get candlesticks by offset");
+            System.out.println("====================");
+
+            Candlestick[] candlesticks = ctx
+                            .getHistoryCandlesticksByOffset("700.HK", Period.Day, AdjustType.NoAdjust,
+                                            false,
+                                            LocalDateTime.of(2023, 8, 18, 0, 0, 0, 0), 10,
+                                            TradeSessions.Intraday)
+                            .get();
+            System.out.println(Arrays.toString(candlesticks));
+
+            System.out.println("get candlesticks by date");
+            System.out.println("====================");
+
+            Candlestick[] candlesticks2 = ctx
+                            .getHistoryCandlesticksByDate("700.HK", Period.Day, AdjustType.NoAdjust,
+                                            LocalDate.of(2022, 5, 5), LocalDate.of(2022, 6, 23),
+                                            TradeSessions.Intraday)
+                            .get();
+            System.out.println(Arrays.toString(candlesticks2));
+        }
+    }
+}

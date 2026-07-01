@@ -1,0 +1,29 @@
+[tasks.c]
+command = "make"
+args = ["cargo-build_longport_c"]
+cwd = "cmake.build"
+
+[tasks.c-release]
+command = "make"
+args = ["cargo-build_longport_c"]
+cwd = "cmake.build"
+
+[tasks.c.windows]
+command = "cmake"
+args = ["--build", ".", "--config", "Debug", "--target", "cargo-build_longport_c"]
+cwd = "cmake.build"
+
+[tasks.c-release.windows]
+command = "cmake"
+args = ["--build", ".", "--config", "Release", "--target", "cargo-build_longport_c"]
+cwd = "cmake.build"
+
+[tasks.c-test]
+command = "make"
+args = ["test-c"]
+cwd = "cmake.build"
+
+[tasks.c-test.windows]
+command = "cmake"
+args = ["--build", ".", "--config", "Debug", "--target", "test-c"]
+cwd = "cmake.build"

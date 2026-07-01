@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package longbridge.control.v1;
+
+// control command, see document: https://open.longbridge.com/docs/socket/control-command
+enum Command {
+  CMD_CLOSE = 0;
+  CMD_HEARTBEAT = 1;
+  CMD_AUTH = 2;
+  CMD_RECONNECT = 3;
+}
+
+message Close {
+  enum Code {
+    HeartbeatTimeout = 0; // 心跳超时
+    ServerError = 1; // 服务端错误
+    ServerShutdown = 2; // 服务端关闭
+    UnpackError = 3; // 数据截取错误
+    AuthError = 4; // 鉴权失败
+    SessExpired = 5; // session 过期
+    ConnectDuplicate = 6; // 单个 session 重复连接
+  }
+  Code code = 1;
+  string reason = 2;
+}
+
+message Heartbeat {
+  int64 timestamp = 1;
+  optional int32 heartbeat_id = 2;
+}
+
+message AuthRequest {
+  string token = 1;
+  map<string, string> metadata = 2;
+}
+
+message AuthResponse {
+  string session_id = 1;
+  int64 expires = 2;
+  uint32 limit = 3;
+  uint32 online = 4;
+}
+
+message ReconnectRequest {
+  string session_id = 1;
+  map<string, string> metadata = 2;
+}
+
+message ReconnectResponse {
+  string session_id = 1;
+  int64 expires = 2;
+  uint32 limit = 3;
+  uint32 online = 4;
+}

@@ -1,0 +1,12 @@
+const { HttpClient, OAuth } = require('longport');
+
+async function main() {
+  const oauth = await OAuth.build("your-client-id", (_, url) => {
+    console.log("Open this URL to authorize: " + url);
+  });
+  let cli = HttpClient.fromOAuth(oauth);
+  let resp = await cli.request("get", "/v1/trade/execution/today");
+  console.log(resp);
+}
+
+Promise.all([main()]).catch((err) => console.error(err));

@@ -1,0 +1,432 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  check-format:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      # Use nightly Rust to check the format
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+      - name: Check format
+        run: cargo fmt --all -- --check
+
+  check-rust-sdk:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Check with clippy
+        run: cargo clippy -p longport --all-features
+
+      - name: Test
+        run: cargo test -p longport --all-features
+
+  check-python-sdk:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Check with clippy
+        run: cargo clippy -p longport-python --all-features
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          manylinux: auto
+          args: -i python${{ matrix.python-version }} --out dist -m python/Cargo.toml
+      - name: Install built wheel
+        run: |
+          pip install longport --no-index --find-links dist --force-reinstall
+          python -c "import longport"
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}-${{ matrix.python-version }}
+          path: dist
+
+  check-python-sdk-musl:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Setup QEMU
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build wheels (musl)
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          manylinux: musllinux_1_2
+          args: -i python${{ matrix.python-version }} --out dist -m python/Cargo.toml
+
+      - name: Install built wheel
+        run: |
+          docker run --rm \
+            --platform ${{ matrix.target == 'aarch64-unknown-linux-musl' && 'linux/arm64' || 'linux/amd64' }} \
+            -v $(pwd)/dist:/dist \
+            python:${{ matrix.python-version }}-alpine \
+            sh -c "pip install --upgrade pip && pip install longport --no-index --find-links /dist --force-reinstall && python -c 'import longport'"
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-musl-${{ matrix.target }}-${{ matrix.python-version }}
+          path: dist
+
+  check-nodejs-sdk:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - host: ubuntu-24.04
+          - host: ubuntu-24.04-arm
+          - host: macos-15
+          - host: macos-15-intel
+          - host: windows-latest
+
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        if: ${{ !matrix.settings.docker }}
+        with:
+          node-version: 24
+          check-latest: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        if: ${{ !matrix.settings.docker }}
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: ${{ matrix.settings.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Check with clippy
+        run: cargo clippy -p longport-nodejs --all-features
+
+      - name: Get yarn cache directory
+        id: yarn-cache-dir
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+        shell: bash
+        working-directory: nodejs
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('nodejs/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        working-directory: nodejs
+        run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
+
+      - name: Build
+        if: ${{ matrix.settings.host != 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug
+
+      - name: Build
+        if: ${{ matrix.settings.host == 'macos-15' }}
+        working-directory: nodejs
+        run: yarn build:debug --target aarch64-apple-darwin
+
+      - name: Move artifacts
+        run: |
+          mkdir -p artifacts
+          mv longport.*.node artifacts/
+          yarn artifacts
+        working-directory: ./nodejs
+
+      - name: List packages
+        run: ls -R ./npm
+        shell: bash
+        working-directory: ./nodejs
+
+  check-java-sdk:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+        java-version: ["11"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: "temurin"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Check with clippy
+        run: cargo clippy -p longport-java --all-features
+
+      - name: Compile java sources
+        working-directory: java/javasrc
+        run: mvn package
+
+  check-cpp-sdk:
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          [
+            ubuntu-24.04,
+            ubuntu-24.04-arm,
+            windows-latest,
+            macos-15,
+            macos-15-intel,
+          ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install MSBuild
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Install cargo make
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-make
+
+      - name: Check with clippy
+        run: cargo clippy -p longport-c --all-features
+
+      - name: Build with cmake
+        if: ${{ matrix.os != 'macos-15' }}
+        run: |
+          cargo make cmake
+          cargo make c
+          cargo make cpp
+
+      - name: Build with cmake
+        if: ${{ matrix.os == 'macos-15' }}
+        run: |
+          cargo make cmake-debug-macos-aarch64
+          cargo make c
+          cargo make cpp
+
+  check-ios-cpp-sdk:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - target: aarch64-apple-ios
+            platform: OS64
+          - target: aarch64-apple-ios-sim
+            platform: SIMULATOR64
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Install target
+        run: |
+          rustup target install ${{ matrix.settings.target }}
+
+      - name: Build C
+        working-directory: c
+        run: |
+          cargo rustc --crate-type=staticlib --target --target ${{ matrix.settings.target }}
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Build CPP
+        working-directory: cpp
+        run: |
+          mkdir cmake.build
+          cd cmake.build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../static/toolchains/ios.cmake -DPLATFORM=${{ matrix.settings.platform }} -DDENABLE_BITCODE=true ../static && make
+
+  check-android-cpp-sdk:
+    needs:
+      - check-format
+    strategy:
+      fail-fast: true
+      matrix:
+        settings:
+          - target: armv7-linux-androideabi
+            cc: armv7a-linux-androideabi28-clang
+            cxx: armv7a-linux-androideabi28-clang++
+            ar: llvm-ar
+          - target: aarch64-linux-android
+            cc: aarch64-linux-android28-clang
+            cxx: aarch64-linux-android28-clang++
+            ar: llvm-ar
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-bin: false
+
+      - name: Install target
+        run: |
+          rustup target install ${{ matrix.settings.target }}
+
+      - name: Setup NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
+          add-to-path: true
+
+      - name: Build C
+        working-directory: c
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          CC: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cc }}
+          AR: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.ar }}
+        run: |
+          cargo rustc --crate-type=staticlib --target ${{ matrix.settings.target }}
+
+      - name: Get CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Build CPP
+        working-directory: cpp
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          CC: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cc }}
+          CXX: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.cxx }}
+          AR: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/${{ matrix.settings.ar }}
+        run: |
+          mkdir cmake.build
+          cd cmake.build && cmake -DCMAKE_BUILD_TYPE=Debug ../static && make

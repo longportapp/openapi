@@ -1,0 +1,21 @@
+[package]
+name = "longport-wscli"
+version.workspace = true
+edition.workspace = true
+description = "Longport Websocket SDK for Rust"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+longport-proto.workspace = true
+
+tokio = { workspace = true, features = ["time", "rt", "macros", "sync", "net"] }
+tokio-tungstenite = { workspace = true, features = ["rustls-tls-webpki-roots"] }
+thiserror.workspace = true
+futures-util.workspace = true
+prost.workspace = true
+byteorder.workspace = true
+num_enum.workspace = true
+url.workspace = true
+flate2.workspace = true
+leaky-bucket.workspace = true
+tracing = { workspace = true, features = ["attributes"] }

@@ -1,0 +1,37 @@
+{
+  "name": "longport",
+  "version": "0.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "binaryName": "longport",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin"
+    ]
+  },
+  "license": "MIT OR Apache-2.0",
+  "description": "A Node.js library for Longport Open API",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/longportapp/openapi"
+  },
+  "homepage": "https://open.longportapp.com/en/",
+  "devDependencies": {
+    "@napi-rs/cli": "^3.5.0"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "version": "napi version"
+  }
+}

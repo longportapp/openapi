@@ -1,0 +1,26 @@
+[package]
+edition.workspace = true
+name = "longport-httpcli"
+version.workspace = true
+description = "Longport HTTP SDK for Rust"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+longport-geo.workspace = true
+longport-oauth.workspace = true
+futures-util.workspace = true
+hmac.workspace = true
+parking_lot.workspace = true
+reqwest = { workspace = true, features = ["rustls-tls", "json"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["raw_value"] }
+sha1.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tracing = { workspace = true, features = ["attributes"] }
+tokio = { workspace = true, features = ["rt", "time"] }
+percent-encoding.workspace = true
+dotenv.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt", "macros"] }
