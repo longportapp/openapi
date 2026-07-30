@@ -1328,6 +1328,10 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.QuoteContext.short_trades">short_trades</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.QuoteContext.option_volume">option_volume</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.QuoteContext.option_volume_daily">option_volume_daily</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.AsyncQuoteContext">AsyncQuoteContext</a>
@@ -1431,6 +1435,10 @@
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AsyncQuoteContext.short_positions">short_positions</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AsyncQuoteContext.short_trades">short_trades</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AsyncQuoteContext.option_volume">option_volume</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.AsyncQuoteContext.option_volume_daily">option_volume_daily</a>
     </li>
         </ul>
     </li>
@@ -4664,38 +4672,44 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.OptionVolumeStats">OptionVolumeStats</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.c">c</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.symbol">symbol</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.p">p</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.call_volume">call_volume</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.put_volume">put_volume</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.call_open_interest">call_open_interest</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.put_open_interest">put_open_interest</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.pc_vol">pc_vol</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeStats.pc_oi">pc_oi</a>
     </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat">OptionVolumeDailyStat</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.symbol">symbol</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.date">date</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.timestamp">timestamp</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.call_volume">call_volume</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.total_volume">total_volume</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.put_volume">put_volume</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.total_put_volume">total_put_volume</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.call_open_interest">call_open_interest</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.total_call_volume">total_call_volume</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.put_open_interest">put_open_interest</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.put_call_volume_ratio">put_call_volume_ratio</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.pc_vol">pc_vol</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.total_open_interest">total_open_interest</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.total_put_open_interest">total_put_open_interest</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.total_call_open_interest">total_call_open_interest</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.put_call_open_interest_ratio">put_call_open_interest_ratio</a>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDailyStat.pc_oi">pc_oi</a>
     </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#longport.openapi.OptionVolumeDaily">OptionVolumeDaily</a>
         <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDaily.symbol">symbol</a>
+    </li>
     <li class="toctree-l3"><a class="reference internal" href="#longport.openapi.OptionVolumeDaily.stats">stats</a>
     </li>
         </ul>
@@ -27240,6 +27254,158 @@ otherwise US endpoint.</p>
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longport.openapi.QuoteContext.option_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">option_volume</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">option_volume(symbol: str) -&gt; OptionVolumeStats</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get real-time option call/put volume for a security.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>symbol</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Security code (e.g. <code>"AAPL.US"</code>)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="OptionVolumeStats (longport.openapi.OptionVolumeStats)" href="#longport.openapi.OptionVolumeStats">OptionVolumeStats</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>OptionVolumeStats</code> with call and put volume strings</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longport.openapi.QuoteContext.option_volume_daily" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">option_volume_daily</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">option_volume_daily(symbol: str, timestamp: int = 0, count: int = 30) -&gt; OptionVolumeDaily</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get daily historical option volume for a security.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>symbol</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Security code (e.g. <code>"AAPL.US"</code>)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>timestamp</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>, default:
+                      <code>0</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Start timestamp (unix seconds, 0 = latest)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>count</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>, default:
+                      <code>30</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of days to return (default 30)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-internal" title="OptionVolumeDaily (longport.openapi.OptionVolumeDaily)" href="#longport.openapi.OptionVolumeDaily">OptionVolumeDaily</a></code>
+              –
+              <div class="doc-md-description">
+                <p>class:<code>OptionVolumeDaily</code> containing a list of daily stats</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
 
 
   </div>
@@ -30416,6 +30582,158 @@ otherwise US endpoint.</p>
               –
               <div class="doc-md-description">
                 <p>Awaitable resolving to :class:<code>ShortTradesResponse</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longport.openapi.AsyncQuoteContext.option_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">option_volume</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">option_volume(symbol: str) -&gt; Awaitable[OptionVolumeStats]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get real-time option call/put volume for a security. Returns awaitable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>symbol</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Security code (e.g. <code>"AAPL.US"</code>)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" title="typing.Awaitable" href="https://docs.python.org/3/library/typing.html#typing.Awaitable">Awaitable</a>[<a class="autorefs autorefs-internal" title="OptionVolumeStats (longport.openapi.OptionVolumeStats)" href="#longport.openapi.OptionVolumeStats">OptionVolumeStats</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Awaitable resolving to :class:<code>OptionVolumeStats</code></p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="longport.openapi.AsyncQuoteContext.option_volume_daily" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">option_volume_daily</span>
+
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">option_volume_daily(symbol: str, timestamp: int = 0, count: int = 30) -&gt; Awaitable[OptionVolumeDaily]</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Get daily historical option volume for a security. Returns awaitable.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>symbol</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>Security code (e.g. <code>"AAPL.US"</code>)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>timestamp</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>, default:
+                      <code>0</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Start timestamp (unix seconds, 0 = latest)</p>
+              </div>
+            </li>
+            <li>
+              <b><code>count</code></b>
+                  (<code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>, default:
+                      <code>30</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>Number of days to return (default 30)</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Returns:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+                  <code><a class="autorefs autorefs-external" title="typing.Awaitable" href="https://docs.python.org/3/library/typing.html#typing.Awaitable">Awaitable</a>[<a class="autorefs autorefs-internal" title="OptionVolumeDaily (longport.openapi.OptionVolumeDaily)" href="#longport.openapi.OptionVolumeDaily">OptionVolumeDaily</a>]</code>
+              –
+              <div class="doc-md-description">
+                <p>Awaitable resolving to :class:<code>OptionVolumeDaily</code></p>
               </div>
             </li>
         </ul>
@@ -76541,8 +76859,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeStats.c" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">c</span>
+<h3 id="longport.openapi.OptionVolumeStats.symbol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">symbol</span>
 
 
   <span class="doc doc-labels">
@@ -76550,7 +76868,30 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">c: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Security symbol</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.OptionVolumeStats.call_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">call_volume</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">call_volume: int</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -76564,8 +76905,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeStats.p" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">p</span>
+<h3 id="longport.openapi.OptionVolumeStats.put_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">put_volume</span>
 
 
   <span class="doc doc-labels">
@@ -76573,11 +76914,103 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">p: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">put_volume: int</code></pre>
 
     <div class="doc doc-contents ">
 
         <p>Total put volume</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.OptionVolumeStats.call_open_interest" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">call_open_interest</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">call_open_interest: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Total call open interest</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.OptionVolumeStats.put_open_interest" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">put_open_interest</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">put_open_interest: int</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Total put open interest</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.OptionVolumeStats.pc_vol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pc_vol</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pc_vol: float</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Put/call volume ratio</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="longport.openapi.OptionVolumeStats.pc_oi" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pc_oi</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">pc_oi: float</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Put/call open interest ratio</p>
 
     </div>
 
@@ -76633,8 +77066,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeDailyStat.symbol" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">symbol</span>
+<h3 id="longport.openapi.OptionVolumeDailyStat.date" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">date</span>
 
 
   <span class="doc doc-labels">
@@ -76642,11 +77075,11 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">date: date</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Underlying security symbol</p>
+        <p>Date</p>
 
     </div>
 
@@ -76656,8 +77089,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeDailyStat.timestamp" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">timestamp</span>
+<h3 id="longport.openapi.OptionVolumeDailyStat.call_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">call_volume</span>
 
 
   <span class="doc doc-labels">
@@ -76665,11 +77098,11 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">timestamp: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">call_volume: int</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Settlement date (unix timestamp string)</p>
+        <p>Call volume</p>
 
     </div>
 
@@ -76679,8 +77112,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeDailyStat.total_volume" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">total_volume</span>
+<h3 id="longport.openapi.OptionVolumeDailyStat.put_volume" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">put_volume</span>
 
 
   <span class="doc doc-labels">
@@ -76688,11 +77121,11 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">total_volume: int</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">put_volume: int</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Total option volume (calls + puts)</p>
+        <p>Put volume</p>
 
     </div>
 
@@ -76702,8 +77135,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeDailyStat.total_put_volume" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">total_put_volume</span>
+<h3 id="longport.openapi.OptionVolumeDailyStat.call_open_interest" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">call_open_interest</span>
 
 
   <span class="doc doc-labels">
@@ -76711,11 +77144,11 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">total_put_volume: int</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">call_open_interest: int</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Total put volume</p>
+        <p>Call open interest</p>
 
     </div>
 
@@ -76725,8 +77158,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeDailyStat.total_call_volume" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">total_call_volume</span>
+<h3 id="longport.openapi.OptionVolumeDailyStat.put_open_interest" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">put_open_interest</span>
 
 
   <span class="doc doc-labels">
@@ -76734,11 +77167,11 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">total_call_volume: int</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">put_open_interest: int</code></pre>
 
     <div class="doc doc-contents ">
 
-        <p>Total call volume</p>
+        <p>Put open interest</p>
 
     </div>
 
@@ -76748,8 +77181,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeDailyStat.put_call_volume_ratio" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">put_call_volume_ratio</span>
+<h3 id="longport.openapi.OptionVolumeDailyStat.pc_vol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pc_vol</span>
 
 
   <span class="doc doc-labels">
@@ -76757,7 +77190,7 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">put_call_volume_ratio: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">pc_vol: float</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -76771,8 +77204,8 @@ for sl in lists.sharelists:
 
 
 
-<h3 id="longport.openapi.OptionVolumeDailyStat.total_open_interest" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">total_open_interest</span>
+<h3 id="longport.openapi.OptionVolumeDailyStat.pc_oi" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">pc_oi</span>
 
 
   <span class="doc doc-labels">
@@ -76780,76 +77213,7 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">total_open_interest: int</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Total open interest</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="longport.openapi.OptionVolumeDailyStat.total_put_open_interest" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">total_put_open_interest</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">total_put_open_interest: int</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Total put open interest</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="longport.openapi.OptionVolumeDailyStat.total_call_open_interest" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">total_call_open_interest</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">total_call_open_interest: int</code></pre>
-
-    <div class="doc doc-contents ">
-
-        <p>Total call open interest</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="longport.openapi.OptionVolumeDailyStat.put_call_open_interest_ratio" class="doc doc-heading">
-            <span class="doc doc-object-name doc-attribute-name">put_call_open_interest_ratio</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<pre class="highlight"><code class="language-python doc-signature">put_call_open_interest_ratio: str</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">pc_oi: float</code></pre>
 
     <div class="doc doc-contents ">
 
@@ -76909,6 +77273,29 @@ for sl in lists.sharelists:
 
 
 
+<h3 id="longport.openapi.OptionVolumeDaily.symbol" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">symbol</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<pre class="highlight"><code class="language-python doc-signature">symbol: str</code></pre>
+
+    <div class="doc doc-contents ">
+
+        <p>Security symbol</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="longport.openapi.OptionVolumeDaily.stats" class="doc doc-heading">
             <span class="doc doc-object-name doc-attribute-name">stats</span>
 
@@ -76918,7 +77305,7 @@ for sl in lists.sharelists:
   </span>
 
 </h3>
-<pre class="highlight"><code class="language-python doc-signature">stats: list[OptionVolumeDailyStat]</code></pre>
+<pre class="highlight"><code class="language-python doc-signature">stats: List[OptionVolumeDailyStat]</code></pre>
 
     <div class="doc doc-contents ">
 
