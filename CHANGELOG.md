@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.3.4] - 2026-07-30
+
 ### Changed
 
 - **All languages:** Redesigned `OptionVolumeStats`, `OptionVolumeDaily`, and `OptionVolumeDailyStat` to match the actual API response. `OptionVolumeStats` now carries `symbol`, `call_volume`, `put_volume`, `call_open_interest`, `put_open_interest`, `pc_vol`, `pc_oi` (removed incorrect `c`/`p` fields). `OptionVolumeDailyStat.date` is now a proper date type (not a string). `OptionVolumeDaily` gains a `symbol` field.
