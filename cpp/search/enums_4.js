@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['elementtype_2747',['ElementType',['../namespacelongport_1_1fundamental.html#a9d5602505de8f2063eb7d2c708b28f38',1,'longport::fundamental']]],
-  ['errorkind_2748',['ErrorKind',['../namespacelongport.html#af5bcd3a8c3c5f5e8487253e271398b48',1,'longport']]]
+  ['elementtype_2751',['ElementType',['../namespacelongport_1_1fundamental.html#a9d5602505de8f2063eb7d2c708b28f38',1,'longport::fundamental']]],
+  ['errorkind_2752',['ErrorKind',['../namespacelongport.html#af5bcd3a8c3c5f5e8487253e271398b48',1,'longport']]]
 ];

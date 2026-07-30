@@ -1,11 +1,11 @@
 var searchData=
 [
-  ['institutionrecommendbuy_3377',['InstitutionRecommendBuy',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a0958f034c7efc3e9e7f0916b603a4333',1,'longport.h']]],
-  ['institutionrecommendhold_3378',['InstitutionRecommendHold',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58ad49c1598278ea960824401976ae293b5',1,'longport.h']]],
-  ['institutionrecommendnoopinion_3379',['InstitutionRecommendNoOpinion',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a5f04436b1332555c5e549174ab81219a',1,'longport.h']]],
-  ['institutionrecommendsell_3380',['InstitutionRecommendSell',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a4a60253c5ba55bf2b65cd1ec465355c5',1,'longport.h']]],
-  ['institutionrecommendstrongbuy_3381',['InstitutionRecommendStrongBuy',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a7bcf1df6d5e41deda4945eadd61b28ef',1,'longport.h']]],
-  ['institutionrecommendstrongsell_3382',['InstitutionRecommendStrongSell',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58abc246f4704807a00230690f7cf90eaa4',1,'longport.h']]],
-  ['institutionrecommendunderperform_3383',['InstitutionRecommendUnderperform',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a123a44d9cd98fb28941a5917945a7d17',1,'longport.h']]],
-  ['institutionrecommendunknown_3384',['InstitutionRecommendUnknown',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a249594d71ce117026223ce3e4661765f',1,'longport.h']]]
+  ['institutionrecommendbuy_3381',['InstitutionRecommendBuy',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a0958f034c7efc3e9e7f0916b603a4333',1,'longport.h']]],
+  ['institutionrecommendhold_3382',['InstitutionRecommendHold',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58ad49c1598278ea960824401976ae293b5',1,'longport.h']]],
+  ['institutionrecommendnoopinion_3383',['InstitutionRecommendNoOpinion',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a5f04436b1332555c5e549174ab81219a',1,'longport.h']]],
+  ['institutionrecommendsell_3384',['InstitutionRecommendSell',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a4a60253c5ba55bf2b65cd1ec465355c5',1,'longport.h']]],
+  ['institutionrecommendstrongbuy_3385',['InstitutionRecommendStrongBuy',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a7bcf1df6d5e41deda4945eadd61b28ef',1,'longport.h']]],
+  ['institutionrecommendstrongsell_3386',['InstitutionRecommendStrongSell',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58abc246f4704807a00230690f7cf90eaa4',1,'longport.h']]],
+  ['institutionrecommendunderperform_3387',['InstitutionRecommendUnderperform',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a123a44d9cd98fb28941a5917945a7d17',1,'longport.h']]],
+  ['institutionrecommendunknown_3388',['InstitutionRecommendUnknown',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a249594d71ce117026223ce3e4661765f',1,'longport.h']]]
 ];
