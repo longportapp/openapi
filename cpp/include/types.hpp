@@ -1327,19 +1327,18 @@ struct OptionVolumeStats
   std::string symbol;
   int64_t call_volume;
   int64_t put_volume;
-  int64_t call_open_interest;
-  int64_t put_open_interest;
-  double pc_vol;
-  double pc_oi;
 };
 
 struct OptionVolumeDailyStat
 {
+  std::string symbol;
   Date date;
   int64_t call_volume;
   int64_t put_volume;
   int64_t call_open_interest;
   int64_t put_open_interest;
+  int64_t total_volume;
+  int64_t total_open_interest;
   double pc_vol;
   double pc_oi;
 };
