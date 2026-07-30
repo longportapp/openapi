@@ -3432,7 +3432,12 @@ impl From<OptionVolumeDaily> for COptionVolumeDailyOwned {
     fn from(v: OptionVolumeDaily) -> Self {
         Self {
             symbol: v.symbol.into(),
-            stats: v.stats.into_iter().map(COptionVolumeDailyStat::from).collect::<Vec<_>>().into(),
+            stats: v
+                .stats
+                .into_iter()
+                .map(COptionVolumeDailyStat::from)
+                .collect::<Vec<_>>()
+                .into(),
         }
     }
 }

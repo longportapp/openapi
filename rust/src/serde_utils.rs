@@ -492,7 +492,10 @@ pub(crate) mod date {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Date::parse(&s, time::macros::format_description!("[year]-[month]-[day]"))
-            .map_err(D::Error::custom)
+        Date::parse(
+            &s,
+            time::macros::format_description!("[year]-[month]-[day]"),
+        )
+        .map_err(D::Error::custom)
     }
 }
