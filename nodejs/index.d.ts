@@ -228,10 +228,10 @@ export declare class Config {
    * - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
    * - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
    *   `false` (Default: `false`)
-   * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
-   *   (Default: `realtime`)
-   * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when
-   *   connected, `true` or `false` (Default: `true`)
+   * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+   *   `realtime`)
+   * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+   *   `true` or `false` (Default: `true`)
    * - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
    */
   static fromApikeyEnv(): Config
@@ -949,6 +949,42 @@ export declare class OptionQuote {
   get historicalVolatility(): Decimal
   /** Underlying security symbol of the option */
   get underlyingSymbol(): string
+}
+
+/** Daily option volume response */
+export declare class OptionVolumeDaily {
+  toString(): string
+  toJSON(): any
+  /** Security symbol */
+  get symbol(): string
+  /** Daily stats */
+  get stats(): Array<OptionVolumeDailyStat>
+}
+
+/** One day's option volume stat */
+export declare class OptionVolumeDailyStat {
+  toString(): string
+  toJSON(): any
+  /** Underlying security symbol */
+  get symbol(): string
+  /** Trading date */
+  get date(): NaiveDate
+  /** Call volume */
+  get callVolume(): number
+  /** Put volume */
+  get putVolume(): number
+  /** Call open interest */
+  get callOpenInterest(): number
+  /** Put open interest */
+  get putOpenInterest(): number
+  /** Total options volume (calls + puts) */
+  get totalVolume(): number
+  /** Total open interest (calls + puts) */
+  get totalOpenInterest(): number
+  /** Put/call volume ratio */
+  get pcVol(): number
+  /** Put/call open interest ratio */
+  get pcOi(): number
 }
 
 /** Order */
@@ -4667,42 +4703,14 @@ export declare const enum OptionType {
   Europe = 2
 }
 
-/** Daily option volume response */
-export interface OptionVolumeDaily {
-  /** Daily stats */
-  stats: Array<OptionVolumeDailyStat>
-}
-
-/** One day's option volume stat */
-export interface OptionVolumeDailyStat {
-  /** Symbol */
-  symbol: string
-  /** Timestamp string */
-  timestamp: string
-  /** Total volume */
-  totalVolume: string
-  /** Put volume */
-  totalPutVolume: string
-  /** Call volume */
-  totalCallVolume: string
-  /** Put/call volume ratio */
-  putCallVolumeRatio: string
-  /** Total OI */
-  totalOpenInterest: string
-  /** Put OI */
-  totalPutOpenInterest: string
-  /** Call OI */
-  totalCallOpenInterest: string
-  /** Put/call OI ratio */
-  putCallOpenInterestRatio: string
-}
-
 /** Option volume stats response */
 export interface OptionVolumeStats {
-  /** Call volume */
-  c: string
-  /** Put volume */
-  p: string
+  /** Security symbol */
+  symbol: string
+  /** Total call volume */
+  callVolume: number
+  /** Total put volume */
+  putVolume: number
 }
 
 export declare const enum OrderSide {
