@@ -223,12 +223,6 @@ jobs:
         run: |
           mkdir -p artifacts
           mv longport.*.node artifacts/
-          yarn artifacts
-        working-directory: ./nodejs
-
-      - name: List packages
-        run: ls -R ./npm
-        shell: bash
         working-directory: ./nodejs
 
   check-java-sdk:
