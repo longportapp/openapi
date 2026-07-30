@@ -1283,11 +1283,10 @@ impl QuoteContext {
         timestamp: i64,
         count: u32,
     ) -> Result<OptionVolumeDaily> {
-        Ok(self
-            .ctx
+        self.ctx
             .option_volume_daily(symbol, timestamp, count)
             .await
             .map_err(ErrorNewType)?
-            .into())
+            .try_into()
     }
 }

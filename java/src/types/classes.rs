@@ -2280,13 +2280,14 @@ impl_java_class!(
 impl_java_class!(
     "com/longport/quote/OptionVolumeStats",
     longport::quote::OptionVolumeStats,
-    [c, p]
+    [symbol, call_volume, put_volume, call_open_interest, put_open_interest, pc_vol, pc_oi]
 );
 
 impl_java_class!(
     "com/longport/quote/OptionVolumeDaily",
     longport::quote::OptionVolumeDaily,
     [
+        symbol,
         #[java(objarray)]
         stats
     ]
@@ -2296,16 +2297,13 @@ impl_java_class!(
     "com/longport/quote/OptionVolumeDailyStat",
     longport::quote::OptionVolumeDailyStat,
     [
-        symbol,
-        timestamp,
-        total_volume,
-        total_put_volume,
-        total_call_volume,
-        put_call_volume_ratio,
-        total_open_interest,
-        total_put_open_interest,
-        total_call_open_interest,
-        put_call_open_interest_ratio
+        date,
+        call_volume,
+        put_volume,
+        call_open_interest,
+        put_open_interest,
+        pc_vol,
+        pc_oi
     ]
 );
 

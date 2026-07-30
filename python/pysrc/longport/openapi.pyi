@@ -4020,6 +4020,32 @@ class QuoteContext:
             :class:`ShortTradesResponse` with raw JSON data
         """
 
+    def option_volume(self, symbol: str) -> OptionVolumeStats:
+        """
+        Get real-time option call/put volume for a security.
+
+        Args:
+            symbol: Security code (e.g. ``"AAPL.US"``)
+
+        Returns:
+            :class:`OptionVolumeStats` with call and put volume strings
+        """
+
+    def option_volume_daily(
+        self, symbol: str, timestamp: int = 0, count: int = 30
+    ) -> OptionVolumeDaily:
+        """
+        Get daily historical option volume for a security.
+
+        Args:
+            symbol: Security code (e.g. ``"AAPL.US"``)
+            timestamp: Start timestamp (unix seconds, 0 = latest)
+            count: Number of days to return (default 30)
+
+        Returns:
+            :class:`OptionVolumeDaily` containing a list of daily stats
+        """
+
 class AsyncQuoteContext:
     """
     Async quote context for use with asyncio. Create via `AsyncQuoteContext.create(config)` and await inside asyncio.
@@ -5369,6 +5395,34 @@ class AsyncQuoteContext:
 
         Returns:
             Awaitable resolving to :class:`ShortTradesResponse`
+        """
+        ...
+
+    def option_volume(self, symbol: str) -> Awaitable[OptionVolumeStats]:
+        """
+        Get real-time option call/put volume for a security. Returns awaitable.
+
+        Args:
+            symbol: Security code (e.g. ``"AAPL.US"``)
+
+        Returns:
+            Awaitable resolving to :class:`OptionVolumeStats`
+        """
+        ...
+
+    def option_volume_daily(
+        self, symbol: str, timestamp: int = 0, count: int = 30
+    ) -> Awaitable[OptionVolumeDaily]:
+        """
+        Get daily historical option volume for a security. Returns awaitable.
+
+        Args:
+            symbol: Security code (e.g. ``"AAPL.US"``)
+            timestamp: Start timestamp (unix seconds, 0 = latest)
+            count: Number of days to return (default 30)
+
+        Returns:
+            Awaitable resolving to :class:`OptionVolumeDaily`
         """
         ...
 
@@ -12070,39 +12124,45 @@ class ShortTradesResponse:
 class OptionVolumeStats:
     """Real-time option call/put volume response."""
 
-    c: str
+    symbol: str
+    """Security symbol"""
+    call_volume: int
     """Total call volume"""
-    p: str
+    put_volume: int
     """Total put volume"""
+    call_open_interest: int
+    """Total call open interest"""
+    put_open_interest: int
+    """Total put open interest"""
+    pc_vol: float
+    """Put/call volume ratio"""
+    pc_oi: float
+    """Put/call open interest ratio"""
 
 
 class OptionVolumeDailyStat:
     """One day's option volume statistics."""
 
-    symbol: str
-    """Underlying security symbol"""
-    timestamp: str
-    """Settlement date (unix timestamp string)"""
-    total_volume: int
-    """Total option volume (calls + puts)"""
-    total_put_volume: int
-    """Total put volume"""
-    total_call_volume: int
-    """Total call volume"""
-    put_call_volume_ratio: str
+    date: date
+    """Date"""
+    call_volume: int
+    """Call volume"""
+    put_volume: int
+    """Put volume"""
+    call_open_interest: int
+    """Call open interest"""
+    put_open_interest: int
+    """Put open interest"""
+    pc_vol: float
     """Put/call volume ratio"""
-    total_open_interest: int
-    """Total open interest"""
-    total_put_open_interest: int
-    """Total put open interest"""
-    total_call_open_interest: int
-    """Total call open interest"""
-    put_call_open_interest_ratio: str
+    pc_oi: float
     """Put/call open interest ratio"""
 
 
 class OptionVolumeDaily:
     """Daily historical option volume response."""
 
-    stats: list[OptionVolumeDailyStat]
+    symbol: str
+    """Security symbol"""
+    stats: List[OptionVolumeDailyStat]
     """Daily option volume statistics"""

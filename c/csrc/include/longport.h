@@ -8273,17 +8273,37 @@ typedef struct lb_short_trades_response_t {
 } lb_short_trades_response_t;
 
 /**
- * Option volume statistics (call and put totals)
+ * Option volume statistics
  */
 typedef struct lb_option_volume_stats_t {
   /**
-   * Call option volume (formatted string)
+   * Security symbol
    */
-  const char *c;
+  const char *symbol;
   /**
-   * Put option volume (formatted string)
+   * Total call volume
    */
-  const char *p;
+  int64_t call_volume;
+  /**
+   * Total put volume
+   */
+  int64_t put_volume;
+  /**
+   * Total call open interest
+   */
+  int64_t call_open_interest;
+  /**
+   * Total put open interest
+   */
+  int64_t put_open_interest;
+  /**
+   * Put/call volume ratio
+   */
+  double pc_vol;
+  /**
+   * Put/call open interest ratio
+   */
+  double pc_oi;
 } lb_option_volume_stats_t;
 
 /**
@@ -8291,51 +8311,43 @@ typedef struct lb_option_volume_stats_t {
  */
 typedef struct lb_option_volume_daily_stat_t {
   /**
-   * Security code
+   * Date
    */
-  const char *symbol;
+  struct lb_date_t date;
   /**
-   * Date of the record (formatted string)
+   * Call volume
    */
-  const char *timestamp;
+  int64_t call_volume;
   /**
-   * Total option volume (calls + puts, formatted string)
+   * Put volume
    */
-  const char *total_volume;
+  int64_t put_volume;
   /**
-   * Total put option volume (formatted string)
+   * Call open interest
    */
-  const char *total_put_volume;
+  int64_t call_open_interest;
   /**
-   * Total call option volume (formatted string)
+   * Put open interest
    */
-  const char *total_call_volume;
+  int64_t put_open_interest;
   /**
-   * Put-to-call volume ratio (formatted string)
+   * Put/call volume ratio
    */
-  const char *put_call_volume_ratio;
+  double pc_vol;
   /**
-   * Total open interest across all options (formatted string)
+   * Put/call open interest ratio
    */
-  const char *total_open_interest;
-  /**
-   * Total put open interest (formatted string)
-   */
-  const char *total_put_open_interest;
-  /**
-   * Total call open interest (formatted string)
-   */
-  const char *total_call_open_interest;
-  /**
-   * Put-to-call open interest ratio (formatted string)
-   */
-  const char *put_call_open_interest_ratio;
+  double pc_oi;
 } lb_option_volume_daily_stat_t;
 
 /**
  * Collection of daily option volume statistics
  */
 typedef struct lb_option_volume_daily_t {
+  /**
+   * Security symbol
+   */
+  const char *symbol;
   /**
    * Pointer to array of daily option volume stat records
    */

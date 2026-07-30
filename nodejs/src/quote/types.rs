@@ -1593,73 +1593,65 @@ impl From<longport::quote::ShortTradesResponse> for ShortTradesResponse {
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct OptionVolumeStats {
-    /// Call volume
-    pub c: String,
-    /// Put volume
-    pub p: String,
+    /// Security symbol
+    pub symbol: String,
+    /// Total call volume
+    pub call_volume: i64,
+    /// Total put volume
+    pub put_volume: i64,
+    /// Total call open interest
+    pub call_open_interest: i64,
+    /// Total put open interest
+    pub put_open_interest: i64,
+    /// Put/call volume ratio
+    pub pc_vol: f64,
+    /// Put/call open interest ratio
+    pub pc_oi: f64,
 }
 
 impl From<longport::quote::OptionVolumeStats> for OptionVolumeStats {
     fn from(v: longport::quote::OptionVolumeStats) -> Self {
-        Self { c: v.c, p: v.p }
+        Self {
+            symbol: v.symbol,
+            call_volume: v.call_volume,
+            put_volume: v.put_volume,
+            call_open_interest: v.call_open_interest,
+            put_open_interest: v.put_open_interest,
+            pc_vol: v.pc_vol,
+            pc_oi: v.pc_oi,
+        }
     }
 }
 
 /// Daily option volume response
-#[napi_derive::napi(object)]
-#[derive(Debug, Clone)]
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longport::quote::OptionVolumeDaily")]
 pub struct OptionVolumeDaily {
+    /// Security symbol
+    symbol: String,
     /// Daily stats
-    pub stats: Vec<OptionVolumeDailyStat>,
-}
-
-impl From<longport::quote::OptionVolumeDaily> for OptionVolumeDaily {
-    fn from(v: longport::quote::OptionVolumeDaily) -> Self {
-        Self {
-            stats: v.stats.into_iter().map(Into::into).collect(),
-        }
-    }
+    #[js(array)]
+    stats: Vec<OptionVolumeDailyStat>,
 }
 
 /// One day's option volume stat
-#[napi_derive::napi(object)]
-#[derive(Debug, Clone)]
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longport::quote::OptionVolumeDailyStat")]
 pub struct OptionVolumeDailyStat {
-    /// Symbol
-    pub symbol: String,
-    /// Timestamp string
-    pub timestamp: String,
-    /// Total volume
-    pub total_volume: String,
-    /// Put volume
-    pub total_put_volume: String,
+    /// Date
+    date: NaiveDate,
     /// Call volume
-    pub total_call_volume: String,
+    call_volume: i64,
+    /// Put volume
+    put_volume: i64,
+    /// Call open interest
+    call_open_interest: i64,
+    /// Put open interest
+    put_open_interest: i64,
     /// Put/call volume ratio
-    pub put_call_volume_ratio: String,
-    /// Total OI
-    pub total_open_interest: String,
-    /// Put OI
-    pub total_put_open_interest: String,
-    /// Call OI
-    pub total_call_open_interest: String,
-    /// Put/call OI ratio
-    pub put_call_open_interest_ratio: String,
-}
-
-impl From<longport::quote::OptionVolumeDailyStat> for OptionVolumeDailyStat {
-    fn from(v: longport::quote::OptionVolumeDailyStat) -> Self {
-        Self {
-            symbol: v.symbol,
-            timestamp: v.timestamp,
-            total_volume: v.total_volume,
-            total_put_volume: v.total_put_volume,
-            total_call_volume: v.total_call_volume,
-            put_call_volume_ratio: v.put_call_volume_ratio,
-            total_open_interest: v.total_open_interest,
-            total_put_open_interest: v.total_put_open_interest,
-            total_call_open_interest: v.total_call_open_interest,
-            put_call_open_interest_ratio: v.put_call_open_interest_ratio,
-        }
-    }
+    pc_vol: f64,
+    /// Put/call open interest ratio
+    pc_oi: f64,
 }

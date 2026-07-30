@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **All languages:** Redesigned `OptionVolumeStats`, `OptionVolumeDaily`, and `OptionVolumeDailyStat` to match the actual API response. `OptionVolumeStats` now carries `symbol`, `call_volume`, `put_volume`, `call_open_interest`, `put_open_interest`, `pc_vol`, `pc_oi` (removed incorrect `c`/`p` fields). `OptionVolumeDailyStat.date` is now a proper date type (not a string). `OptionVolumeDaily` gains a `symbol` field.
+- **Rust:** Moved `deserialize_f64_from_str` and `deserialize_date_ymd` serde helpers from `utils` to `serde_utils`.
+
 ## [4.3.3] - 2026-06-26
 
 ### Added

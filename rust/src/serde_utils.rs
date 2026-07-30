@@ -471,3 +471,28 @@ where
 {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
 }
+
+pub(crate) mod f64_str {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<f64, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        s.parse::<f64>().map_err(D::Error::custom)
+    }
+}
+
+pub(crate) mod date {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Date, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Date::parse(&s, time::macros::format_description!("[year]-[month]-[day]"))
+            .map_err(D::Error::custom)
+    }
+}
