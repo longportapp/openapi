@@ -94,6 +94,9 @@ jobs:
       matrix:
         settings:
           - host: ubuntu-24.04
+          - host: ubuntu-24.04
+            target: x86_64-unknown-linux-musl
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
           - host: ubuntu-24.04-arm
           - host: macos-15
           - host: macos-15-intel
@@ -120,11 +123,12 @@ jobs:
           targets: ${{ matrix.settings.target }}
 
       - name: Install dependencies
+        if: ${{ !matrix.settings.docker }}
         working-directory: nodejs
         run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
 
       - name: Build
-        if: ${{ matrix.settings.host != 'macos-15' }}
+        if: ${{ !matrix.settings.docker && matrix.settings.host != 'macos-15' }}
         working-directory: nodejs
         run: yarn build:debug
 
@@ -133,10 +137,22 @@ jobs:
         working-directory: nodejs
         run: yarn build:debug --target aarch64-apple-darwin
 
+      - name: Build in docker
+        if: ${{ matrix.settings.docker }}
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.settings.docker }}
+          options: '--user 0:0 -v ${{ github.workspace }}/.cargo/git:/usr/local/cargo/git -v ${{ github.workspace }}/.cargo/registry:/usr/local/cargo/registry -v ${{ github.workspace }}:/build -w /build'
+          run: |
+            set -e
+            cd nodejs
+            yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
+            yarn build:debug
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bindings-${{ matrix.settings.host }}
+          name: bindings-${{ matrix.settings.target || matrix.settings.host }}
           path: nodejs/longport.*.node
 
   build-java-jni:
