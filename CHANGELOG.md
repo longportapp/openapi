@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Java SDK:** prevent native handle use-after-free and double-free crashes by using a type-safe shared handle registry
+
+### Changed
+
+- **Java SDK:** enable the native library test suite in CI on Linux, Windows, and macOS
+
 ## [4.3.5] - 2026-07-30
 
 ### Fixed
