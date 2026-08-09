@@ -10,7 +10,6 @@ mod content_context;
 mod dca_context;
 mod error;
 mod fundamental_context;
-mod handles;
 mod http_client;
 mod init;
 mod market_context;
