@@ -178,7 +178,9 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_configRefreshAccessTok
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
-        let config = &*(config as *const Config);
+        // Clone the (Arc-backed) config so the spawned future owns it: the Java
+        // `Config` may be close()d while this refresh is still in flight.
+        let config = (*(config as *const Config)).clone();
         let expired_at: Option<OffsetDateTime> = FromJValue::from_jvalue(env, expired_at.into())?;
         async_util::execute(env, callback, async move {
             let token = config.refresh_access_token(expired_at).await?;

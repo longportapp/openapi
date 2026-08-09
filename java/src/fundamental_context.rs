@@ -50,12 +50,13 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextFina
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let kind: Option<FinancialReportKind> = get_field(env, &opts, "kind")?;
         let kind = kind.unwrap_or(FinancialReportKind::All);
         let period: Option<FinancialReportPeriod> = get_field(env, &opts, "period")?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.financial_report(symbol, kind, period).await?;
+            let resp = __owned_ctx.financial_report(symbol, kind, period).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -76,9 +77,10 @@ macro_rules! symbol_method {
         ) {
             jni_result(&mut env, (), |env| {
                 let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
                 let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
                 async_util::execute(env, callback, async move {
-                    let resp = context.ctx.$method(symbol).await?;
+                    let resp = __owned_ctx.$method(symbol).await?;
                     Ok(resp)
                 })?;
                 Ok(())
@@ -165,9 +167,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetB
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.buyback(symbol).await?;
+            let resp = __owned_ctx.buyback(symbol).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -184,9 +187,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetR
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.ratings(symbol).await?;
+            let resp = __owned_ctx.ratings(symbol).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -203,9 +207,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextShar
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.shareholder_top(symbol).await?;
+            let resp = __owned_ctx.shareholder_top(symbol).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -223,9 +228,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextShar
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         async_util::execute(env, callback, async move {
-            let resp = context.ctx.shareholder_detail(symbol, object_id).await?;
+            let resp = __owned_ctx.shareholder_detail(symbol, object_id).await?;
             Ok(resp)
         })?;
         Ok(())
@@ -244,6 +250,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextValu
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
         let currency: String = FromJValue::from_jvalue(env, currency.into())?;
         let comparison_syms: Option<Vec<String>> = if comparison_symbols.is_null() {
@@ -253,8 +260,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextValu
             Some(arr.0)
         };
         async_util::execute(env, callback, async move {
-            let resp = context
-                .ctx
+            let resp = __owned_ctx
                 .valuation_comparison(symbol, currency, comparison_syms)
                 .await?;
             Ok(resp)
@@ -276,6 +282,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextMacr
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let country: Option<String> = FromJValue::from_jvalue(env, country.into())?;
         let country = country.and_then(|s| {
             use longport::fundamental::MacroeconomicCountry::*;
@@ -293,8 +300,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextMacr
         let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .macroeconomic_indicators(country, keyword, offset, limit)
                 .await?)
         })?;
@@ -316,14 +322,14 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextMacr
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
         let indicator_code: String = FromJValue::from_jvalue(env, indicator_code.into())?;
         let start_date: Option<String> = FromJValue::from_jvalue(env, start_time.into())?;
         let end_date: Option<String> = FromJValue::from_jvalue(env, end_time.into())?;
         let offset: Option<i32> = FromJValue::from_jvalue(env, offset.into())?;
         let limit: Option<i32> = FromJValue::from_jvalue(env, limit.into())?;
         async_util::execute(env, callback, async move {
-            Ok(context
-                .ctx
+            Ok(__owned_ctx
                 .macroeconomic(indicator_code, start_date, end_date, offset, limit)
                 .await?)
         })?;
