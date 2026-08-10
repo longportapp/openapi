@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.3.6] - 2026-08-10
+
 ### Fixed
 
 - **Java SDK:** invalid arguments passed across the JNI boundary no longer crash the JVM (process abort / core dump). Previously a Rust `panic!`/`unwrap`/`expect` in the value conversions unwound across the `extern "system"` boundary and aborted the whole process. These cases now throw a catchable `java.lang.IllegalArgumentException` instead:
