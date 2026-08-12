@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.3.7] - 2026-08-12
+
 ### Changed
 
 - **All SDKs:** every `HttpClient` now shares a single process-wide `reqwest::Client` (connection pool, DNS cache and TLS state) instead of creating its own. Each SDK context previously built two independent connection pools, so a process that churns thousands of short-lived contexts spun up thousands of pools; they now all share one. `reqwest::Client` is internally reference-counted, all requests target the same OpenAPI host, and auth is applied per-request, so sharing is both correct and far cheaper
