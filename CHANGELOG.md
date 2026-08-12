@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **All SDKs:** every `HttpClient` now shares a single process-wide `reqwest::Client` (connection pool, DNS cache and TLS state) instead of creating its own. Each SDK context previously built two independent connection pools, so a process that churns thousands of short-lived contexts spun up thousands of pools; they now all share one. `reqwest::Client` is internally reference-counted, all requests target the same OpenAPI host, and auth is applied per-request, so sharing is both correct and far cheaper
+
+### Fixed
+
+- **All SDKs:** the background reconnect loop in `TradeContext` / `QuoteContext` now stops when the context is dropped. Previously the reconnect loop never observed the shutdown signal, so a context dropped (e.g. evicted from a connection cache) while its server was unreachable would keep reconnecting forever, leaking the task, its HTTP client and connection pool, and the WebSocket state. Under long-running, high-churn workloads (many short-lived contexts) these zombie tasks accumulated and slowly exhausted memory. The reconnect loop now races each attempt against a shutdown channel that closes as soon as the owning context is dropped, so teardown is immediate even mid-reconnect
+- **Java SDK:** calling a method on a native-handle-backed object (`Config`, `HttpClient`, `OAuth`, and every `*Context`) while another thread `close()`s the same object no longer risks a use-after-free that corrupts the heap and crashes the JVM (native `SIGSEGV`). The previous `clone-before-spawn` fix protected the in-flight async task, but the tiny synchronous window at the JNI entry — reading the raw handle and dereferencing it in native code to clone it — still raced against `close()`'s `Box::from_raw`. This race is easy to hit when handles are pooled and evicted on a background thread (e.g. a Caffeine cache) while worker threads are still using them. Every instance method that passes a native handle across the JNI boundary is now `synchronized`, making it mutually exclusive with the already-`synchronized` `close()`; the cross-object factory methods (`TradeContext.create(config)`, `Config.fromOAuth(oauth)`, `HttpClient.fromOAuth(oauth)`, …) now hold the source handle's monitor while reading it. `close()` therefore cannot free a handle mid-call, and a method that loses the race sees the handle already cleared and throws a catchable `IllegalStateException` instead
+
 ## [4.3.6] - 2026-08-10
 
 ### Fixed
