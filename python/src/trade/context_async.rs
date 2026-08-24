@@ -82,8 +82,7 @@ impl AsyncTradeContext {
     /// Subscribe. Returns awaitable.
     fn subscribe(&self, py: Python<'_>, topics: Vec<TopicType>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
-        let topics: Vec<longport::trade::TopicType> =
-            topics.into_iter().map(Into::into).collect();
+        let topics: Vec<longport::trade::TopicType> = topics.into_iter().map(Into::into).collect();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             ctx.subscribe(topics).await.map_err(ErrorNewType)?;
             Ok(())
@@ -94,8 +93,7 @@ impl AsyncTradeContext {
     /// Unsubscribe. Returns awaitable.
     fn unsubscribe(&self, py: Python<'_>, topics: Vec<TopicType>) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
-        let topics: Vec<longport::trade::TopicType> =
-            topics.into_iter().map(Into::into).collect();
+        let topics: Vec<longport::trade::TopicType> = topics.into_iter().map(Into::into).collect();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             ctx.unsubscribe(topics).await.map_err(ErrorNewType)?;
             Ok(())

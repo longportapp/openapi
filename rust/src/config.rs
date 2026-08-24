@@ -300,10 +300,10 @@ impl Config {
     ///   `wss://openapi-trade.longportapp.com/v2`)
     /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
     ///   `false` (Default: `false`)
-    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
-    ///   (Default: `realtime`)
-    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when
-    ///   connected, `true` or `false` (Default: `true`)
+    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
+    ///   `realtime`)
+    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
+    ///   `true` or `false` (Default: `true`)
     /// - `LONGPORT_LOG_PATH` - Set the path of the log files (Default: `no
     ///   logs`)
     ///

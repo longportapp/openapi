@@ -10,15 +10,13 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result, serde_utils,
     trade::{
-        AccountBalance, AllExecutionsResponse, CancelOrderOptions, CashFlow,
-        EstimateMaxPurchaseQuantityOptions, Execution, FundPositionsResponse,
-        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        AccountBalance, CancelOrderOptions, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        Execution, FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersOptions, QueryUSOrdersResponse, ReplaceOrderOptions,
-        StockPositionsResponse, SubmitOrderOptions, TopicType, USAssetOverview,
-        USOrderDetailResponse, USRealizedPL,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -864,8 +862,6 @@ impl TradeContext {
     pub async fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
-
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()
@@ -877,11 +873,11 @@ impl TradeContext {
             _ => 0,
         };
 
-        let counter_ids = opts
+        let symbols = opts
             .symbol
             .as_deref()
             .filter(|s| !s.is_empty())
-            .map(|s| vec![symbol_to_counter_id(s)])
+            .map(|s| vec![s.to_string()])
             .unwrap_or_default();
 
         let start_at = if opts.start_at == 0 {
@@ -902,7 +898,7 @@ impl TradeContext {
             action,
             start_at,
             end_at,
-            counter_ids,
+            symbols,
             security_types: vec![],
             query_type: opts.query_type,
             page,

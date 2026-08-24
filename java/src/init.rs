@@ -10,6 +10,7 @@ use crate::types::ClassLoader;
 
 pub(crate) static INTEGER_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static LONG_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DOUBLE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static STRING_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DECIMAL_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_INSTANT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
@@ -61,6 +62,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         env,
         (INTEGER_CLASS, "java/lang/Integer"),
         (LONG_CLASS, "java/lang/Long"),
+        (DOUBLE_CLASS, "java/lang/Double"),
         (STRING_CLASS, "java/lang/String"),
         (DECIMAL_CLASS, "java/math/BigDecimal"),
         (TIME_INSTANT_CLASS, "java/time/Instant"),
@@ -232,6 +234,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::dca::DcaSupportInfo,
         longport::dca::DcaSupportList,
         // AlertContext
+        longport::alert::AlertValueMap,
         longport::alert::AlertItem,
         longport::alert::AlertSymbolGroup,
         longport::alert::AlertList,
@@ -399,10 +402,30 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::fundamental::ValuationHistoryPoint,
         longport::fundamental::ValuationComparisonItem,
         longport::fundamental::ValuationComparisonResponse,
+        // FundamentalContext: industry rank / peers
+        longport::fundamental::IndustryRankItem,
+        longport::fundamental::IndustryRankGroup,
+        longport::fundamental::IndustryRankResponse,
+        longport::fundamental::IndustryPeersTop,
+        longport::fundamental::IndustryPeerNode,
+        longport::fundamental::IndustryPeersResponse,
+        // FundamentalContext: business segments / rating views / snapshot
+        longport::fundamental::BusinessSegmentItem,
+        longport::fundamental::BusinessSegments,
+        longport::fundamental::BusinessSegmentHistoryItem,
+        longport::fundamental::BusinessSegmentsHistoricalItem,
+        longport::fundamental::BusinessSegmentsHistory,
+        longport::fundamental::InstitutionRatingViewItem,
+        longport::fundamental::InstitutionRatingViews,
+        longport::fundamental::SnapshotForecastMetric,
+        longport::fundamental::SnapshotReportedMetric,
+        longport::fundamental::FinancialReportSnapshot,
         // MarketContext: top movers / rank
         longport::market::TopMoversStock,
         longport::market::TopMoversEvent,
         longport::market::TopMoversResponse,
+        longport::market::RankSubCategory,
+        longport::market::RankCategory,
         longport::market::RankCategoriesResponse,
         longport::market::RankListItem,
         longport::market::RankListResponse,

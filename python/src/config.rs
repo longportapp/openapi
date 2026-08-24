@@ -110,15 +110,15 @@ impl Config {
     ///     - ``LONGPORT_APP_KEY`` - App key
     ///     - ``LONGPORT_APP_SECRET`` - App secret
     ///     - ``LONGPORT_ACCESS_TOKEN`` - Access token
-    ///     - ``LONGPORT_LANGUAGE`` - Language identifier, ``zh-CN``,
-    ///       ``zh-HK`` or ``en`` (Default: ``en``)
+    ///     - ``LONGPORT_LANGUAGE`` - Language identifier, ``zh-CN``, ``zh-HK``
+    ///       or ``en`` (Default: ``en``)
     ///     - ``LONGPORT_HTTP_URL`` - HTTP endpoint url
     ///     - ``LONGPORT_QUOTE_WS_URL`` - Quote websocket endpoint url
     ///     - ``LONGPORT_TRADE_WS_URL`` - Trade websocket endpoint url
     ///     - ``LONGPORT_ENABLE_OVERNIGHT`` - ``true`` or ``false`` (Default:
     ///       ``false``)
-    ///     - ``LONGPORT_PUSH_CANDLESTICK_MODE`` - ``realtime`` or
-    ///       ``confirmed`` (Default: ``realtime``)
+    ///     - ``LONGPORT_PUSH_CANDLESTICK_MODE`` - ``realtime`` or ``confirmed``
+    ///       (Default: ``realtime``)
     ///     - ``LONGPORT_PRINT_QUOTE_PACKAGES`` - ``true`` or ``false``
     ///       (Default: ``true``)
     ///     - ``LONGPORT_LOG_PATH`` - Log file directory (Default: no logs)

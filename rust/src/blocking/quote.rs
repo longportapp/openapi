@@ -432,9 +432,7 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{
-    ///     Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::TradeSessions,
-    /// };
+    /// use longport::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::TradeSessions};
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let oauth =
@@ -1212,25 +1210,6 @@ impl QuoteContextSync {
     ) -> Result<ShortTradesResponse> {
         self.rt
             .call(move |ctx| async move { ctx.short_trades(symbol, count).await })
-    }
-
-    /// Batch convert symbols to counter IDs via the remote API
-    pub fn symbol_to_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<std::collections::HashMap<String, String>> {
-        self.rt
-            .call(move |ctx| async move { ctx.symbol_to_counter_ids(symbols).await })
-    }
-
-    /// Resolve counter IDs for symbols, local-first with remote fallback and
-    /// local caching
-    pub fn resolve_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<std::collections::HashMap<String, String>> {
-        self.rt
-            .call(move |ctx| async move { ctx.resolve_counter_ids(symbols).await })
     }
 
     // ── US-market blocking wrappers ───────────────────────────────────────────

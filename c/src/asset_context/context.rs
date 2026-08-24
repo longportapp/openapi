@@ -1,8 +1,6 @@
 use std::{ffi::c_void, os::raw::c_char, sync::Arc};
 
-use longport::asset::{
-    AssetContext, GetStatementListOptions, GetStatementOptions, StatementType,
-};
+use longport::asset::{AssetContext, GetStatementListOptions, GetStatementOptions, StatementType};
 
 use crate::{
     asset_context::types::CStatementItemOwned,
