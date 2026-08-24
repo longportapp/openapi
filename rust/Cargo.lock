@@ -553,16 +553,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "longbridge-sdk"
+name = "longport-sdk"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "bitflags",
  "flume",
  "futures-util",
- "longbridge-sdk-httpcli",
- "longbridge-sdk-proto",
- "longbridge-sdk-wscli",
+ "longport-sdk-httpcli",
+ "longport-sdk-proto",
+ "longport-sdk-wscli",
  "num-traits",
  "num_enum",
  "prost",
@@ -579,7 +579,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "longbridge-sdk-httpcli"
+name = "longport-sdk-httpcli"
 version = "0.1.0"
 dependencies = [
  "futures-util",
@@ -597,7 +597,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "longbridge-sdk-proto"
+name = "longport-sdk-proto"
 version = "0.1.0"
 dependencies = [
  "prost",
@@ -605,11 +605,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "longbridge-sdk-python"
+name = "longport-sdk-python"
 version = "0.1.0"
 dependencies = [
- "longbridge-sdk",
- "longbridge-sdk-python-macros",
+ "longport-sdk",
+ "longport-sdk-python-macros",
  "once_cell",
  "pyo3",
  "pyo3-build-config",
@@ -618,7 +618,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "longbridge-sdk-python-macros"
+name = "longport-sdk-python-macros"
 version = "0.1.0"
 dependencies = [
  "darling",
@@ -629,13 +629,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "longbridge-sdk-wscli"
+name = "longport-sdk-wscli"
 version = "0.1.0"
 dependencies = [
  "byteorder",
  "flate2",
  "futures-util",
- "longbridge-sdk-proto",
+ "longport-sdk-proto",
  "num_enum",
  "prost",
  "thiserror",

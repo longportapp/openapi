@@ -30,6 +30,115 @@ export declare class AccountBalance {
   get frozenTransactionFees(): Array<FrozenTransactionFee>
 }
 
+/**
+ * AI Agent conversation context.
+ *
+ * Reference: <https://open.longportapp.com/en/docs/ai/chat/conversation>
+ */
+export declare class AgentContext {
+  /** Create a new AgentContext. */
+  static new(config: Config): AgentContext
+  /**
+   * List the Workspaces the current account belongs to.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longport');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.workspaces();
+   * console.log(resp);
+   * ```
+   */
+  workspaces(): Promise<WorkspacesResponse>
+  /**
+   * List the Agents in the specified Workspace.
+   *
+   * `page`/`limit` control pagination; `name` fuzzy-searches by Agent name.
+   * All three are optional.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longport');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.agents(workspaceId);
+   * console.log(resp);
+   * ```
+   */
+  agents(workspaceId: string, page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
+   * List all publicly available Agents on the platform (the Explore
+   * catalog). Not scoped to a Workspace.
+   */
+  publicAgents(page?: number | undefined | null, limit?: number | undefined | null, name?: string | undefined | null): Promise<AgentsResponse>
+  /**
+   * Start a conversation with the specified Agent, blocking until the run
+   * succeeds, is interrupted, or fails.
+   *
+   * `parentMessageId` is the `messageId` from a previous response. Pass it
+   * when asking a follow-up in an existing conversation to attach the new
+   * message after the specified one, keeping the message stream in order. It
+   * is only valid together with `chatUid`, the parent message must belong to
+   * that conversation, and it must not be set for a new conversation.
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longport');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversation(agentId, "How has Tesla stock performed recently?");
+   * console.log(resp);
+   * ```
+   */
+  conversation(agentId: string, query: string, chatUid?: string | undefined | null, parentMessageId?: string | undefined | null): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, blocking until the run succeeds, is
+   * interrupted again, or fails.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversation(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>): Promise<ConversationResponse>
+  /**
+   * Start a conversation with the specified Agent, invoking `callback` for
+   * every progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes (this is the same shape
+   * `conversation` returns).
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { Config, AgentContext } = require('longport');
+   *
+   * const ctx = AgentContext.new(config);
+   * const resp = await ctx.conversationStreamed(
+   *   agentId,
+   *   "How has Tesla stock performed recently?",
+   *   undefined,
+   *   undefined,
+   *   (err, event) => console.log(event),
+   * );
+   * console.log(resp);
+   * ```
+   *
+   * `parentMessageId` behaves as in `conversation`.
+   */
+  conversationStreamed(agentId: string, query: string, chatUid: string | undefined | null, parentMessageId: string | undefined | null, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+  /**
+   * Resume an interrupted conversation, invoking `callback` for every
+   * progress event observed over SSE, and resolving to the final
+   * `ConversationResponse` once the run finishes.
+   *
+   * `answersByToolCall` is keyed by `toolCallId` (see `Interrupt`), each
+   * value being a map of question text to answer.
+   */
+  continueConversationStreamed(agentId: string, chatUid: string, messageId: string, answersByToolCall: Record<string, Record<string, string>>, callback: (err: null | Error, event: ConversationStreamEvent) => void): Promise<ConversationResponse>
+}
+
 /** Price alert management context. */
 export declare class AlertContext {
   /** Create a new AlertContext. */
@@ -54,6 +163,16 @@ export declare class AlertContext {
   delete(alertIds: Array<string>): Promise<void>
 }
 
+/** Response for get all executions request */
+export declare class AllExecutionsResponse {
+  toString(): string
+  toJSON(): any
+  /** Has more records */
+  get hasMore(): boolean
+  /** Execution list */
+  get trades(): Array<Execution>
+}
+
 /** Asset context */
 export declare class AssetContext {
   /** Create a new `AssetContext` */
@@ -62,6 +181,54 @@ export declare class AssetContext {
   statements(req?: GetStatementListRequest | undefined | null): Promise<GetStatementListResponse>
   /** Get statement data download URL */
   statementDownloadUrl(req: GetStatementDownloadUrlRequest): Promise<GetStatementDownloadUrlResponse>
+}
+
+/** Attached order detail */
+export declare class AttachedOrderDetail {
+  toString(): string
+  toJSON(): any
+  /** Order ID */
+  get orderId(): string
+  /** Attached order type */
+  get attachedTypeDisplay(): AttachedOrderType
+  /** Trigger price */
+  get triggerPrice(): Decimal | null
+  /** Submitted quantity */
+  get quantity(): Decimal
+  /** Executed quantity */
+  get executedQty(): Decimal
+  /** Order status */
+  get status(): OrderStatus
+  /** Last updated time */
+  get updatedAt(): Date
+  /** Whether withdrawn */
+  get withdrawn(): boolean
+  /** Good till date */
+  get gtd(): NaiveDate | null
+  /** Time in force type */
+  get timeInForce(): TimeInForceType
+  /** Counter ID */
+  get counterId(): string
+  /** Trigger status */
+  get triggerStatus(): TriggerStatus | null
+  /** Executed amount */
+  get executedAmount(): Decimal
+  /** Tag */
+  get tag(): OrderTag
+  /** Submitted time */
+  get submittedAt(): Date
+  /** Executed price */
+  get executedPrice(): Decimal | null
+  /** Force only RTH */
+  get forceOnlyRth(): OutsideRTH | null
+  /** Reviewed */
+  get reviewed(): boolean
+  /** Activate order type */
+  get activateOrderType(): OrderType
+  /** Activate RTH */
+  get activateRth(): OutsideRTH | null
+  /** Submit price */
+  get submitPrice(): Decimal | null
 }
 
 /** Brokers */
@@ -181,7 +348,7 @@ export declare class CashInfo {
   get currency(): string
 }
 
-/** Configuration for Longport SDK */
+/** Configuration for LongPort SDK */
 export declare class Config {
   /**
    * Create a new `Config` using API Key authentication
@@ -228,10 +395,10 @@ export declare class Config {
    * - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
    * - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
    *   `false` (Default: `false`)
-   * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
-   *   `realtime`)
-   * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
-   *   `true` or `false` (Default: `true`)
+   * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
+   *   (Default: `realtime`)
+   * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when
+   *   connected, `true` or `false` (Default: `true`)
    * - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
    */
   static fromApikeyEnv(): Config
@@ -622,6 +789,24 @@ export declare class FundamentalContext {
   macroeconomicIndicators(country?: MacroeconomicCountry | undefined | null, keyword?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicIndicatorListResponse>
   /** Get historical data for a macroeconomic indicator */
   macroeconomic(indicatorCode: string, startDate?: string | undefined | null, endDate?: string | undefined | null, offset?: number | undefined | null, limit?: number | undefined | null): Promise<MacroeconomicResponse>
+  /** Get US company overview. US token required. */
+  usCompanyOverview(symbol: string): Promise<USCompanyOverview>
+  /** Get US valuation overview. US token required. */
+  usValuationOverview(symbol: string): Promise<USValuationOverview>
+  /** Get US financial overview. US token required. */
+  usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
+  /** Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required. */
+  usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
+  /** Get US key financial metrics. US token required. */
+  usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
+  /** Get US analyst consensus estimates. US token required. */
+  usAnalystConsensus(symbol: string, report: string): Promise<USAnalystConsensus>
+  /** Get US ETF dividend history. US token required. */
+  usEtfDividendInfo(symbol: string): Promise<USETFDividendInfo>
+  /** Get US company dividends. US token required. */
+  usCompanyDividends(symbol: string): Promise<USCompanyDividends>
+  /** Get US ETF document list. size=None returns all. US token required. */
+  usEtfFiles(symbol: string, size?: number | undefined | null): Promise<USETFFilesResponse>
 }
 
 /** Fund position */
@@ -869,7 +1054,7 @@ export declare class NewsItem {
 }
 
 /**
- * OAuth 2.0 client handle for Longport OpenAPI
+ * OAuth 2.0 client handle for LongPort OpenAPI
  *
  * Obtain an instance via `OAuth.build(...)`.
  * Pass it to `Config.fromOAuth(...)` or `HttpClient.fromOAuth(...)`.
@@ -893,7 +1078,7 @@ export declare class OAuth {
    * the browser authorization flow is started and `onOpenUrl` is called
    * with the authorization URL.
    *
-   * @param clientId      OAuth 2.0 client ID from the Longport developer
+   * @param clientId      OAuth 2.0 client ID from the LongPort developer
    * portal @param onOpenUrl     Called with the authorization URL; open
    * it in a browser or print it however you like
    * @param callbackPort  TCP port for the local callback server
@@ -955,7 +1140,7 @@ export declare class OptionQuote {
 export declare class OptionVolumeDaily {
   toString(): string
   toJSON(): any
-  /** Security symbol */
+  /** Underlying security symbol */
   get symbol(): string
   /** Daily stats */
   get stats(): Array<OptionVolumeDailyStat>
@@ -983,7 +1168,7 @@ export declare class OptionVolumeDailyStat {
   get totalOpenInterest(): number
   /** Put/call volume ratio */
   get pcVol(): number
-  /** Put/call open interest ratio */
+  /** Put/call OI ratio */
   get pcOi(): number
 }
 
@@ -1049,6 +1234,8 @@ export declare class Order {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /** Attached orders */
+  get attachedOrders(): Array<AttachedOrderDetail>
 }
 
 /** Order charge detail */
@@ -1172,7 +1359,9 @@ export declare class OrderDetail {
   /** Order history details */
   get history(): Array<OrderHistoryDetail>
   /** Order charges */
-  get chargeDetail(): OrderChargeDetail
+  get chargeDetail(): OrderChargeDetail | null
+  /** Attached orders */
+  get attachedOrders(): Array<AttachedOrderDetail>
 }
 
 /** Order history detail */
@@ -2066,6 +2255,8 @@ export declare class QuoteContext {
   optionVolume(symbol: string): Promise<OptionVolumeStats>
   /** Get daily historical option volume */
   optionVolumeDaily(symbol: string, timestamp: number, count: number): Promise<OptionVolumeDaily>
+  /** Get US cryptocurrency market overview. US token required. */
+  usCryptoOverview(symbol: string): Promise<USCryptoOverview>
 }
 
 export declare class QuotePackageDetail {
@@ -2718,7 +2909,7 @@ export declare class TradeContext {
    * await ctx.cancelOrder("709043056541253632");
    * ```
    */
-  cancelOrder(orderId: string): Promise<void>
+  cancelOrder(orderId: string, isAttached?: boolean | undefined | null): Promise<void>
   /**
    * Get account balance
    *
@@ -2816,6 +3007,18 @@ export declare class TradeContext {
    * ```
    */
   orderDetail(orderId: string): Promise<OrderDetail>
+  /**
+   * Query US order list. Returns JSON string. US token required.
+   * symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+   */
+  usQueryOrders(symbol: string | undefined | null, action: number, startAt: number, endAt: number, queryType: number, page: number, limit: number): Promise<string>
+  /** Get US order detail. US token required. */
+  usOrderDetail(orderId: string): Promise<USOrderDetailResponse>
+  /** Get US account asset overview. US token required. */
+  usAssetOverview(): Promise<USAssetOverview>
+  /** Get US realized P&L. US token required. */
+  usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
+  orderDetailAttached(orderId: string): Promise<OrderDetail>
   /**
    * Estimating the maximum purchase quantity for Hong Kong and US stocks,
    * warrants, and options
@@ -2992,6 +3195,127 @@ export declare const enum AdjustType {
   NoAdjust = 0,
   /** Adjust forward */
   ForwardAdjust = 1
+}
+
+/** An Agent in a Workspace */
+export interface Agent {
+  /** Agent UID, used as the path parameter of `AgentContext.conversation` */
+  uid: string
+  /** Agent name */
+  name: string
+  /** Agent description */
+  description: string
+  /** Agent mode, e.g. `chat` */
+  mode: string
+  /** Icon URL */
+  icon: string
+  /** Whether published; only published Agents can start conversations */
+  isPublished: boolean
+  /** Publish time, Unix timestamp in seconds; 0 if unpublished */
+  publishedAt: number
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Present when a conversation run failed */
+export interface AgentError {
+  /** Error code */
+  code: number
+  /** Error message */
+  message: string
+}
+
+/** Response for `AgentContext.agents` */
+export interface AgentsResponse {
+  /** Agent list */
+  agents: Array<Agent>
+  /** Total number of matching Agents */
+  total: number
+}
+
+/** Payload of an `agent_tool_finished` stream event */
+export interface AgentToolFinishedPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** Matches the `toolUseId` of `AgentToolStarted` */
+  toolUseId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Total duration in seconds */
+  elapsedTime: number
+  /** Error description on failure */
+  error: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Result of the delegated Agent */
+  outputs?: any
+  /** Tool category */
+  toolType: string
+  /** Progress text; may be omitted */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** `true` if during the thinking phase */
+  isThinking: boolean
+}
+
+/**
+ * Payload of an `agent_tool_progress` stream event, emitted for each inner
+ * tool call the delegated Agent makes.
+ */
+export interface AgentToolProgressPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** `toolUseId` of the owning `AgentToolStarted` event */
+  parentToolCallId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** Name of the inner tool the delegated Agent called */
+  innerToolName: string
+  /** Arguments of that inner call, as a JSON string */
+  innerToolArgs: string
+  /** Status of the inner call: `running` / `succeeded` / `failed` */
+  status: string
+  /** Duration of the inner call in milliseconds */
+  durationMs: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** `true` if during the thinking phase */
+  isThinking: boolean
+}
+
+/**
+ * Payload of an `agent_tool_started` stream event. When the Agent delegates
+ * to another Agent as a tool, that inner run is reported with the
+ * `agentTool*` family — the shape mirrors the subagent events.
+ */
+export interface AgentToolStartedPayload {
+  /** ID of the calling node */
+  nodeId: string
+  /** Unique ID of this call; matches the finished event */
+  toolUseId: string
+  /** Identifier of the Agent being called */
+  agentToolName: string
+  /** Display title; may be omitted */
+  title: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Localized display name */
+  toolName: string
+  /** Progress text; may be omitted */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** `true` if called during the thinking phase */
+  isThinking: boolean
 }
 
 /** A/H premium intraday response */
@@ -3183,6 +3507,18 @@ export declare const enum AssetType {
   Fund = 2,
   /** Crypto */
   Crypto = 3
+}
+
+/** Attached order type */
+export declare const enum AttachedOrderType {
+  /** Unknown */
+  Unknown = 0,
+  /** Profit taker */
+  ProfitTaker = 1,
+  /** Stop loss */
+  StopLoss = 2,
+  /** Bracket */
+  Bracket = 3
 }
 
 export declare const enum BalanceType {
@@ -3495,6 +3831,55 @@ export declare const enum ChargeCategoryCode {
   Third = 2
 }
 
+/**
+ * Payload of a `chat_finished` stream event, observed once all `message`
+ * events for this round have been sent, shortly before `workflow_finished`
+ */
+export interface ChatFinishedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Empty string in every run observed so far */
+  error: string
+  /** Empty string in every run observed so far */
+  errorMessage: string
+}
+
+/** Payload of a `chat_started` stream event */
+export interface ChatStartedPayload {
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** ID of the owning conversation */
+  chatId: number
+  /** Error detail; empty at start */
+  error: string
+  /** User-facing error message; empty at start */
+  errorMessage: string
+}
+
+/**
+ * Payload of a `chat_title_updated` stream event — the server auto-generates
+ * a short title for the conversation as a UI convenience. Can arrive before
+ * *or* after `workflow_finished`; not tied to the run's outcome.
+ */
+export interface ChatTitleUpdatedPayload {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Where the title came from, e.g. `"ai_generated"` */
+  source: string
+  /** The new (possibly truncated) title */
+  title: string
+  /** Unix timestamp in seconds */
+  updatedAt: number
+}
+
 /** Commission-free Status */
 export declare const enum CommissionFreeStatus {
   /** Unknown */
@@ -3643,6 +4028,181 @@ export interface ConstituentStock {
   chg?: string
   /** Raw trade status code */
   tradeStatus: number
+}
+
+/**
+ * Payload of a `context_compress_finished` stream event. Unlike other
+ * events, the timestamp here is an RFC 3339 string.
+ */
+export interface ContextCompressFinishedPayload {
+  /** Finish time, RFC 3339 */
+  createdAt: string
+  /** Compression input summary */
+  inputs?: any
+  /** Compression result summary */
+  outputs?: any
+}
+
+/**
+ * Payload of a `context_compress_started` stream event, marking the start
+ * of a context-compression pass triggered by a long conversation. Unlike
+ * other events, the timestamp here is an RFC 3339 string.
+ */
+export interface ContextCompressStartedPayload {
+  /** Start time, RFC 3339 */
+  startedAt: string
+  /** Compression input summary */
+  inputs?: any
+}
+
+/**
+ * Response for `AgentContext.conversation`,
+ * `AgentContext.continueConversation`, and the final result of the streamed
+ * counterparts
+ */
+export interface ConversationResponse {
+  /**
+   * Conversation identifier, used for follow-up questions and
+   * troubleshooting
+   */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** Final run status */
+  status: ConversationStatus
+  /** Final answer text; valid when `status` is `succeeded` */
+  answer: string
+  /** Sources referenced by the answer */
+  references?: Array<Reference>
+  /** Suggested follow-up questions */
+  furtherQuestions?: Array<string>
+  /** Run duration in seconds */
+  elapsedTime: number
+  /** Present only when `status` is `interrupted` */
+  interrupt?: Interrupt
+  /** Present only when the run failed */
+  error?: AgentError
+}
+
+/** Final run status of a conversation */
+export declare const enum ConversationStatus {
+  /** The run completed successfully */
+  Succeeded = 0,
+  /** The run is paused, waiting for `AgentContext.continueConversation` */
+  Interrupted = 1,
+  /** The run failed */
+  Failed = 2,
+  /** The run was stopped */
+  Stopped = 3
+}
+
+/**
+ * One event observed while streaming `AgentContext.conversationStreamed` or
+ * `AgentContext.continueConversationStreamed`.
+ *
+ * Design note: the Rust core models this as an enum with a per-variant
+ * payload (`longport::agent::ConversationStreamEvent`), but napi-rs has no
+ * ergonomic equivalent of a Rust/Serde "enum with data" for a plain
+ * `#[napi(object)]` value, and there's no existing precedent for reifying one
+ * as a single JS value in this codebase (the closest analogue,
+ * `trade::PushEvent`, is dispatched to separate per-variant JS callbacks
+ * instead). We instead mirror the common "discriminant + optional per-kind
+ * fields" shape used for tagged unions in plain JS/JSON: `kind` is one of
+ * `"chat_started" | "workflow_started" | "message" | "ping" |
+ * "thinking_started" | "thinking_finished" | "node_tool_use_started" |
+ * "node_tool_use_finished" | "subagent_started" | "subagent_progress" |
+ * "subagent_finished" | "agent_tool_started" | "agent_tool_progress" |
+ * "agent_tool_finished" | "human_interaction_required" | "query_masked" |
+ * "plan_changed" | "context_compress_started" | "context_compress_finished" |
+ * "chat_finished" | "workflow_finished" | "chat_title_updated" | "other"`,
+ * and exactly one of `chatStarted` / `workflowStarted` / `message` /
+ * `thinkingStarted` / `thinkingFinished` / `nodeToolUseStarted` /
+ * `nodeToolUseFinished` / `subagentStarted` / `subagentProgress` /
+ * `subagentFinished` / `agentToolStarted` / `agentToolProgress` /
+ * `agentToolFinished` / `humanInteractionRequired` / `queryMasked` /
+ * `planChanged` / `contextCompressStarted` / `contextCompressFinished` /
+ * `chatFinished` / `workflowFinished` / `chatTitleUpdated` / `other` is set,
+ * matching `kind` — except `"ping"`, a heartbeat with no payload, for which
+ * every payload field is `None`. When `kind` is `"other"`, `otherEvent`
+ * additionally carries the SSE envelope's `event` field (the event type
+ * name).
+ */
+export interface ConversationStreamEvent {
+  /**
+   * Discriminant: one of `"chat_started"`, `"workflow_started"`,
+   * `"message"`, `"ping"`, `"thinking_started"`, `"thinking_finished"`,
+   * `"node_tool_use_started"`, `"node_tool_use_finished"`,
+   * `"subagent_started"`, `"subagent_progress"`, `"subagent_finished"`,
+   * `"agent_tool_started"`, `"agent_tool_progress"`,
+   * `"agent_tool_finished"`, `"human_interaction_required"`,
+   * `"query_masked"`, `"plan_changed"`, `"context_compress_started"`,
+   * `"context_compress_finished"`, `"chat_finished"`,
+   * `"workflow_finished"`, `"chat_title_updated"`, or `"other"`
+   */
+  kind: string
+  /** Set when `kind` is `"chat_started"` */
+  chatStarted?: ChatStartedPayload
+  /** Set when `kind` is `"workflow_started"` */
+  workflowStarted?: WorkflowStartedPayload
+  /** Set when `kind` is `"message"` */
+  message?: MessagePayload
+  /** Set when `kind` is `"thinking_started"` */
+  thinkingStarted?: ThinkingStartedPayload
+  /** Set when `kind` is `"thinking_finished"` */
+  thinkingFinished?: ThinkingFinishedPayload
+  /** Set when `kind` is `"node_tool_use_started"` */
+  nodeToolUseStarted?: NodeToolUseStartedPayload
+  /** Set when `kind` is `"node_tool_use_finished"` */
+  nodeToolUseFinished?: NodeToolUseFinishedPayload
+  /** Set when `kind` is `"subagent_started"` */
+  subagentStarted?: SubagentStartedPayload
+  /** Set when `kind` is `"subagent_progress"` */
+  subagentProgress?: SubagentProgressPayload
+  /** Set when `kind` is `"subagent_finished"` */
+  subagentFinished?: SubagentFinishedPayload
+  /** Set when `kind` is `"agent_tool_started"` */
+  agentToolStarted?: AgentToolStartedPayload
+  /** Set when `kind` is `"agent_tool_progress"` */
+  agentToolProgress?: AgentToolProgressPayload
+  /** Set when `kind` is `"agent_tool_finished"` */
+  agentToolFinished?: AgentToolFinishedPayload
+  /**
+   * Set when `kind` is `"human_interaction_required"`, carrying the run's
+   * outcome for an interrupted run — the same `ConversationResponse` shape
+   * `workflowFinished` carries for the other outcomes. Unlike
+   * `workflowFinished`, this is set instead of (never alongside)
+   * `workflowFinished` for the same run.
+   */
+  humanInteractionRequired?: ConversationResponse
+  /** Set when `kind` is `"query_masked"` */
+  queryMasked?: QueryMaskedPayload
+  /** Set when `kind` is `"plan_changed"` */
+  planChanged?: PlanChangedPayload
+  /** Set when `kind` is `"context_compress_started"` */
+  contextCompressStarted?: ContextCompressStartedPayload
+  /** Set when `kind` is `"context_compress_finished"` */
+  contextCompressFinished?: ContextCompressFinishedPayload
+  /** Set when `kind` is `"chat_finished"` */
+  chatFinished?: ChatFinishedPayload
+  /**
+   * Set when `kind` is `"workflow_finished"`, carrying the run's outcome
+   * — not necessarily the last event of the stream, since the server may
+   * still emit a few more housekeeping events (`kind` `"other"`) before
+   * actually closing the connection
+   */
+  workflowFinished?: ConversationResponse
+  /** Set when `kind` is `"chat_title_updated"` */
+  chatTitleUpdated?: ChatTitleUpdatedPayload
+  /**
+   * Set when `kind` is `"other"` — the SSE envelope's `event` field (the
+   * event type name)
+   */
+  otherEvent?: string
+  /**
+   * Set when `kind` is `"other"` — raw JSON of an event type not
+   * recognized by this SDK version
+   */
+  other?: any
 }
 
 /** One corporate action event */
@@ -4012,6 +4572,19 @@ export interface ExtraConfigParams {
   enablePrintQuotePackages?: boolean
   /** Set the path of the log files (Default: `no logs`) */
   logPath?: string
+  /**
+   * Enable paper trading mode (default: `false`).
+   *
+   * When `true`, all API calls target the paper trading (simulation)
+   * environment.  The server validates the token: if it belongs to a
+   * real-money account the server returns an error.
+   *
+   * When `false` (the default) the server imposes no restrictions — both
+   * paper trading and real-money accounts are accepted.
+   *
+   * Paper trading users should set this to `true` as a safety guard.
+   */
+  enablePapertrading?: boolean
 }
 
 /** Filter warrant expiry date type */
@@ -4159,6 +4732,20 @@ export interface FundHolders {
   lists: Array<FundHolder>
 }
 
+/** Options for get all executions request */
+export interface GetAllExecutionsOptions {
+  /** Security symbol */
+  symbol?: string
+  /** Order id */
+  orderId?: string
+  /** Start time */
+  startAt?: Date
+  /** End time */
+  endAt?: Date
+  /** Page number */
+  page?: number
+}
+
 /** Options for get cash flow request */
 export interface GetCashFlowOptions {
   /** Start time */
@@ -4249,6 +4836,12 @@ export interface GetTodayOrdersOptions {
   market?: Market
   /** Order id */
   orderId?: string
+  /**
+   * When set together with order_id, indicates that order_id is an attached
+   * sub-order ID. The server returns the attached sub-order itself as an
+   * Order entry (not the parent order). Has no effect without order_id.
+   */
+  isAttached?: boolean
 }
 
 /** Data granularity */
@@ -4277,6 +4870,22 @@ export interface HoldingDetail {
   holdingType: string
   /** Holding type name */
   holdingTypeName: string
+}
+
+/** A single interaction requested while an Agent workflow is paused */
+export interface HumanInteraction {
+  /** Tool call that requested the interaction */
+  toolCallId: string
+  /** Stable key expected by `answersByToolCall` */
+  interruptId: string
+  /** Interaction type such as `ask_human` or `trade_password` */
+  interactionType: string
+  /** Human-readable tool name */
+  toolName: string
+  /** Questions and answer options presented to the user */
+  questions: Array<Question>
+  /** Original tool arguments, retained for host-specific UI rendering */
+  toolArgs: any
 }
 
 /** Index constituents response */
@@ -4474,6 +5083,25 @@ export declare const enum InstitutionRecommend {
   NoOpinion = 7
 }
 
+/**
+ * Present when a conversation run is interrupted, waiting for
+ * `AgentContext.continueConversation`
+ */
+export interface Interrupt {
+  /** ID of the node that triggered the interrupt */
+  nodeId: string
+  /** Tool call ID of this inquiry; used as the answer key when continuing */
+  toolCallId: string
+  /** Questions you need to answer */
+  questions: Array<Question>
+  /** Full interaction descriptors used to render and answer the pause */
+  interactions: Array<HumanInteraction>
+  /** ID of the paused message */
+  messageId: number
+  /** ID of the owning conversation */
+  chatId: number
+}
+
 /** Investor relations response */
 export interface InvestRelations {
   /** Link to IR page */
@@ -4614,6 +5242,43 @@ export interface MarketTimeItem {
   delaySubStatus: number
 }
 
+/**
+ * Payload of a `message` stream event — an incremental text chunk. This is
+ * the highest-frequency event; concatenate `text` fragments in arrival
+ * order.
+ */
+export interface MessagePayload {
+  /** Incremental text fragment */
+  text: string
+  /**
+   * `answer` — final answer text; `think` — reasoning process; `process`
+   * — stage progress description
+   */
+  messageType: string
+  /**
+   * Identifier of the stream segment this fragment belongs to. Fragments
+   * with the same `key` form one continuous block — group by `key` when
+   * rendering
+   */
+  key: string
+  /** Time this segment started, Unix timestamp in seconds */
+  startedAt: number
+  /** Stage identifier; only present when `messageType` is `"process"` */
+  stage: string
+  /**
+   * Stage title while running; only present when `messageType` is
+   * `"process"`
+   */
+  stageTitle: string
+  /**
+   * Stage title after it finishes; only present when `messageType` is
+   * `"process"`
+   */
+  stageFinishedTitle: string
+  /** Extra payload attached to the fragment; usually absent */
+  outputs?: any
+}
+
 /** Localized text in simplified Chinese, traditional Chinese, and English */
 export interface MultiLanguageText {
   english: string
@@ -4629,6 +5294,93 @@ export interface MyTopicsRequest {
   size?: number
   /** Filter by topic type: "article" or "post"; empty returns all */
   topicType?: string
+}
+
+/**
+ * Payload of a `node_tool_use_finished` stream event — the tool call has
+ * ended.
+ */
+export interface NodeToolUseFinishedPayload {
+  /** Matches the `toolUseId` of the started event */
+  toolUseId: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Error description on failure */
+  error: string
+  /** Call duration in seconds */
+  elapsedTime: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Localized display name */
+  toolName: string
+  /** Locale-stable tool identifier */
+  toolFuncName: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /** Tool category */
+  toolType: string
+  /** Progress text */
+  tips: string
+  /** Short tags; may be omitted */
+  tipChips: Array<string>
+  /** Round number */
+  iteration: number
+  /** `true` if the call happened during the thinking phase */
+  isThinking: boolean
+  /** Filtered call results, for display */
+  outputs: NodeToolUseOutputs
+}
+
+/**
+ * `outputs` of a `NodeToolUseFinishedPayload` — only carries fields meant
+ * for display
+ */
+export interface NodeToolUseOutputs {
+  /** Sources referenced by the tool result */
+  references?: Array<Reference>
+  /** Domains of the referenced sources */
+  referenceDomains?: Array<string>
+  /** The query the tool executed */
+  query?: string
+  /** Raw response text of the tool */
+  text?: string
+  /** Parsed request arguments */
+  toolArgs?: any
+  /** Structured result; present only for selected tools */
+  data?: any
+}
+
+/**
+ * Payload of a `node_tool_use_started` stream event — an ordinary tool call
+ * has started. Match it to its `NodeToolUseFinished` counterpart by
+ * `toolUseId`.
+ */
+export interface NodeToolUseStartedPayload {
+  /** Unique ID of this call; matches the finished event */
+  toolUseId: string
+  /** Localized display name of the tool */
+  toolName: string
+  /**
+   * Locale-stable tool identifier; use this for logic keyed on the tool
+   * kind
+   */
+  toolFuncName: string
+  /** Call arguments as a JSON string */
+  toolArgs: string
+  /**
+   * Progress text suitable for direct display, e.g. `"Searching the
+   * web…"`
+   */
+  tips: string
+  /** Short tags accompanying `tips`; may be omitted */
+  tipChips: Array<string>
+  /**
+   * Round number. Calls in the same round (same `iteration`) run in
+   * parallel
+   */
+  iteration: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
 }
 
 /** Key financial metrics from an operating report */
@@ -4705,7 +5457,7 @@ export declare const enum OptionType {
 
 /** Option volume stats response */
 export interface OptionVolumeStats {
-  /** Security symbol */
+  /** Underlying security symbol */
   symbol: string
   /** Total call volume */
   callVolume: number
@@ -4770,19 +5522,7 @@ export declare const enum OrderTag {
   /** Long term Order */
   LongTerm = 2,
   /** Grey Order */
-  Grey = 3,
-  /** Force Selling */
-  MarginCall = 4,
-  /** OTC */
-  Offline = 5,
-  /** Option Exercise Long */
-  Creditor = 6,
-  /** Option Exercise Short */
-  Debtor = 7,
-  /** Wavier Of Option Exercise */
-  NonExercise = 8,
-  /** Trade Allocation */
-  AllocatedSub = 9
+  Grey = 3
 }
 
 export declare const enum OrderType {
@@ -4825,7 +5565,9 @@ export declare const enum OutsideRTH {
   /** Any time */
   AnyTime = 2,
   /** Overnight */
-  Overnight = 3
+  Overnight = 3,
+  /** Overnight option */
+  OptionPreMarket = 4
 }
 
 /** Candlestick period */
@@ -4876,6 +5618,21 @@ export declare const enum PinnedMode {
   Add = 0,
   /** Unpin (remove) securities from the top */
   Remove = 1
+}
+
+/**
+ * Payload of a `plan_changed` stream event — the Agent created or updated
+ * its task plan.
+ */
+export interface PlanChangedPayload {
+  /** ID of the planning node */
+  nodeId: string
+  /** Time of the change, Unix timestamp in seconds */
+  startedAt: number
+  /** The current plan content */
+  outputs?: any
+  /** Identifies the planning tool */
+  toolName: string
 }
 
 /** One executive / board member */
@@ -5129,6 +5886,36 @@ export declare const enum PushCandlestickMode {
   Confirmed = 1
 }
 
+/**
+ * Payload of a `query_masked` stream event — sensitive content in the user
+ * query was masked before processing. Display `maskedQuery` instead of the
+ * original query.
+ */
+export interface QueryMaskedPayload {
+  /** The original user query */
+  rawQuery: string
+  /** The masked query */
+  maskedQuery: string
+}
+
+/** One question the Agent needs you to answer */
+export interface Question {
+  /** Question text */
+  question: string
+  /** Options; empty means free-form answer */
+  options: Array<QuestionOption>
+  /** Whether multiple options may be selected */
+  multiSelect: boolean
+}
+
+/** One option of a `Question` */
+export interface QuestionOption {
+  /** Short UI label for the option */
+  label: string
+  /** Option text */
+  description: string
+}
+
 /** Rank categories response. `data` is a JSON string. */
 export interface RankCategoriesResponse {
   /** Raw rank categories data (JSON string) */
@@ -5238,6 +6025,61 @@ export interface RecentBuybacks {
   netBuybackYieldTtm: string
 }
 
+/** A source referenced by the answer */
+export interface Reference {
+  /** Reference index */
+  index: number
+  /** Original index in the source list, before any reranking */
+  originalIndex: number
+  /** Reference kind, e.g. `"NewsArticle"` */
+  refType: string
+  /** Reference id */
+  id: string
+  /** Reference title */
+  title: string
+  /** Reference URL */
+  url: string
+  /**
+   * Full reference payload as sent by the server; kept as raw JSON
+   * because the field set varies by reference `ref_type`
+   */
+  content?: any
+}
+
+/** Parameters for replacing an attached order */
+export interface ReplaceAttachedParams {
+  /** Attached order type */
+  attachedOrderType: AttachedOrderType
+  /** Profit taker price */
+  profitTakerPrice?: Decimal
+  /** Stop loss price */
+  stopLossPrice?: Decimal
+  /** Time in force type */
+  timeInForce?: TimeInForceType
+  /** Expire time (unix timestamp) */
+  expireTime?: number
+  /** Activate order type */
+  activateOrderType?: OrderType
+  /** Profit taker submit price */
+  profitTakerSubmitPrice?: Decimal
+  /** Stop loss submit price */
+  stopLossSubmitPrice?: Decimal
+  /** Activate RTH */
+  activateRth?: OutsideRTH
+  /** Profit taker order ID */
+  profitTakerId?: number
+  /** Stop loss order ID */
+  stopLossId?: number
+  /** Cancel all attached orders */
+  cancelAllAttached?: boolean
+  /** Main order ID */
+  mainId?: number
+  /** Quantity */
+  quantity?: Decimal
+  /** Market price */
+  marketPrice?: Decimal
+}
+
 /** Options for replace order request */
 export interface ReplaceOrderOptions {
   /** Order id */
@@ -5262,6 +6104,8 @@ export interface ReplaceOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+  /** Attached order parameters */
+  attachedParams?: ReplaceAttachedParams
 }
 
 /** A filter condition for screener_search Mode B. */
@@ -5614,6 +6458,105 @@ export interface StockRatings {
   ratingsJson: string
 }
 
+/** Payload of a `subagent_finished` stream event */
+export interface SubagentFinishedPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** Matches the `toolUseId` of `SubagentStarted` */
+  toolUseId: string
+  /** `succeeded` / `failed` */
+  status: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Total subagent duration in seconds */
+  elapsedTime: number
+  /** Error description on failure */
+  error: string
+  /**
+   * Subagent result: `goal`, `result`, and the timeline of tool calls it
+   * made
+   */
+  outputs: SubagentOutputs
+}
+
+/** `outputs` of a `SubagentFinishedPayload` */
+export interface SubagentOutputs {
+  /** The goal that was assigned to the subagent */
+  goal?: string
+  /** The subagent's result */
+  result?: string
+  /** Timeline of tool calls the subagent made */
+  subagentTools?: Array<any>
+}
+
+/**
+ * Payload of a `subagent_progress` stream event, emitted every time the
+ * subagent calls one of its own tools. Use it to render a live timeline
+ * inside the subagent card.
+ */
+export interface SubagentProgressPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** `toolUseId` of the owning `SubagentStarted` event */
+  parentToolCallId: string
+  /** Name of the tool the subagent called */
+  subagentToolName: string
+  /** Arguments of that call, as a JSON string */
+  subagentToolArgs: string
+  /** Status of that call: `running` / `succeeded` / `failed` */
+  subagentStatus: string
+  /** Duration of that call in milliseconds */
+  subagentDurationMs: number
+  /** The subagent's internal round number */
+  subagentIteration: number
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+}
+
+/**
+ * Payload of a `subagent_started` stream event. When the Agent spawns a
+ * subagent to work on a sub-task, the subagent's lifecycle is reported with
+ * this dedicated event family instead of `nodeToolUse*`.
+ */
+export interface SubagentStartedPayload {
+  /** ID of the node that spawned the subagent */
+  nodeId: string
+  /** Unique ID of this spawn; matches the finished event */
+  toolUseId: string
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
+  /** Goal assigned to the subagent */
+  goal: string
+  /** Full task prompt given to the subagent */
+  prompt: string
+  /** Subagent identifier; may be omitted */
+  subagentId: string
+  /** Tools granted to the subagent; may be omitted */
+  tools: Array<any>
+}
+
+/** Parameters for submitting an attached order */
+export interface SubmitAttachedParams {
+  /** Attached order type */
+  attachedOrderType: AttachedOrderType
+  /** Profit taker price */
+  profitTakerPrice?: Decimal
+  /** Stop loss price */
+  stopLossPrice?: Decimal
+  /** Time in force type */
+  timeInForce?: TimeInForceType
+  /** Expire time (unix timestamp) */
+  expireTime?: number
+  /** Activate order type */
+  activateOrderType?: OrderType
+  /** Profit taker submit price */
+  profitTakerSubmitPrice?: Decimal
+  /** Stop loss submit price */
+  stopLossSubmitPrice?: Decimal
+  /** Activate RTH */
+  activateRth?: OutsideRTH
+}
+
 /** Options for submit order request */
 export interface SubmitOrderOptions {
   /** Security code */
@@ -5651,6 +6594,14 @@ export interface SubmitOrderOptions {
   monitorPrice?: Decimal
   /** Remark (Maximum 64 characters) */
   remark?: string
+  /**
+   * Client request ID for idempotency control.
+   * If not specified, idempotency control is skipped.
+   * The server caches this ID for 10 minutes.
+   */
+  clientRequestId?: string
+  /** Attached order parameters */
+  attachedParams?: SubmitAttachedParams
 }
 
 /** Quote type of subscription */
@@ -5663,6 +6614,28 @@ export declare const enum SubType {
   Brokers = 2,
   /** Trade */
   Trade = 3
+}
+
+/**
+ * Payload of a `thinking_finished` stream event — the reasoning phase is
+ * over; answer text (`Message` with `messageType == "answer"`) follows.
+ */
+export interface ThinkingFinishedPayload {
+  /** Finish time, Unix timestamp in seconds */
+  finishedAt: number
+  /** Reasoning duration in seconds */
+  elapsedTime: number
+}
+
+/**
+ * Payload of a `thinking_started` stream event — the Agent has entered the
+ * reasoning phase (analyzing the question, planning tool calls). Between
+ * this and `ThinkingFinished`, `Message` events with `messageType ==
+ * "think"` and tool-call events may arrive.
+ */
+export interface ThinkingStartedPayload {
+  /** Start time, Unix timestamp in seconds */
+  startedAt: number
 }
 
 /** Time in force type */
@@ -5846,6 +6819,512 @@ export interface UpdateWatchlistGroup {
   securities?: Array<string>
   /** Securities Update mode */
   mode: SecuritiesUpdateMode
+}
+
+/** AI chat context embedded in USAnalystConsensus. */
+export interface USAIChatData {
+  agentId: string
+  handoffAgentId: string
+  symbol: string
+  text: string
+  chatType: string
+  workflowType: string
+}
+
+/** US analyst consensus estimates and AI analysis. */
+export interface USAnalystConsensus {
+  aiSummary: string
+  aichatData: USAIChatData
+  currency: string
+  report: string
+  list: Array<USConsensusItem>
+  optReports: Array<string>
+  h5Data: any
+}
+
+/** US account asset snapshot */
+export interface USAssetOverview {
+  accountType: string
+  assetTimestamp: number
+  cashBuyPower: string
+  overnightBuyPower: string
+  currency: string
+  cashList: Array<USCashEntry>
+  stockList: Array<USStockEntry>
+  optionList: Array<any>
+  cryptoList: Array<USCryptoEntry>
+  multiLeg: any
+}
+
+/** One bracket/conditional sub-order attached to a main order. */
+export interface USAttachedOrder {
+  attachedTypeDisplay: number
+  executedQty: string
+  quantity: string
+  status: string
+  triggerPrice: string
+  orderId: string
+  gtd: string
+  timeInForce: number
+  tag: number
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  symbol: string
+  withdrawn: boolean
+}
+
+/** Action-button state for an order. */
+export interface USButtonControl {
+  withdraw: number
+  replace: number
+  exceptionable: Array<string>
+}
+
+/** One cash currency entry in USAssetOverview */
+export interface USCashEntry {
+  currency: string
+  frozenBuyCash: string
+  outstanding: string
+  settledCash: string
+  totalAmount: string
+  totalCash: string
+}
+
+/** Fee breakdown for an order. */
+export interface USChargeDetail {
+  currency: string
+  totalAmount: string
+  items: Array<USChargeItem>
+}
+
+/** One fee category within USChargeDetail. */
+export interface USChargeItem {
+  code: number
+  name: string
+  fees: Array<string>
+}
+
+/** US company dividends */
+export interface USCompanyDividends {
+  recentDividends: USRecentDividend
+  dividendHistory: Array<USDividendHistoryItem>
+  payoutRatios: Array<USDividendHistoryItem>
+  dividendPayoutHistory: Array<USDividendPayoutRecord>
+}
+
+/** US company overview */
+export interface USCompanyOverview {
+  intro: string
+  marketCap: string
+  ccySymbol: string
+  topRankTags: Array<USRankTag>
+  detailUrl: string
+  shareList: Array<USSharelistItem>
+}
+
+/** Actual vs estimated value for one consensus metric. */
+export interface USConsensusEstimate {
+  actual: string
+  estimate: string
+}
+
+/** One fiscal-year entry in USAnalystConsensus.list. */
+export interface USConsensusItem {
+  ebit: USConsensusEstimate
+  eps: USConsensusEstimate
+  fiscalYear: number
+  reportTxt: string
+  revenue: USConsensusEstimate
+}
+
+/** One cryptocurrency holding in USAssetOverview */
+export interface USCryptoEntry {
+  assetType: string
+  averageCost: string
+  symbol: string
+  currency: string
+  industryName: string
+}
+
+/** US cryptocurrency market overview */
+export interface USCryptoOverview {
+  name: string
+  ticker: string
+  currency: string
+  allTimeHigh: string
+  allTimeHighDate: string
+  allTimeLow: string
+  allTimeLowDate: string
+  ipoDate: string
+  issuePrice: string
+  shares: string
+  officialWebAddress: string
+  /** User-facing symbol (e.g. "BTCUSD.BKKT"), converted from counter_id */
+  symbol: string
+  baseAsset: string
+  logo: string
+  wikiUrl: string
+  /** Profile serialized as JSON string */
+  profile: string
+}
+
+/** One fiscal-year row in dividend_history or payout_ratios. */
+export interface USDividendHistoryItem {
+  fiscalYear: string
+  fiscalYearRange: string
+  totalShareholderYield: string
+  dividend: string
+  dividendYield: string
+  dividendGrowthRate: string
+  dividendPayoutRatio: string
+  dividendToCashflowRatio: string
+  netBuyback: string
+  netBuybackYield: string
+  netBuybackGrowthRate: string
+  netBuybackPayoutRatio: string
+  netBuybackToCashflowRatio: string
+  currency: string
+}
+
+/** US dividend item */
+export interface USDividendItem {
+  dividend: string
+  dividendType: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+}
+
+/** One actual dividend payment event. */
+export interface USDividendPayoutRecord {
+  dividend: string
+  dividendType: string
+  currency: string
+  exDate: string
+  paymentDate: string
+  recordDate: string
+  title: string
+  startTimeUnix: string
+}
+
+/** US ETF dividend info */
+export interface USETFDividendInfo {
+  dividendTtm: string
+  dividendYieldTtm: string
+  dividendFrequency: string
+  currency: string
+  fiscalYearInfo: Array<USFiscalYearDividend>
+}
+
+/** US ETF file */
+export interface USETFFile {
+  fileName: string
+  filePath: string
+  updateDate: string
+  code: string
+  format: string
+}
+
+/** US ETF files response */
+export interface USETFFilesResponse {
+  files: Array<USETFFile>
+}
+
+/** One balance-sheet entry in USFinancialOverview. */
+export interface USFinancialBSItem {
+  debtAssetsRatio: string
+  totalAssets: string
+  totalLiabilities: string
+  report: USReportPeriod
+}
+
+/** One cash-flow entry in USFinancialOverview. */
+export interface USFinancialCFItem {
+  operating: string
+  investing: string
+  financing: string
+  report: USReportPeriod
+}
+
+/** One income-statement entry in USFinancialOverview. */
+export interface USFinancialISItem {
+  revenue: string
+  netIncome: string
+  netMargin: string
+  report: USReportPeriod
+}
+
+/** US financial overview — income statement, balance sheet, and cash flow. */
+export interface USFinancialOverview {
+  ccySymbol: string
+  reportType: string
+  isList: Array<USFinancialISItem>
+  bsList: Array<USFinancialBSItem>
+  cfList: Array<USFinancialCFItem>
+}
+
+/** US financial statement */
+export interface USFinancialStatement {
+  currency: string
+  report: string
+  list: Array<USFinancialStatementPeriod>
+  emptyFields: Array<string>
+}
+
+/** One financial field within a USFinancialStatementPeriod. */
+export interface USFinancialStatementField {
+  displayOrder: number
+  field: string
+  id: string
+  level: number
+  name: string
+  value: string
+  valueType: string
+  yoy: string
+}
+
+/** One reporting period in USFinancialStatement. */
+export interface USFinancialStatementPeriod {
+  ffPeriod: string
+  ffYear: number
+  fields: Array<USFinancialStatementField>
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+}
+
+/** Per-fiscal-year dividend row for a US ETF. */
+export interface USFiscalYearDividend {
+  dividend: string
+  dividendYield: string
+  fiscalYear: string
+  currency: string
+  fiscalYearRange: string
+}
+
+/** US key financial metrics — ratios and indicators per reporting period. */
+export interface USKeyFinancialMetrics {
+  currency: string
+  report: string
+  emptyFields: Array<string>
+  list: Array<USKeyMetricItem>
+}
+
+/** One period entry in USKeyFinancialMetrics. */
+export interface USKeyMetricItem {
+  ffPeriod: string
+  ffYear: number
+  fpEnd: string
+  reportTxt: string
+  rptDate: string
+  fields: Array<any>
+}
+
+/** Full typed order object within USOrderDetailResponse. */
+export interface USOrderDetail {
+  id: string
+  aaid: string
+  accountChannel: string
+  action: number
+  symbol: string
+  underlyingSymbol: string
+  securityType: string
+  name: string
+  currency: string
+  tradeCurrency: string
+  orderType: string
+  status: string
+  price: string
+  quantity: string
+  executedQty: string
+  executedPrice: string
+  executedAmount: string
+  operateDirection: string
+  timeInForce: number
+  gtd: string
+  tag: number
+  msg: string
+  forceOnlyRth: number
+  submittedAt: string
+  doneAt: string
+  triggerPrice: string
+  triggerAt: string
+  triggerStatus: number
+  triggerExchange: string
+  triggerLastDone: string
+  triggerCount: number
+  tailingAmount: string
+  tailingPercent: string
+  limitOffset: string
+  limitDepthLevel: number
+  marketPrice: string
+  submittedAmount: string
+  estimatedFee: string
+  freeStatus: number
+  freeAmount: string
+  freeCurrency: string
+  deductionsStatus: number
+  deductionsAmount: string
+  deductionsCurrency: string
+  platformDeductionsStatus: number
+  platformDeductionsAmount: string
+  platformDeductionsCurrency: string
+  displayAccount: string
+  settlementAccount: string
+  settlementChannel: string
+  customerName: string
+  realName: string
+  enName: string
+  jointRealName: string
+  jointEnName: string
+  orgId: string
+  bcan: string
+  opEntrustWay: number
+  opEntrustWayName: string
+  remark: string
+  notice: string
+  shortSellType: number
+  ployType: string
+  ployId: string
+  ployStatus: string
+  trend: number
+  withdrawalReason: string
+  activateOrderType: string
+  activateRth: number
+  submitPrice: string
+  contractDirection: string
+  strikePrice: string
+  contractSize: string
+  monitorPrice: string
+  buttonControl: USButtonControl
+  chargeDetail?: USChargeDetail
+  attachedOrders: Array<USAttachedOrder>
+  orderHistories: Array<USOrderHistory>
+}
+
+/** Response for us_order_detail. */
+export interface USOrderDetailResponse {
+  order?: USOrderDetail
+  currentAttachedOrder?: USOrderDetail
+  currentMillisecond: string
+}
+
+/** One order state-transition entry within USOrderDetail. */
+export interface USOrderHistory {
+  execType: number
+  status: string
+  price: string
+  qty: string
+  time: string
+  msg: string
+  isManually: boolean
+  oppPartyId: string
+  trdMatchId: string
+  operator: string
+  opEntrustWay: string
+  cxlRejResponseTo: number
+  withdrawalReason: string
+  oppName: string
+  execId: string
+}
+
+/** Industry rank tag */
+export interface USRankTag {
+  key: string
+  location: number
+  title: string
+  text: string
+  rankType: number
+  highlightText: string
+}
+
+/** Realized P&L response for a US account */
+export interface USRealizedPL {
+  realizedPlList: Array<USRealizedPLEntry>
+}
+
+/** One asset-category entry in USRealizedPL */
+export interface USRealizedPLEntry {
+  category: number
+  currency: string
+  metrics: Array<USRealizedPLMetric>
+}
+
+/** One time-period metric in USRealizedPLEntry */
+export interface USRealizedPLMetric {
+  amount: string
+  period: number
+  rate: string
+}
+
+/** TTM dividend summary within USCompanyDividends. */
+export interface USRecentDividend {
+  dividendTtm: string
+  dividendYieldTtm: string
+  payouts: string
+  currency: string
+}
+
+/** One reporting-period window shared by IS/BS/CF entries. */
+export interface USReportPeriod {
+  startDate: string
+  endDate: string
+  reportTxt: string
+}
+
+/** One entry in USCompanyOverview.share_list. */
+export interface USSharelistItem {
+  chg: string
+  id: string
+  name: string
+}
+
+/** One stock/equity position in USAssetOverview */
+export interface USStockEntry {
+  symbol: string
+  fullSymbol: string
+  assetType: string
+  quantity: string
+  currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
+  industryName: string
+}
+
+/** One valuation metric entry in USValuationOverview.metrics */
+export interface USValuationMetric {
+  circle: string
+  part: string
+  metric: string
+  desc: string
+  industryMedian: string
+}
+
+/** US valuation overview */
+export interface USValuationOverview {
+  metrics: Record<string, USValuationMetric>
+  indicator: string
+  range: number
+  date: string
+  ccySymbol: string
+  aichatData: USAIChatData
+  aiSummary: string
 }
 
 /** One security's valuation comparison item. */
@@ -6066,4 +7545,49 @@ export declare const enum WarrantType {
   Bear = 4,
   /** Inline */
   Inline = 5
+}
+
+/** `inputs` of a `workflow_started` stream event */
+export interface WorkflowStartedInputs {
+  /** ID of the owning conversation */
+  chatId: number
+  /** Conversation identifier */
+  chatUid: string
+  /** Message ID of this round */
+  messageId: string
+  /** The question that was asked */
+  query: string
+}
+
+/**
+ * Payload of a `workflow_started` stream event, observed right after
+ * `chat_started`
+ */
+export interface WorkflowStartedPayload {
+  /** Whether this run's answer was served from a cache */
+  hitCache: boolean
+  /** Echoes the run's inputs */
+  inputs: WorkflowStartedInputs
+  /** Unix timestamp in seconds */
+  startedAt: number
+  /** Internal workflow run ID */
+  workflowId: number
+}
+
+/** A Workspace the current account belongs to */
+export interface Workspace {
+  /** Workspace ID */
+  id: string
+  /** Workspace name */
+  name: string
+  /** Creation time, Unix timestamp in seconds */
+  createdAt: number
+  /** Last updated time, Unix timestamp in seconds */
+  updatedAt: number
+}
+
+/** Response for `AgentContext.workspaces` */
+export interface WorkspacesResponse {
+  /** Workspaces the current account belongs to */
+  workspaces: Array<Workspace>
 }

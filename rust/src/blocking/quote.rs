@@ -14,8 +14,8 @@ use crate::{
         RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
         SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
         ShortPositionsResponse, ShortTradesResponse, SortOrderType, StrikePriceInfo, SubFlags,
-        Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
-        WarrantStatus, WarrantType, WatchlistGroup,
+        Subscription, Trade, TradeSessions, USCryptoOverview, WarrantInfo, WarrantQuote,
+        WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
     },
 };
 
@@ -432,7 +432,9 @@ impl QuoteContextSync {
     /// ```no_run
     /// use std::sync::Arc;
     ///
-    /// use longport::{Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::TradeSessions};
+    /// use longport::{
+    ///     Config, blocking::QuoteContextSync, oauth::OAuthBuilder, quote::TradeSessions,
+    /// };
     ///
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let oauth =
@@ -1229,5 +1231,16 @@ impl QuoteContextSync {
     ) -> Result<std::collections::HashMap<String, String>> {
         self.rt
             .call(move |ctx| async move { ctx.resolve_counter_ids(symbols).await })
+    }
+
+    // ── US-market blocking wrappers ───────────────────────────────────────────
+
+    /// Get cryptocurrency market overview (blocking)
+    pub fn us_crypto_overview(
+        &self,
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<USCryptoOverview> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_crypto_overview(symbol).await })
     }
 }

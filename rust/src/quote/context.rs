@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use longport_httpcli::{HttpClient, Json, Method};
+use longport_httpcli::{DcRegion, HttpClient, Json, Method};
 use longport_proto::quote;
 use longport_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
@@ -242,7 +242,7 @@ impl QuoteContext {
 
     /// Subscribe
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/subscribe/subscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/subscribe/subscribe>
     ///
     /// # Examples
     ///
@@ -292,7 +292,7 @@ impl QuoteContext {
 
     /// Unsubscribe
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/subscribe/unsubscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/subscribe/unsubscribe>
     ///
     /// # Examples
     ///
@@ -443,7 +443,7 @@ impl QuoteContext {
 
     /// Get basic information of securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/static>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/static>
     ///
     /// # Examples
     ///
@@ -487,7 +487,7 @@ impl QuoteContext {
 
     /// Get quote of securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/quote>
     ///
     /// # Examples
     ///
@@ -528,7 +528,7 @@ impl QuoteContext {
 
     /// Get quote of option securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/option-quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/option-quote>
     ///
     /// # Examples
     ///
@@ -567,7 +567,7 @@ impl QuoteContext {
 
     /// Get quote of warrant securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/warrant-quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/warrant-quote>
     ///
     /// # Examples
     ///
@@ -606,7 +606,7 @@ impl QuoteContext {
 
     /// Get security depth
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/depth>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/depth>
     ///
     /// # Examples
     ///
@@ -652,7 +652,7 @@ impl QuoteContext {
 
     /// Get security brokers
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/brokers>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/brokers>
     ///
     /// # Examples
     ///
@@ -674,6 +674,17 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {
+        // Broker queue is served only by the AP data center; short-circuit a
+        // non-AP session with the same unified error the HTTP path returns.
+        let current = self.0.http_cli.dc_region().await;
+        if !current.allows(longport_httpcli::DcRegion::Ap) {
+            return Err(longport_httpcli::HttpClientError::DcRegionRestricted {
+                path: "quote/brokers (WebSocket)".to_string(),
+                required: longport_httpcli::DcRegion::Ap,
+                current,
+            }
+            .into());
+        }
         let resp: quote::SecurityBrokersResponse = self
             .request(
                 cmd_code::GET_SECURITY_BROKERS,
@@ -690,7 +701,7 @@ impl QuoteContext {
 
     /// Get participants
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/broker-ids>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/broker-ids>
     ///
     /// # Examples
     ///
@@ -732,7 +743,7 @@ impl QuoteContext {
 
     /// Get security trades
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/trade>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade>
     ///
     /// # Examples
     ///
@@ -773,7 +784,7 @@ impl QuoteContext {
 
     /// Get security intraday lines
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/intraday>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/intraday>
     ///
     /// # Examples
     ///
@@ -822,7 +833,7 @@ impl QuoteContext {
 
     /// Get security candlesticks
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/candlestick>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/candlestick>
     ///
     /// # Examples
     ///
@@ -995,7 +1006,7 @@ impl QuoteContext {
 
     /// Get option chain expiry date list
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/optionchain-date>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/optionchain-date>
     ///
     /// # Examples
     ///
@@ -1041,7 +1052,7 @@ impl QuoteContext {
 
     /// Get option chain info by date
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/optionchain-date-strike>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/optionchain-date-strike>
     ///
     /// # Examples
     ///
@@ -1095,7 +1106,7 @@ impl QuoteContext {
 
     /// Get warrant issuers
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/issuer>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/issuer>
     ///
     /// # Examples
     ///
@@ -1179,7 +1190,7 @@ impl QuoteContext {
 
     /// Get trading session of the day
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/trade-session>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade-session>
     ///
     /// # Examples
     ///
@@ -1222,7 +1233,7 @@ impl QuoteContext {
     /// The interval must be less than one month, and only the most recent year
     /// is supported.
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/trade-day>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade-day>
     ///
     /// # Examples
     ///
@@ -1284,7 +1295,7 @@ impl QuoteContext {
 
     /// Get capital flow intraday
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/capital-flow-intraday>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/capital-flow-intraday>
     ///
     /// # Examples
     ///
@@ -1320,7 +1331,7 @@ impl QuoteContext {
 
     /// Get capital distribution
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/capital-distribution>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/capital-distribution>
     ///
     /// # Examples
     ///
@@ -1388,7 +1399,7 @@ impl QuoteContext {
 
     /// Get watchlist
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_groups>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_groups>
     ///
     /// # Examples
     ///
@@ -1428,7 +1439,7 @@ impl QuoteContext {
 
     /// Create watchlist group
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_create_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_create_group>
     ///
     /// # Examples
     ///
@@ -1486,7 +1497,7 @@ impl QuoteContext {
 
     /// Delete watchlist group
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_delete_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_delete_group>
     ///
     /// # Examples
     ///
@@ -1525,8 +1536,8 @@ impl QuoteContext {
 
     /// Update watchlist group
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_update_group>
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_update_group_securities>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_update_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_update_group_securities>
     ///
     /// # Examples
     ///
@@ -1643,7 +1654,7 @@ impl QuoteContext {
 
     /// Get current market temperature
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/market_temperature>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/market_temperature>
     ///
     /// # Examples
     ///
@@ -1684,7 +1695,7 @@ impl QuoteContext {
 
     /// Get historical market temperature
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/history_market_temperature>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/history_market_temperature>
     ///
     /// # Examples
     ///
@@ -2332,6 +2343,41 @@ impl QuoteContext {
             }
         }
         Ok(result)
+    }
+
+    // ── US-market APIs ────────────────────────────────────────────────────────
+
+    /// Get cryptocurrency market overview.
+    ///
+    /// `symbol` must be in `PAIR.EXCHANGE` format.
+    /// US DC uses the **BKKT** exchange: e.g. `"BTCUSD.BKKT"` →
+    /// `"VA/BKKT/BTCUSD"`. Pass the exchange suffix explicitly.
+    ///
+    /// Path: `GET /v1/us/gemini/crypto-overview`
+    ///
+    /// US token required.
+    pub async fn us_crypto_overview(
+        &self,
+        symbol: impl Into<String>,
+    ) -> Result<crate::quote::USCryptoOverview> {
+        use crate::utils::counter::symbol_to_counter_id;
+        #[derive(Serialize)]
+        struct Query {
+            counter_id: String,
+        }
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/gemini/crypto-overview")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                counter_id: symbol_to_counter_id(&symbol.into()),
+            })
+            .response::<Json<crate::quote::USCryptoOverview>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
     }
 }
 

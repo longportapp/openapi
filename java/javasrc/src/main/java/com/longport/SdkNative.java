@@ -2,6 +2,7 @@ package com.longport;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.concurrent.Flow;
 import java.util.function.Consumer;
 import org.scijava.nativelib.NativeLoader;
 
@@ -51,6 +52,8 @@ public class SdkNative {
         public static native long configSetEnablePrintQuotePackages(long config, boolean enable);
 
         public static native long configSetLogPath(long config, String logPath);
+
+        public static native long configSetEnablePapertrading(long config);
 
         public static native void configRefreshAccessToken(long config, OffsetDateTime expiredAt,
                         AsyncCallback callback);
@@ -219,6 +222,9 @@ public class SdkNative {
         public static native void tradeContextTodayExecutions(long context, GetTodayExecutionsOptions opts,
                         AsyncCallback callback);
 
+        public static native void tradeContextAllExecutions(long context, GetAllExecutionsOptions opts,
+                        AsyncCallback callback);
+
         public static native void tradeContextHistoryOrders(long context, GetHistoryOrdersOptions opts,
                         AsyncCallback callback);
 
@@ -233,6 +239,9 @@ public class SdkNative {
 
         public static native void tradeContextCancelOrder(long context, String orderId, AsyncCallback callback);
 
+        public static native void tradeContextCancelOrderAttached(long context, String orderId,
+                        AsyncCallback callback);
+
         public static native void tradeContextAccountBalance(long context, String currency, AsyncCallback callback);
 
         public static native void tradeContextCashFlow(long context, GetCashFlowOptions opts, AsyncCallback callback);
@@ -246,6 +255,8 @@ public class SdkNative {
         public static native void tradeContextMarginRatio(long context, String symbol, AsyncCallback callback);
 
         public static native void tradeContextOrderDetail(long context, String orderId, AsyncCallback callback);
+
+        public static native void tradeContextOrderDetailAttached(long context, String orderId, Object callback);
 
         public static native void tradeContextEstimateMaxPurchaseQuantity(long context,
                         EstimateMaxPurchaseQuantityOptions opts,
@@ -464,6 +475,31 @@ public class SdkNative {
 
         public static native void quoteContextUpdatePinned(long context, Object req,
                         AsyncCallback callback);
+
+        // ── AgentContext ──────────────────────────────────────────────
+
+        public static native long newAgentContext(long config);
+        public static native void freeAgentContext(long context);
+
+        public static native void agentContextWorkspaces(long context, AsyncCallback callback);
+        public static native void agentContextAgents(long context, String workspaceId, Object opts,
+                        AsyncCallback callback);
+        public static native void agentContextPublicAgents(long context, Object opts,
+                        AsyncCallback callback);
+        public static native void agentContextConversation(long context, String agentId, String query,
+                        String chatUid, String parentMessageId, AsyncCallback callback);
+        public static native void agentContextContinueConversation(long context, String agentId, String chatUid,
+                        String messageId, String answersByToolCallJson, AsyncCallback callback);
+
+        public static native void agentContextConversationStreamSubscribe(long context, String agentId, String query,
+                        String chatUid, String parentMessageId, Flow.Subscriber<?> subscriber);
+        public static native void agentContextContinueConversationStreamSubscribe(long context, String agentId,
+                        String chatUid, String messageId, String answersByToolCallJson,
+                        Flow.Subscriber<?> subscriber);
+
+        public static native void conversationStreamSubscriptionRequest(long handle, long n);
+        public static native void conversationStreamSubscriptionCancel(long handle);
+        public static native void freeConversationStreamSubscription(long handle);
 
         static {
                 try {

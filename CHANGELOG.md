@@ -6,6 +6,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+> Synced with longbridge/openapi 4.4.0 → 4.5.0 (the 4.3.6/4.3.7 stability fixes
+> released here earlier are part of that range and are not repeated below).
+
+### Added
+
+- **All languages:** **US market APIs** — 14 new interfaces for US-region accounts (requires `us_` token): US stock-info series (company overview, valuation overview, financial overview, financial statements, key financial metrics, analyst consensus, ETF dividend info, ETF files, company dividends), `us_query_orders` / `us_order_detail`, US assets overview, and the Gemini crypto overview
+- **All languages:** **DC-region routing** — `x-dc-region` header auto-derived from the token prefix (`us_` → US, others → AP)
+- **All languages:** **AI Agent module** — new `AgentContext` for the AI Agent conversation API: `workspaces` / `agents` / `public_agents`, blocking and SSE-streamed `conversation` (with `chat_uid` / `parent_message_id` continuation), typed stream events, `further_questions`, full `Reference` payloads, `Interrupt.interactions` (`HumanInteraction`) and `QuestionOption.label`
+- **All languages:** paper trading mode support via `Config` (`enable_papertrading`)
+- **All languages:** attached order (take-profit / stop-loss) support for `submit_order` and `replace_order`; `submit_order` gains optional `client_request_id` for idempotency control
+- **All languages:** new `all_executions` (`GET /v3/trade/execution/all`) with pagination (temporarily disabled pending API availability); `OutsideRTH` gains `OptionPreMarket` for overnight option orders
+
+### Changed
+
+- **All languages:** `OrderTag` enum: `GTC` renamed to `Gtc`; undocumented variants removed
+- **Node.js SDK:** removed musl (x86_64-unknown-linux-musl) target support
+- **Rust:** non-OpenAPI HTTP error responses now preserve the status, trace ID, headers, and raw body instead of being reduced to a status code
+
+### Breaking changes
+
+- **All languages:** `OrderDetail.charge_detail` is now optional (attached orders return `null` for this field); the C struct gains `has_charge_detail`
+
 ## [4.3.7] - 2026-08-12
 
 ### Changed

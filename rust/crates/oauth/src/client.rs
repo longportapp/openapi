@@ -16,7 +16,7 @@ use crate::{
 
 const OAUTH_BASE_URL: &str = "https://openapi.longportapp.com/oauth2";
 const OAUTH_BASE_URL_CN: &str = "https://openapi.longport.cn/oauth2";
-const OAUTH_BASE_URL_TEST: &str = "https://openapi.longport.xyz/oauth2";
+const OAUTH_BASE_URL_TEST: &str = "https://openapi-global.longport.xyz/oauth2";
 
 async fn oauth_base_url() -> &'static str {
     if std::env::var("LONGPORT_ENV")
@@ -42,7 +42,7 @@ pub(crate) struct OAuthInner {
     pub(crate) token: tokio::sync::Mutex<Option<OAuthToken>>,
 }
 
-/// OAuth 2.0 client for Longport OpenAPI.
+/// OAuth 2.0 client for LongPort OpenAPI.
 ///
 /// Obtain an instance via [`crate::OAuthBuilder`].  Cloning is cheap — all
 /// clones share the same internal state through an [`Arc`].
@@ -215,7 +215,7 @@ impl OAuth {
     }
 }
 
-/// Build the oauth2 BasicClient for Longport endpoints.
+/// Build the oauth2 BasicClient for LongPort endpoints.
 async fn create_oauth_client(client_id: &str, redirect_uri: &str) -> BasicClient {
     let base = oauth_base_url().await;
     BasicClient::new(

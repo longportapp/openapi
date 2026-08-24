@@ -2,7 +2,7 @@
 edition.workspace = true
 name = "longport"
 version.workspace = true
-description = "Longport OpenAPI SDK for Rust"
+description = "LongPort OpenAPI SDK for Rust"
 homepage = "https://open.longportapp.com/en/"
 readme = "README.md"
 repository = "https://github.com/longportapp/openapi"

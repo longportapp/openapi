@@ -27,7 +27,7 @@ impl ContentContext {
 
     /// Get topics created by the current authenticated user.
     ///
-    /// See: <https://open.longport.com/docs/api?op=list_my_topics>
+    /// See: <https://open.longportapp.com/docs/api?op=list_my_topics>
     pub async fn my_topics(&self, opts: MyTopicsOptions) -> Result<Vec<OwnedTopic>> {
         #[derive(Debug, Deserialize)]
         struct Response {
@@ -48,7 +48,7 @@ impl ContentContext {
 
     /// Create a new community topic.
     ///
-    /// See: <https://open.longport.com/docs/api?op=create_topic>
+    /// See: <https://open.longportapp.com/docs/api?op=create_topic>
     pub async fn create_topic(&self, opts: CreateTopicOptions) -> Result<String> {
         #[derive(Debug, Deserialize)]
         struct TopicId {
@@ -94,7 +94,7 @@ impl ContentContext {
 
     /// Get full details of a topic by its ID.
     ///
-    /// See: <https://open.longport.com/docs/api?op=topic_detail>
+    /// See: <https://open.longportapp.com/docs/api?op=topic_detail>
     pub async fn topic_detail(&self, id: impl Into<String>) -> Result<OwnedTopic> {
         #[derive(Debug, Deserialize)]
         struct Response {
@@ -115,7 +115,7 @@ impl ContentContext {
 
     /// List replies on a topic.
     ///
-    /// See: <https://open.longport.com/docs/api?op=list_topic_replies>
+    /// See: <https://open.longportapp.com/docs/api?op=list_topic_replies>
     pub async fn list_topic_replies(
         &self,
         topic_id: impl Into<String>,
@@ -144,7 +144,7 @@ impl ContentContext {
 
     /// Post a reply to a community topic.
     ///
-    /// See: <https://open.longport.com/docs/api?op=create_topic_reply>
+    /// See: <https://open.longportapp.com/docs/api?op=create_topic_reply>
     pub async fn create_topic_reply(
         &self,
         topic_id: impl Into<String>,

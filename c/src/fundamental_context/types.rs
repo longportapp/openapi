@@ -3178,7 +3178,9 @@ pub(crate) struct CBusinessSegmentHistoryItemOwned {
     value: CString,
 }
 
-impl From<longport::fundamental::BusinessSegmentHistoryItem> for CBusinessSegmentHistoryItemOwned {
+impl From<longport::fundamental::BusinessSegmentHistoryItem>
+    for CBusinessSegmentHistoryItemOwned
+{
     fn from(v: longport::fundamental::BusinessSegmentHistoryItem) -> Self {
         Self {
             name: v.name.into(),

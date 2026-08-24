@@ -5,6 +5,22 @@ use std::str::FromStr;
 use serde::{Deserialize, Deserializer, Serializer, de::Error as _, ser::Error as _};
 use time::{Date, OffsetDateTime};
 
+pub(crate) mod date {
+    use super::*;
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Date, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Date::parse(
+            &s,
+            time::macros::format_description!("[year]-[month]-[day]"),
+        )
+        .map_err(D::Error::custom)
+    }
+}
+
 pub(crate) mod date_opt {
     use super::*;
 
@@ -463,15 +479,6 @@ where
     }
 }
 
-/// Deserializer that maps a JSON `null` to the type's `Default` value.
-pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
-where
-    D: Deserializer<'de>,
-    T: Deserialize<'de> + Default,
-{
-    Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
-}
-
 pub(crate) mod f64_str {
     use super::*;
 
@@ -484,18 +491,11 @@ pub(crate) mod f64_str {
     }
 }
 
-pub(crate) mod date {
-    use super::*;
-
-    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Date, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        Date::parse(
-            &s,
-            time::macros::format_description!("[year]-[month]-[day]"),
-        )
-        .map_err(D::Error::custom)
-    }
+/// Deserializer that maps a JSON `null` to the type's `Default` value.
+pub(crate) fn null_as_default<'de, D, T>(d: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de> + Default,
+{
+    Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
 }

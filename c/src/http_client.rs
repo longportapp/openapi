@@ -14,7 +14,7 @@ use crate::{
     oauth::COAuth,
 };
 
-/// A HTTP client for Longport OpenAPI
+/// A HTTP client for LongPort OpenAPI
 pub struct CHttpClient(HttpClient);
 
 /// Create a HTTP client using API Key authentication

@@ -56,7 +56,7 @@ impl AsyncContentContext {
 
     /// Create a new community topic. Returns awaitable.
     ///
-    /// See: <https://open.longport.com/docs/api?op=create_topic>
+    /// See: <https://open.longportapp.com/docs/api?op=create_topic>
     #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None))]
     fn create_topic(
         &self,
@@ -141,7 +141,7 @@ impl AsyncContentContext {
 
     /// Post a reply to a community topic. Returns awaitable.
     ///
-    /// See: <https://open.longport.com/docs/api?op=create_topic_reply>
+    /// See: <https://open.longportapp.com/docs/api?op=create_topic_reply>
     #[pyo3(signature = (topic_id, body, reply_to_id = None))]
     fn create_topic_reply(
         &self,

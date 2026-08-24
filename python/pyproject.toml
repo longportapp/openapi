@@ -1,5 +1,6 @@
 [project]
 name = "longport"
+dynamic = ["version"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -7,7 +8,7 @@ classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
 ]
-description = "A Python library for Longport Open API"
+description = "A Python library for LongPort Open API"
 readme = "README.md"
 repository = "https://github.com/longportapp/openapi"
 requires-python = ">=3.8"

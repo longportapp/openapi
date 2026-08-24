@@ -1,7 +1,7 @@
 package com.longport;
 
 /**
- * OAuth 2.0 client handle for Longport OpenAPI
+ * OAuth 2.0 client handle for LongPort OpenAPI
  *
  * <p>
  * Instances are created by {@link OAuthBuilder#build}. This class is an

@@ -2,7 +2,7 @@
 edition.workspace = true
 name = "longport-candlesticks"
 version.workspace = true
-description = "Longport candlestick utils for Rust"
+description = "LongPort candlestick utils for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

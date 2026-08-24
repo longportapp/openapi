@@ -31,9 +31,23 @@ pub struct ExtraConfigParams {
     pub enable_print_quote_packages: Option<bool>,
     /// Set the path of the log files (Default: `no logs`)
     pub log_path: Option<String>,
+    /// Enable paper trading mode (default: `false`).
+    ///
+    /// When `true`, all API calls target the paper trading (simulation)
+    /// environment.  The server validates the token: if it belongs to a
+    /// real-money account the server returns an error.
+    ///
+    /// When `false` (the default) the server imposes no restrictions — both
+    /// paper trading and real-money accounts are accepted.
+    ///
+    /// Paper trading users should set this to `true` as a safety guard.
+    pub enable_papertrading: Option<bool>,
 }
 
-fn apply_extra(mut config: longport::Config, extra: Option<ExtraConfigParams>) -> longport::Config {
+fn apply_extra(
+    mut config: longport::Config,
+    extra: Option<ExtraConfigParams>,
+) -> longport::Config {
     if let Some(extra) = extra {
         if let Some(http_url) = extra.http_url {
             config.set_http_url(http_url);
@@ -59,11 +73,14 @@ fn apply_extra(mut config: longport::Config, extra: Option<ExtraConfigParams>) -
         if let Some(log_path) = extra.log_path {
             config.set_log_path(log_path);
         }
+        if let Some(true) = extra.enable_papertrading {
+            config.set_enable_papertrading();
+        }
     }
     config
 }
 
-/// Configuration for Longport SDK
+/// Configuration for LongPort SDK
 #[napi_derive::napi]
 pub struct Config(pub(crate) longport::Config);
 
@@ -121,10 +138,10 @@ impl Config {
     /// - `LONGPORT_TRADE_WS_URL` - Trade websocket endpoint url
     /// - `LONGPORT_ENABLE_OVERNIGHT` - Enable overnight quote, `true` or
     ///   `false` (Default: `false`)
-    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
-    ///   `realtime`)
-    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
-    ///   `true` or `false` (Default: `true`)
+    /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed`
+    ///   (Default: `realtime`)
+    /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when
+    ///   connected, `true` or `false` (Default: `true`)
     /// - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
     #[napi(factory, js_name = "fromApikeyEnv")]
     pub fn from_apikey_env() -> Result<Self> {

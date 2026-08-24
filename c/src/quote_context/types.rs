@@ -3307,7 +3307,7 @@ impl ToFFI for CShortTradesResponseOwned {
 /// Option volume statistics
 #[repr(C)]
 pub struct COptionVolumeStats {
-    /// Security symbol
+    /// Underlying security symbol
     pub symbol: *const c_char,
     /// Total call volume
     pub call_volume: i64,
@@ -3344,12 +3344,12 @@ impl ToFFI for COptionVolumeStatsOwned {
 
 // ── OptionVolumeDaily ─────────────────────────────────────────────
 
-/// Daily option volume statistics for a single security
+/// One day's option volume statistics
 #[repr(C)]
 pub struct COptionVolumeDailyStat {
     /// Underlying security symbol
     pub symbol: *const c_char,
-    /// Date
+    /// Trading date
     pub date: CDate,
     /// Call volume
     pub call_volume: i64,
@@ -3417,14 +3417,14 @@ impl ToFFI for COptionVolumeDailyStatOwned {
     }
 }
 
-/// Collection of daily option volume statistics
+/// Daily option volume response
 #[repr(C)]
 pub struct COptionVolumeDaily {
-    /// Security symbol
+    /// Underlying security symbol
     pub symbol: *const c_char,
     /// Pointer to array of daily option volume stat records
     pub stats: *const COptionVolumeDailyStat,
-    /// Number of elements in the array.
+    /// Number of elements in the array
     pub num_stats: usize,
 }
 
