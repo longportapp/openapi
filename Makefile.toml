@@ -12,15 +12,21 @@ skip_core_tasks = true
 
 [tasks.default]
 
+[tasks.create-cmake-build-dir]
+command = "cmake"
+args = ["-E", "make_directory", "cmake.build"]
+
 [tasks.cmake]
 command = "cmake"
 args = ["../"]
 cwd = "cmake.build"
+dependencies = ["create-cmake-build-dir"]
 
 [tasks.cmake-release]
 command = "cmake"
 args = ["-DCMAKE_BUILD_TYPE=Release", "../"]
 cwd = "cmake.build"
+dependencies = ["create-cmake-build-dir"]
 
 [tasks.cmake-release.windows]
 command = "cmake"
@@ -36,11 +42,13 @@ args = [
     "../",
 ]
 cwd = "cmake.build"
+dependencies = ["create-cmake-build-dir"]
 
 [tasks.cmake-debug]
 command = "cmake"
 args = ["-DCMAKE_BUILD_TYPE=Debug", "../"]
 cwd = "cmake.build"
+dependencies = ["create-cmake-build-dir"]
 
 [tasks.cmake-debug.windows]
 command = "cmake"
@@ -56,3 +64,4 @@ args = [
     "../",
 ]
 cwd = "cmake.build"
+dependencies = ["create-cmake-build-dir"]
