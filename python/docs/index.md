@@ -1,6 +1,6 @@
-# Longport OpenAPI SDK for Python
+# LongPort OpenAPI SDK for Python
 
-`longport` provides an easy-to-use interface for invokes [`Longport OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invokes [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 ## References
 
@@ -34,7 +34,7 @@
 
 ## Quickstart
 
-_Install Longport OpenAPI SDK_
+_Install LongPort OpenAPI SDK_
 
 ```bash
 pip install longport

@@ -7,7 +7,7 @@ fn oauth_err(e: OAuthError) -> PyErr {
     ErrorNewType(longport::Error::OAuth(e.to_string())).into()
 }
 
-/// OAuth 2.0 client handle for Longport OpenAPI
+/// OAuth 2.0 client handle for LongPort OpenAPI
 ///
 /// Obtain an instance via :meth:`OAuthBuilder.build` (blocking) or
 /// :meth:`OAuthBuilder.build_async` (async).  Pass it to
@@ -18,7 +18,7 @@ pub(crate) struct OAuth(pub(crate) longport::oauth::OAuth);
 /// Builder for the OAuth 2.0 authorization flow
 ///
 /// Args:
-///     client_id: OAuth 2.0 client ID from the Longport developer portal
+///     client_id: OAuth 2.0 client ID from the LongPort developer portal
 ///     callback_port: TCP port for the local callback server (default 60355).
 ///         Must match one of the redirect URIs registered for the client.
 ///

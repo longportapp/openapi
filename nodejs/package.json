@@ -14,7 +14,7 @@
     ]
   },
   "license": "MIT OR Apache-2.0",
-  "description": "A Node.js library for Longport Open API",
+  "description": "A Node.js library for LongPort Open API",
   "repository": {
     "type": "git",
     "url": "https://github.com/longportapp/openapi"

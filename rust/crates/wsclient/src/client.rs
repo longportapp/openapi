@@ -37,7 +37,7 @@ const RECONNECT_TIMEOUT: Duration = Duration::from_secs(5);
 const COMMAND_CODE_AUTH: u8 = 2;
 const COMMAND_CODE_RECONNECT: u8 = 3;
 
-/// Longport websocket protocol version
+/// LongPort websocket protocol version
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum ProtocolVersion {
@@ -45,7 +45,7 @@ pub enum ProtocolVersion {
     Version1 = 1,
 }
 
-/// Longport websocket codec type
+/// LongPort websocket codec type
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum CodecType {
@@ -53,7 +53,7 @@ pub enum CodecType {
     Protobuf = 1,
 }
 
-/// Longport websocket platform type
+/// LongPort websocket platform type
 #[derive(Debug, IntoPrimitive, Copy, Clone, Eq, PartialEq, Hash)]
 #[repr(i32)]
 pub enum Platform {
@@ -257,7 +257,7 @@ impl WsSession {
     }
 }
 
-/// Longport Websocket client
+/// LongPort Websocket client
 pub struct WsClient {
     command_tx: mpsc::UnboundedSender<Command>,
     rate_limit: Arc<HashMap<u8, RateLimiter>>,
@@ -299,8 +299,8 @@ impl WsClient {
 
     /// Send an authentication request to get a [`WsSession`]
     ///
-    /// Reference: <https://open.longport.com/en/docs/socket-token-api>
-    /// Reference: <https://open.longport.com/en/docs/socket/control-command#auth>
+    /// Reference: <https://open.longportapp.com/en/docs/socket-token-api>
+    /// Reference: <https://open.longportapp.com/en/docs/socket/control-command#auth>
     pub async fn request_auth(
         &self,
         otp: impl Into<String>,
@@ -331,7 +331,7 @@ impl WsClient {
 
     /// Send a reconnect request to get a [`WsSession`]
     ///
-    /// Reference: <https://open.longport.com/en/docs/socket/control-command#reconnect>
+    /// Reference: <https://open.longportapp.com/en/docs/socket/control-command#reconnect>
     pub async fn request_reconnect(
         &self,
         session_id: impl Into<String>,

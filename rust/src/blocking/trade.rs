@@ -4,12 +4,14 @@ use crate::{
     Config, Result,
     blocking::runtime::BlockingRuntime,
     trade::{
-        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        AccountBalance, CancelOrderOptions, CashFlow, EstimateMaxPurchaseQuantityOptions,
         EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, GetCashFlowOptions,
         GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio,
-        Order, OrderDetail, PushEvent, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext,
+        GetOrderDetailOptions, GetStockPositionsOptions, GetTodayExecutionsOptions,
+        GetTodayOrdersOptions, GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order,
+        OrderDetail, PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitOrderOptions, SubmitOrderResponse, TopicType, TradeContext, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
     },
 };
 
@@ -110,6 +112,16 @@ impl TradeContextSync {
         self.rt
             .call(move |ctx| async move { ctx.today_executions(options).await })
     }
+
+    // TODO: temporarily disabled — restore when API is available
+    // Get all executions
+    // pub fn all_executions(
+    // &self,
+    // options: impl Into<Option<GetAllExecutionsOptions>> + Send + 'static,
+    // ) -> Result<AllExecutionsResponse> {
+    // self.rt
+    // .call(move |ctx| async move { ctx.all_executions(options).await })
+    // }
 
     /// Get history orders
     ///
@@ -278,9 +290,12 @@ impl TradeContextSync {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn cancel_order(&self, order_id: impl Into<String> + Send + 'static) -> Result<()> {
+    pub fn cancel_order(
+        &self,
+        options: impl Into<CancelOrderOptions> + Send + 'static,
+    ) -> Result<()> {
         self.rt
-            .call(move |ctx| async move { ctx.cancel_order(order_id).await })
+            .call(move |ctx| async move { ctx.cancel_order(options).await })
     }
 
     /// Get account balance
@@ -419,7 +434,7 @@ impl TradeContextSync {
 
     /// Get order detail
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/order_detail>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/order_detail>
     ///
     /// # Examples
     ///
@@ -441,10 +456,10 @@ impl TradeContextSync {
     /// ```
     pub fn order_detail(
         &self,
-        order_id: impl Into<String> + Send + 'static,
+        options: impl Into<GetOrderDetailOptions> + Send + 'static,
     ) -> Result<OrderDetail> {
         self.rt
-            .call(move |ctx| async move { ctx.order_detail(order_id).await })
+            .call(move |ctx| async move { ctx.order_detail(options).await })
     }
 
     /// Estimating the maximum purchase quantity for Hong Kong and US stocks,
@@ -455,5 +470,34 @@ impl TradeContextSync {
     ) -> Result<EstimateMaxPurchaseQuantityResponse> {
         self.rt
             .call(move |ctx| async move { ctx.estimate_max_purchase_quantity(opts).await })
+    }
+
+    // ── US-market blocking wrappers ───────────────────────────────────────────
+
+    /// Query the paginated US order list (blocking)
+    pub fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_query_orders(opts).await })
+    }
+
+    /// Get US order detail (blocking)
+    pub fn us_order_detail(
+        &self,
+        order_id: impl Into<String> + Send + 'static,
+    ) -> Result<USOrderDetailResponse> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_order_detail(order_id).await })
+    }
+
+    /// Get the full US account asset overview (blocking)
+    pub fn us_asset_overview(&self) -> Result<USAssetOverview> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_asset_overview().await })
+    }
+
+    /// Get realized P&L for the US account (blocking)
+    pub fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
+        self.rt
+            .call(move |ctx| async move { ctx.us_realized_pl(opts).await })
     }
 }

@@ -1,6 +1,6 @@
-# Longport OpenAPI SDK for C
+# LongPort OpenAPI SDK for C
 
-`longport` provides an easy-to-use interface for invoking [`Longport OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 
 ## Context Types
@@ -21,8 +21,8 @@
 
 ## Documentation
 
-- SDK docs: https://longportapp.github.io/openapi/c/index.html
-- Longport OpenAPI: https://open.longportapp.com/en/
+- SDK docs: https://longport.github.io/openapi/c/index.html
+- LongPort OpenAPI: https://open.longportapp.com/en/
 
 ## Examples
 
@@ -37,13 +37,13 @@ Runnable examples live in `examples/c/`:
 
 ## Quickstart
 
-_Install Longport OpenAPI SDK_
+_Install LongPort OpenAPI SDK_
 
 [`Download C SDK`](https://github.com/longportapp/openapi/releases)
 
 ### Authentication
 
-Longport OpenAPI supports two authentication methods:
+LongPort OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
@@ -162,6 +162,35 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 | LONGPORT_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                 |
 | LONGPORT_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)        |
 | LONGPORT_LOG_PATH              | Set the path of the log files (Default: `no logs`)                              |
+| LONGPORT_PAPERTRADING          | Enable paper trading mode, `true` or `false` (Default: `false`). See [Paper Trading](#paper-trading). |
+
+## Paper Trading
+
+If your account is a **paper trading** (simulation) account and you want to
+place orders, you must explicitly enable paper trading mode.  When enabled, all
+API calls target the paper trading environment and the server validates the
+token — if the token belongs to a real-money account the server returns an
+error.
+
+By default this option is **off**: the server imposes no restrictions and
+accepts requests from both paper trading and real-money accounts.
+
+**Via environment variable** (applies automatically to all constructor methods):
+
+```bash
+export LONGPORT_PAPERTRADING=true   # macOS / Linux
+```
+
+```powershell
+$env:LONGPORT_PAPERTRADING = "true"   # Windows PowerShell
+```
+
+**Programmatically:**
+
+```c
+lb_config_t* config = lb_config_from_apikey("app-key", "app-secret", "access-token");
+lb_config_enable_papertrading(config);
+```
 
 ## Quote API _(Get basic information of securities)_
 
