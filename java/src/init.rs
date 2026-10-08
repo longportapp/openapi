@@ -133,7 +133,8 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::alert::types::AlertCondition,
         longport::alert::types::AlertFrequency,
         longport::calendar::types::CalendarCategory,
-        longport::agent::ConversationStatus
+        longport::agent::ConversationStatus,
+        longport::forex::ForexOrderStatus
     );
 
     // classes
@@ -200,6 +201,8 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::trade::OrderChargeDetail,
         longport::trade::OrderDetail,
         longport::trade::EstimateMaxPurchaseQuantityResponse,
+        longport::forex::ForexQuote,
+        longport::forex::ForexOrderDetail,
         longport::content::TopicItem,
         longport::content::NewsItem,
         longport::content::TopicAuthor,

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Plus the counter_id → symbol removal (longbridge/openapi PR #562):
 
+### Added
+
+- **Forex (currency exchange) channel:** new `ForexContext` / `ForexContextSync` for the currency-exchange flow — `quote` (`POST /v1/forex/quote`), `submit_order` (`POST /v1/forex/order`) and `order` (`GET /v1/forex/order`) — across all SDK layers (Rust core async + blocking, C, C++, Java, Node.js, Python). Conversion is asynchronous: a successful `submit_order` only means the order was accepted, so callers poll `order` by `client_order_id` until it reaches a terminal state. The order state is an integer-coded enum `ForexOrderStatus` (`Processing` / `Success` / `Failed`); the quote `rate` and the order's `rate` / `from_amount` / `to_amount` are decimals, with the three order amounts modeled as nullable (they arrive empty until the order is filled). `rate` / `expire_at` (Unix ms) / `ccy_pair` follow the standard currency-pair convention (`1 BASE = rate QUOTE`), independent of the request's from/to direction. Mirrored into `c/csrc/include/longport.h` (`lb_forex_context_*`, `lb_forex_quote_t`, `lb_forex_order_detail_t`, `lb_forex_order_status_t`), `nodejs/index.d.ts`, the Java classes under `com.longport.forex`, and the `openapi.pyi` stub; the separate Go SDK is pending.
+
 ### Fixed
 
 - **All languages:** the AI Agent streamed conversation no longer errors mid-run when the server sends an explicit `"outputs": null`. `WorkflowFinishedPayload.outputs`, `NodeToolUseFinishedPayload.outputs`, and `SubagentFinishedPayload.outputs` were annotated `#[serde(default)]`, which only covers a *missing* key, not an explicit `null` — so a `workflow_finished` / `node_tool_use_finished` / `subagent_finished` event carrying `null` outputs failed to deserialize and aborted the whole event stream (`invalid type: null, expected struct WorkflowOutputs`). These fields now map `null` to the type's default

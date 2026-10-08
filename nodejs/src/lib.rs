@@ -9,6 +9,7 @@ mod content;
 mod dca;
 mod decimal;
 mod error;
+mod forex;
 mod fundamental;
 mod http_client;
 mod market;
