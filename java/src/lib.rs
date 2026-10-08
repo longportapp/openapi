@@ -10,6 +10,7 @@ mod config;
 mod content_context;
 mod dca_context;
 mod error;
+mod forex_context;
 mod fundamental_context;
 mod http_client;
 mod init;
