@@ -3,17 +3,20 @@ use std::sync::Arc;
 use jni::{
     JNIEnv, JavaVM,
     errors::Result,
-    objects::{GlobalRef, JClass, JObject, JString},
-    sys::jobjectArray,
+    objects::{GlobalRef, JClass, JObject, JObjectArray, JString},
+    sys::{jboolean, jobjectArray},
 };
 use longport::{
     Config, Decimal, Market, TradeContext,
     trade::{
-        BalanceType, EstimateMaxPurchaseQuantityOptions, GetCashFlowOptions,
-        GetFundPositionsOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
-        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
-        OrderStatus, OrderType, OutsideRTH, PushEvent, ReplaceOrderOptions, SubmitOrderOptions,
-        TimeInForceType, TopicType,
+        AttachedOrderType, BalanceType, CancelOrderOptions, EstimateMaxPurchaseQuantityOptions,
+        GetAllExecutionsOptions, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        MultiLegStrategy, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
+        QueryUSOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams,
+        SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions, TimeInForceType,
+        TopicType,
     },
 };
 use parking_lot::Mutex;
@@ -22,12 +25,13 @@ use time::{Date, OffsetDateTime};
 use crate::{
     async_util,
     error::jni_result,
-    types::{FromJValue, IntoJValue, JavaInteger, ObjectArray, get_field},
+    types::{FromJValue, IntoJValue, JavaInteger, JavaLong, ObjectArray, get_field},
 };
 
 #[derive(Default)]
 struct Callbacks {
     order_changed: Option<GlobalRef>,
+    grid_order_changed: Option<GlobalRef>,
 }
 
 struct ContextObj {
@@ -46,6 +50,17 @@ fn send_push_event(jvm: &JavaVM, callbacks: &Callbacks, event: PushEvent) -> Res
                     handler,
                     "onOrderChanged",
                     "(Lcom/longport/trade/PushOrderChanged;)V",
+                    &[event.borrow()],
+                )?;
+            }
+        }
+        PushEvent::GridOrderChanged(grid_order_changed) => {
+            if let Some(handler) = &callbacks.grid_order_changed {
+                let event = grid_order_changed.into_jvalue(&mut env)?;
+                env.call_method(
+                    handler,
+                    "onGridOrderChanged",
+                    "(Lcom/longport/trade/PushGridOrderChanged;)V",
                     &[event.borrow()],
                 )?;
             }
@@ -104,6 +119,24 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSetOnOrder
             context.callbacks.lock().order_changed = Some(env.new_global_ref(handler)?);
         } else {
             context.callbacks.lock().order_changed = None;
+        }
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSetOnGridOrderChanged(
+    mut env: JNIEnv,
+    _class: JClass,
+    ctx: i64,
+    handler: JObject,
+) {
+    let context = &*(ctx as *const ContextObj);
+    jni_result(&mut env, (), |env| {
+        if !handler.is_null() {
+            context.callbacks.lock().grid_order_changed = Some(env.new_global_ref(handler)?);
+        } else {
+            context.callbacks.lock().grid_order_changed = None;
         }
         Ok(())
     })
@@ -217,6 +250,50 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayExecu
     })
 }
 
+// TODO: temporarily disabled — restore when API is available
+// #[unsafe(no_mangle)]
+// pub unsafe extern "system" fn
+// Java_com_longport_SdkNative_tradeContextAllExecutions( mut env: JNIEnv,
+// _class: JClass,
+// context: i64,
+// opts: JObject,
+// callback: JObject,
+// ) {
+// jni_result(&mut env, (), |env| {
+// let context = &*(context as *const ContextObj);
+// let opts = if !opts.is_null() {
+// let mut new_opts = GetAllExecutionsOptions::new();
+// let symbol: Option<String> = get_field(env, &opts, "symbol")?;
+// if let Some(symbol) = symbol {
+// new_opts = new_opts.symbol(symbol);
+// }
+// let order_id: Option<String> = get_field(env, &opts, "orderId")?;
+// if let Some(order_id) = order_id {
+// new_opts = new_opts.order_id(order_id);
+// }
+// let start_at: Option<OffsetDateTime> = get_field(env, &opts, "startAt")?;
+// if let Some(start_at) = start_at {
+// new_opts = new_opts.start_at(start_at);
+// }
+// let end_at: Option<OffsetDateTime> = get_field(env, &opts, "endAt")?;
+// if let Some(end_at) = end_at {
+// new_opts = new_opts.end_at(end_at);
+// }
+// let page: Option<JavaInteger> = get_field(env, &opts, "page")?;
+// if let Some(page) = page {
+// new_opts = new_opts.page(i32::from(page) as u64);
+// }
+// Some(new_opts)
+// } else {
+// None
+// };
+// async_util::execute(env, callback, async move {
+// Ok(__owned_ctx.all_executions(opts).await?)
+// })?;
+// Ok(())
+// })
+// }
+
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextHistoryOrders(
     mut env: JNIEnv,
@@ -294,6 +371,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayOrder
             if let Some(order_id) = order_id {
                 new_opts = new_opts.order_id(order_id);
             }
+            let is_attached_obj = env.get_field(&opts, "isAttached", "Ljava/lang/Boolean;")?;
+            if !is_attached_obj.l()?.is_null() {
+                new_opts = new_opts.is_attached();
+            }
             Some(new_opts)
         } else {
             None
@@ -303,6 +384,117 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextTodayOrder
         })?;
         Ok(())
     })
+}
+
+fn read_submit_attached_params(
+    env: &mut JNIEnv<'_>,
+    obj: &JObject<'_>,
+) -> jni::errors::Result<SubmitAttachedParams> {
+    let attached_order_type: AttachedOrderType = get_field(env, obj, "attachedOrderType")?;
+    let mut params = SubmitAttachedParams::new(attached_order_type);
+    let profit_taker_price: Option<Decimal> = get_field(env, obj, "profitTakerPrice")?;
+    if let Some(v) = profit_taker_price {
+        params = params.profit_taker_price(v);
+    }
+    let stop_loss_price: Option<Decimal> = get_field(env, obj, "stopLossPrice")?;
+    if let Some(v) = stop_loss_price {
+        params = params.stop_loss_price(v);
+    }
+    let time_in_force: Option<TimeInForceType> = get_field(env, obj, "timeInForce")?;
+    if let Some(v) = time_in_force {
+        params = params.time_in_force(v);
+    }
+    let expire_time_obj = env.get_field(obj, "expireTime", "Ljava/lang/Long;")?;
+    if !expire_time_obj.l()?.is_null() {
+        let expire_time: JavaLong = get_field(env, obj, "expireTime")?;
+        params = params.expire_time(i64::from(expire_time));
+    }
+    let activate_order_type: Option<OrderType> = get_field(env, obj, "activateOrderType")?;
+    if let Some(v) = activate_order_type {
+        params = params.activate_order_type(v);
+    }
+    let profit_taker_submit_price: Option<Decimal> = get_field(env, obj, "profitTakerSubmitPrice")?;
+    if let Some(v) = profit_taker_submit_price {
+        params = params.profit_taker_submit_price(v);
+    }
+    let stop_loss_submit_price: Option<Decimal> = get_field(env, obj, "stopLossSubmitPrice")?;
+    if let Some(v) = stop_loss_submit_price {
+        params = params.stop_loss_submit_price(v);
+    }
+    let activate_rth: Option<OutsideRTH> = get_field(env, obj, "activateRth")?;
+    if let Some(v) = activate_rth {
+        params = params.activate_rth(v);
+    }
+    Ok(params)
+}
+
+fn read_replace_attached_params(
+    env: &mut JNIEnv<'_>,
+    obj: &JObject<'_>,
+) -> jni::errors::Result<ReplaceAttachedParams> {
+    let attached_order_type: AttachedOrderType = get_field(env, obj, "attachedOrderType")?;
+    let mut params = ReplaceAttachedParams::new(attached_order_type);
+    let profit_taker_price: Option<Decimal> = get_field(env, obj, "profitTakerPrice")?;
+    if let Some(v) = profit_taker_price {
+        params = params.profit_taker_price(v);
+    }
+    let stop_loss_price: Option<Decimal> = get_field(env, obj, "stopLossPrice")?;
+    if let Some(v) = stop_loss_price {
+        params = params.stop_loss_price(v);
+    }
+    let time_in_force: Option<TimeInForceType> = get_field(env, obj, "timeInForce")?;
+    if let Some(v) = time_in_force {
+        params = params.time_in_force(v);
+    }
+    let expire_time_obj = env.get_field(obj, "expireTime", "Ljava/lang/Long;")?;
+    if !expire_time_obj.l()?.is_null() {
+        let expire_time: JavaLong = get_field(env, obj, "expireTime")?;
+        params = params.expire_time(i64::from(expire_time));
+    }
+    let activate_order_type: Option<OrderType> = get_field(env, obj, "activateOrderType")?;
+    if let Some(v) = activate_order_type {
+        params = params.activate_order_type(v);
+    }
+    let profit_taker_submit_price: Option<Decimal> = get_field(env, obj, "profitTakerSubmitPrice")?;
+    if let Some(v) = profit_taker_submit_price {
+        params = params.profit_taker_submit_price(v);
+    }
+    let stop_loss_submit_price: Option<Decimal> = get_field(env, obj, "stopLossSubmitPrice")?;
+    if let Some(v) = stop_loss_submit_price {
+        params = params.stop_loss_submit_price(v);
+    }
+    let activate_rth: Option<OutsideRTH> = get_field(env, obj, "activateRth")?;
+    if let Some(v) = activate_rth {
+        params = params.activate_rth(v);
+    }
+    let profit_taker_id_obj = env.get_field(obj, "profitTakerId", "Ljava/lang/Long;")?;
+    if !profit_taker_id_obj.l()?.is_null() {
+        let profit_taker_id: JavaLong = get_field(env, obj, "profitTakerId")?;
+        params = params.profit_taker_id(i64::from(profit_taker_id));
+    }
+    let stop_loss_id_obj = env.get_field(obj, "stopLossId", "Ljava/lang/Long;")?;
+    if !stop_loss_id_obj.l()?.is_null() {
+        let stop_loss_id: JavaLong = get_field(env, obj, "stopLossId")?;
+        params = params.stop_loss_id(i64::from(stop_loss_id));
+    }
+    let cancel_all_obj = env.get_field(obj, "cancelAllAttached", "Ljava/lang/Boolean;")?;
+    if !cancel_all_obj.l()?.is_null() {
+        params = params.cancel_all_attached();
+    }
+    let main_id_obj = env.get_field(obj, "mainId", "Ljava/lang/Long;")?;
+    if !main_id_obj.l()?.is_null() {
+        let main_id: JavaLong = get_field(env, obj, "mainId")?;
+        params = params.main_id(i64::from(main_id));
+    }
+    let quantity: Option<Decimal> = get_field(env, obj, "quantity")?;
+    if let Some(v) = quantity {
+        params = params.quantity(v);
+    }
+    let market_price: Option<Decimal> = get_field(env, obj, "marketPrice")?;
+    if let Some(v) = market_price {
+        params = params.market_price(v);
+    }
+    Ok(params)
 }
 
 #[unsafe(no_mangle)]
@@ -354,6 +546,22 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextReplaceOrd
         let remark: Option<String> = get_field(env, &opts, "remark")?;
         if let Some(remark) = remark {
             new_opts = new_opts.remark(remark);
+        }
+        let attached_params_obj = env.get_field(
+            &opts,
+            "attachedParams",
+            "Lcom/longport/trade/ReplaceAttachedParams;",
+        )?;
+        if !attached_params_obj.l()?.is_null() {
+            let attached_params_java = env
+                .get_field(
+                    &opts,
+                    "attachedParams",
+                    "Lcom/longport/trade/ReplaceAttachedParams;",
+                )?
+                .l()?;
+            let ap = read_replace_attached_params(env, &attached_params_java)?;
+            new_opts = new_opts.attached_params(ap);
         }
 
         async_util::execute(env, callback, async move {
@@ -425,9 +633,86 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitOrde
         if let Some(remark) = remark {
             new_opts = new_opts.remark(remark);
         }
+        let client_request_id: Option<String> = get_field(env, &opts, "clientRequestId")?;
+        if let Some(id) = client_request_id {
+            new_opts = new_opts.client_request_id(id);
+        }
+        let attached_params_obj = env.get_field(
+            &opts,
+            "attachedParams",
+            "Lcom/longport/trade/SubmitAttachedParams;",
+        )?;
+        if !attached_params_obj.l()?.is_null() {
+            let attached_params_java = env
+                .get_field(
+                    &opts,
+                    "attachedParams",
+                    "Lcom/longport/trade/SubmitAttachedParams;",
+                )?
+                .l()?;
+            let ap = read_submit_attached_params(env, &attached_params_java)?;
+            new_opts = new_opts.attached_params(ap);
+        }
 
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.submit_order(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitMultileg(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let side: OrderSide = get_field(env, &opts, "side")?;
+        let order_type: OrderType = get_field(env, &opts, "orderType")?;
+        let submitted_quantity: Decimal = get_field(env, &opts, "submittedQuantity")?;
+        let strategy: MultiLegStrategy = get_field(env, &opts, "strategy")?;
+
+        let legs_obj = env
+            .get_field(
+                &opts,
+                "legs",
+                "[Lcom/longport/trade/SubmitMultiLegOrderLeg;",
+            )?
+            .l()?;
+        let mut legs = Vec::new();
+        if !legs_obj.is_null() {
+            let legs_array: JObjectArray = legs_obj.into();
+            let len = env.get_array_length(&legs_array)?;
+            for i in 0..len {
+                let leg_obj = env.get_object_array_element(&legs_array, i)?;
+                let symbol: String = get_field(env, &leg_obj, "symbol")?;
+                let ratio_quantity: Decimal = get_field(env, &leg_obj, "ratioQuantity")?;
+                legs.push(SubmitMultiLegOrderLeg::new(symbol, ratio_quantity));
+            }
+        }
+
+        let mut new_opts =
+            SubmitMultiLegOrderOptions::new(side, order_type, submitted_quantity, strategy, legs);
+        let submitted_price: Option<Decimal> = get_field(env, &opts, "submittedPrice")?;
+        if let Some(submitted_price) = submitted_price {
+            new_opts = new_opts.submitted_price(submitted_price);
+        }
+        let remark: Option<String> = get_field(env, &opts, "remark")?;
+        if let Some(remark) = remark {
+            new_opts = new_opts.remark(remark);
+        }
+        let client_request_id: Option<String> = get_field(env, &opts, "clientRequestId")?;
+        if let Some(id) = client_request_id {
+            new_opts = new_opts.client_request_id(id);
+        }
+
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx.submit_multileg(new_opts).await?)
         })?;
         Ok(())
     })
@@ -447,6 +732,27 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCancelOrde
         let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.cancel_order(order_id).await?)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextCancelOrderAttached(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx
+                .cancel_order(CancelOrderOptions::new(order_id).is_attached())
+                .await?)
         })?;
         Ok(())
     })
@@ -637,6 +943,137 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextEstimateMa
         }
         async_util::execute(env, callback, async move {
             Ok(__owned_ctx.estimate_max_purchase_quantity(new_opts).await?)
+        })?;
+        Ok(())
+    })
+}
+
+// ── US-market JNI stubs ──────────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextUsQueryOrders(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    action: i64,
+    start_at: i64,
+    end_at: i64,
+    query_type: i64,
+    page: i64,
+    limit: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol_str: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let us_opts = longport::trade::GetUSHistoryOrders {
+            symbol: if symbol_str.is_empty() {
+                None
+            } else {
+                Some(symbol_str)
+            },
+            side: match action {
+                1 => longport::trade::OrderSide::Buy,
+                2 => longport::trade::OrderSide::Sell,
+                _ => longport::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type: query_type as i32,
+            page: page as i32,
+            limit: limit as i32,
+        };
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.us_query_orders(us_opts).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextUsOrderDetail(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.us_order_detail(order_id).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextUsAssetOverview(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.us_asset_overview().await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextUsRealizedPl(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    currency: JObject,
+    category: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let currency: String = FromJValue::from_jvalue(env, currency.into())?;
+        let category: Option<String> = FromJValue::from_jvalue(env, category.into()).ok();
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .us_realized_pl(longport::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextOrderDetailAttached(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    order_id: JString,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let order_id: String = FromJValue::from_jvalue(env, order_id.into())?;
+        async_util::execute(env, callback, async move {
+            Ok(__owned_ctx
+                .order_detail(GetOrderDetailOptions::new(order_id).is_attached())
+                .await?)
         })?;
         Ok(())
     })

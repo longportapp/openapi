@@ -9,7 +9,7 @@ use longport::{Config, FundamentalContext, fundamental::types::*};
 use crate::{
     async_util,
     error::jni_result,
-    types::{FromJValue, ObjectArray, get_field},
+    types::{FromJValue, JavaInteger, ObjectArray, get_field},
 };
 
 struct ContextObj {
@@ -63,6 +63,119 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextFina
     })
 }
 
+// ── industry_rank ─────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetIndustryRank(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let market: String = get_field(env, &opts, "market")?;
+        let indicator: String = get_field(env, &opts, "indicator")?;
+        let sort_type: String = get_field(env, &opts, "sortType")?;
+        let limit: i32 = get_field(env, &opts, "limit")?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .industry_rank(market, indicator, sort_type, limit as u32)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+// ── industry_peers ────────────────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetIndustryPeers(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let market: String = get_field(env, &opts, "market")?;
+        let industry_id: Option<String> = get_field(env, &opts, "industryId")?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .industry_peers(symbol, market, industry_id)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+// ── business_segments_history ─────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetBusinessSegmentsHistory(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let report: Option<String> = get_field(env, &opts, "report")?;
+        // The core API takes `Option<&'static str>`; leak the short report
+        // code.
+        let report: Option<&'static str> = report.map(|s| &*s.leak());
+        let cate: Option<String> = get_field(env, &opts, "cate")?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .business_segments_history(symbol, report, cate)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+// ── financial_report_snapshot ─────────────────────────────────────
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetFinancialReportSnapshot(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    opts: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let report: Option<String> = get_field(env, &opts, "report")?;
+        // The core API takes `Option<&'static str>`; leak the short codes.
+        let report: Option<&'static str> = report.map(|s| &*s.leak());
+        let fiscal_year: Option<JavaInteger> = get_field(env, &opts, "fiscalYear")?;
+        let fiscal_year: Option<i32> = fiscal_year.map(i32::from);
+        let fiscal_period: Option<String> = get_field(env, &opts, "fiscalPeriod")?;
+        let fiscal_period: Option<&'static str> = fiscal_period.map(|s| &*s.leak());
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .financial_report_snapshot(symbol, report, fiscal_year, fiscal_period)
+                .await?;
+            Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
 // ── simple symbol-only methods ────────────────────────────────────
 
 macro_rules! symbol_method {
@@ -92,6 +205,14 @@ macro_rules! symbol_method {
 symbol_method!(
     Java_com_longport_SdkNative_fundamentalContextInstitutionRating,
     institution_rating
+);
+symbol_method!(
+    Java_com_longport_SdkNative_fundamentalContextGetBusinessSegments,
+    business_segments
+);
+symbol_method!(
+    Java_com_longport_SdkNative_fundamentalContextGetInstitutionRatingViews,
+    institution_rating_views
 );
 symbol_method!(
     Java_com_longport_SdkNative_fundamentalContextInstitutionRatingDetail,
@@ -222,14 +343,14 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextShar
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    object_id: i64,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let object_id: i64 = get_field(env, &opts, "objectId")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx.shareholder_detail(symbol, object_id).await?;
             Ok(resp)
@@ -243,22 +364,17 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextValu
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    currency: JObject,
-    comparison_symbols: JObject,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        let currency: String = FromJValue::from_jvalue(env, currency.into())?;
-        let comparison_syms: Option<Vec<String>> = if comparison_symbols.is_null() {
-            None
-        } else {
-            let arr: ObjectArray<String> = FromJValue::from_jvalue(env, comparison_symbols.into())?;
-            Some(arr.0)
-        };
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let currency: String = get_field(env, &opts, "currency")?;
+        let comparison_syms: Option<Vec<String>> =
+            get_field::<_, _, Option<ObjectArray<String>>>(env, &opts, "comparisonSymbols")?
+                .map(|arr| arr.0);
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
                 .valuation_comparison(symbol, currency, comparison_syms)
@@ -332,6 +448,139 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextMacr
             Ok(__owned_ctx
                 .macroeconomic(indicator_code, start_date, end_date, offset, limit)
                 .await?)
+        })?;
+        Ok(())
+    })
+}
+
+// ── US-market JNI stubs
+// ─────────────────────────────────────────────────────── All US APIs return
+// JSON strings; Java callers parse with Gson/Jackson.
+
+macro_rules! us_symbol_method {
+    ($jni_name:ident, $method:ident) => {
+        #[unsafe(no_mangle)]
+        pub unsafe extern "system" fn $jni_name(
+            mut env: JNIEnv,
+            _class: JClass,
+            context: i64,
+            symbol: JObject,
+            callback: JObject,
+        ) {
+            jni_result(&mut env, (), |env| {
+                let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
+                let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+                async_util::execute(env, callback, async move {
+                    let resp = __owned_ctx.$method(symbol).await?;
+                    Ok(serde_json::to_string(&resp).unwrap_or_default())
+                })?;
+                Ok(())
+            })
+        }
+    };
+}
+
+macro_rules! us_symbol_report_method {
+    ($jni_name:ident, $method:ident) => {
+        #[unsafe(no_mangle)]
+        pub unsafe extern "system" fn $jni_name(
+            mut env: JNIEnv,
+            _class: JClass,
+            context: i64,
+            symbol: JObject,
+            report: JObject,
+            callback: JObject,
+        ) {
+            jni_result(&mut env, (), |env| {
+                let context = &*(context as *const ContextObj);
+                let __owned_ctx = context.ctx.clone();
+                let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+                let report: String = FromJValue::from_jvalue(env, report.into())?;
+                async_util::execute(env, callback, async move {
+                    let resp = __owned_ctx.$method(symbol, report).await?;
+                    Ok(serde_json::to_string(&resp).unwrap_or_default())
+                })?;
+                Ok(())
+            })
+        }
+    };
+}
+
+us_symbol_method!(
+    Java_com_longport_SdkNative_fundamentalContextUsCompanyOverview,
+    us_company_overview
+);
+us_symbol_method!(
+    Java_com_longport_SdkNative_fundamentalContextUsValuationOverview,
+    us_valuation_overview
+);
+us_symbol_report_method!(
+    Java_com_longport_SdkNative_fundamentalContextUsFinancialOverview,
+    us_financial_overview
+);
+us_symbol_report_method!(
+    Java_com_longport_SdkNative_fundamentalContextUsKeyFinancialMetrics,
+    us_key_financial_metrics
+);
+us_symbol_report_method!(
+    Java_com_longport_SdkNative_fundamentalContextUsAnalystConsensus,
+    us_analyst_consensus
+);
+us_symbol_method!(
+    Java_com_longport_SdkNative_fundamentalContextUsEtfDividendInfo,
+    us_etf_dividend_info
+);
+us_symbol_method!(
+    Java_com_longport_SdkNative_fundamentalContextUsCompanyDividends,
+    us_company_dividends
+);
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextUsFinancialStatementV3(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    kind: JObject,
+    report: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let kind: String = FromJValue::from_jvalue(env, kind.into())?;
+        let report: String = FromJValue::from_jvalue(env, report.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .us_financial_statement(symbol, kind, report)
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextUsEtfFiles(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    size: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let size: Option<i32> = FromJValue::from_jvalue(env, size.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx
+                .us_etf_files(symbol, size.map(|s| s as u32))
+                .await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
     })

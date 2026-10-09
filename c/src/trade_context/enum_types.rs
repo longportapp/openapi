@@ -158,24 +158,6 @@ pub enum COrderTag {
     /// Grey Order
     #[c(remote = "Grey")]
     OrderTagGrey,
-    /// Force Selling
-    #[c(remote = "MarginCall")]
-    OrderTagMarginCall,
-    /// OTC
-    #[c(remote = "Offline")]
-    OrderTagOffline,
-    /// Option Exercise Long
-    #[c(remote = "Creditor")]
-    OrderTagCreditor,
-    /// Option Exercise Short
-    #[c(remote = "Debtor")]
-    OrderTagDebtor,
-    /// Wavier Of Option Exercise
-    #[c(remote = "NonExercise")]
-    OrderTagNonExercise,
-    /// Trade Allocation
-    #[c(remote = "AllocatedSub")]
-    OrderTagAllocatedSub,
 }
 
 /// Order tag
@@ -216,6 +198,9 @@ pub enum COutsideRTH {
     /// Overnight
     #[c(remote = "Overnight")]
     OutsideRTHOvernight,
+    /// Overnight option
+    #[c(remote = "OptionPreMarket")]
+    OutsideRTHOptionPreMarket,
 }
 
 /// Time in force Type
@@ -336,4 +321,76 @@ pub enum CChargeCategoryCode {
     /// Third
     #[c(remote = "Third")]
     ChargeCategoryCodeThird,
+}
+
+/// Multi-leg strategy
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longport::trade::MultiLegStrategy")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CMultiLegStrategy {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    MultiLegStrategyUnknown,
+    /// Covered call (covered stock)
+    #[c(remote = "CoveredCall")]
+    MultiLegStrategyCoveredCall,
+    /// Covered put (covered stock)
+    #[c(remote = "CoveredPut")]
+    MultiLegStrategyCoveredPut,
+    /// Vertical call spread
+    #[c(remote = "VerticalCallSpread")]
+    MultiLegStrategyVerticalCallSpread,
+    /// Vertical put spread
+    #[c(remote = "VerticalPutSpread")]
+    MultiLegStrategyVerticalPutSpread,
+    /// Collar
+    #[c(remote = "Collar")]
+    MultiLegStrategyCollar,
+    /// Straddle
+    #[c(remote = "Straddle")]
+    MultiLegStrategyStraddle,
+    /// Strangle
+    #[c(remote = "Strangle")]
+    MultiLegStrategyStrangle,
+    /// Calendar call spread
+    #[c(remote = "CalendarCallSpread")]
+    MultiLegStrategyCalendarCallSpread,
+    /// Calendar put spread
+    #[c(remote = "CalendarPutSpread")]
+    MultiLegStrategyCalendarPutSpread,
+}
+
+/// Multi-leg position direction
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longport::trade::MultiLegPosition")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CMultiLegPosition {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    MultiLegPositionUnknown,
+    /// Long
+    #[c(remote = "Long")]
+    MultiLegPositionLong,
+    /// Short
+    #[c(remote = "Short")]
+    MultiLegPositionShort,
+}
+
+/// Option contract type
+#[derive(Debug, Copy, Clone, Eq, PartialEq, CEnum)]
+#[c(remote = "longport::trade::ContractDirection")]
+#[allow(clippy::enum_variant_names)]
+#[repr(C)]
+pub enum CContractDirection {
+    /// Unknown
+    #[c(remote = "Unknown")]
+    ContractDirectionUnknown,
+    /// Call
+    #[c(remote = "Call")]
+    ContractDirectionCall,
+    /// Put
+    #[c(remote = "Put")]
+    ContractDirectionPut,
 }

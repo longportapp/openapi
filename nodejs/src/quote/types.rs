@@ -208,6 +208,35 @@ pub enum OptionDirection {
     Call,
 }
 
+/// Special expiration cycle of an option contract
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longport::quote::OptionExpiryCycleType")]
+pub enum OptionExpiryCycleType {
+    /// Unknown
+    Unknown,
+    /// Standard monthly option
+    Monthly,
+    /// Weekly option, expires weekly
+    Weekly,
+    /// Quarterly option, expires quarterly
+    Quarterly,
+}
+
+/// Whether an option contract is a legacy contract left over from a corporate
+/// action (e.g. a stock split or a merger)
+#[napi_derive::napi]
+#[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longport::quote::OptionStandardAttr")]
+pub enum OptionStandardAttr {
+    /// Unknown
+    Unknown,
+    /// A normal, active contract
+    Normal,
+    /// A legacy contract produced by a corporate action
+    Old,
+}
+
 /// Warrant type
 #[napi_derive::napi]
 #[derive(JsEnum, Debug, Hash, Eq, PartialEq, Copy, Clone)]
@@ -690,19 +719,30 @@ pub struct Candlestick {
     trade_session: TradeSession,
 }
 
-/// Strike price info
+/// A single option contract of an option chain
+///
+/// Every contract is an independent entry: calls and puts are not paired, so a
+/// strike price that is listed on one side only yields a single entry.
 #[napi_derive::napi]
 #[derive(Debug, JsObject)]
-#[js(remote = "longport::quote::StrikePriceInfo")]
-pub struct StrikePriceInfo {
+#[js(remote = "longport::quote::OptionChainContract")]
+pub struct OptionChainContract {
+    /// Option contract code, in `ticker.region` format
+    symbol: String,
+    /// Expiry date, in US Eastern time
+    expiry_date: NaiveDate,
     /// Strike price
-    price: Decimal,
-    /// Security code of call option
-    call_symbol: String,
-    /// Security code of put option
-    put_symbol: String,
-    /// Is standard
-    standard: bool,
+    strike_price: Decimal,
+    /// Contract direction
+    direction: OptionDirection,
+    /// Special expiration cycle of the contract
+    option_type: OptionExpiryCycleType,
+    /// Whether the contract is a legacy contract left over from a corporate
+    /// action
+    standard_attr: OptionStandardAttr,
+    /// Number of days remaining until the option expires, `0` on the expiry
+    /// day and negative once expired
+    days_to_expiry: i32,
 }
 
 /// Issuer info
@@ -1329,33 +1369,27 @@ pub struct SecurityCalcIndex {
     /// Open interest
     #[js(opt)]
     open_interest: Option<i64>,
-    /// Delta
+    /// Delta. Measures the expected change in option price for a $1 move in the
+    /// underlying asset price.
     #[js(opt)]
     delta: Option<Decimal>,
-    /// Gamma
+    /// Gamma. Measures the expected change in Delta for a $1 move in the
+    /// underlying asset price.
     #[js(opt)]
     gamma: Option<Decimal>,
-    /// Theta
-    ///
-    /// The raw value returned by the API is annualized (scaled by 252 trading
-    /// days per year). To obtain the standard per-calendar-day theta, divide
-    /// by 252: `theta / 252`.
+    /// Theta. Measures the expected change in option price as one day passes;
+    /// the raw value has been divided by 365 to convert to a daily value,
+    /// representing the impact of one day's time decay on the option price.
     #[js(opt)]
     theta: Option<Decimal>,
-    /// Vega
-    ///
-    /// The raw value returned by the API is expressed per 1 percentage-point
-    /// change in implied volatility (i.e. the value has been multiplied by
-    /// 100). To obtain the standard vega (per unit change in IV), divide by
-    /// 100: `vega / 100`.
+    /// Vega. Measures the expected change in option price when implied
+    /// volatility (IV) moves by 1 (i.e. 100%); divide the raw value by 100 to
+    /// get the expected price change per 1% move in IV.
     #[js(opt)]
     vega: Option<Decimal>,
-    /// Rho
-    ///
-    /// The raw value returned by the API is expressed per 1 percentage-point
-    /// change in the risk-free rate (i.e. the value has been multiplied by
-    /// 100). To obtain the standard rho (per unit change in rate), divide by
-    /// 100: `rho / 100`.
+    /// Rho. Measures the expected change in option price when the risk-free
+    /// interest rate moves by 1 (i.e. 100%); divide the raw value by 100 to get
+    /// the expected price change per 1% move in the interest rate.
     #[js(opt)]
     rho: Option<Decimal>,
 }
@@ -1593,7 +1627,7 @@ impl From<longport::quote::ShortTradesResponse> for ShortTradesResponse {
 #[napi_derive::napi(object)]
 #[derive(Debug, Clone)]
 pub struct OptionVolumeStats {
-    /// Security symbol
+    /// Underlying security symbol
     pub symbol: String,
     /// Total call volume
     pub call_volume: i64,
@@ -1616,7 +1650,7 @@ impl From<longport::quote::OptionVolumeStats> for OptionVolumeStats {
 #[derive(Debug, JsObject)]
 #[js(remote = "longport::quote::OptionVolumeDaily")]
 pub struct OptionVolumeDaily {
-    /// Security symbol
+    /// Underlying security symbol
     symbol: String,
     /// Daily stats
     #[js(array)]
@@ -1646,6 +1680,53 @@ pub struct OptionVolumeDailyStat {
     total_open_interest: i64,
     /// Put/call volume ratio
     pc_vol: f64,
-    /// Put/call open interest ratio
+    /// Put/call OI ratio
     pc_oi: f64,
+}
+
+/// US cryptocurrency market overview
+#[napi_derive::napi(object, js_name = "USCryptoOverview")]
+#[derive(Debug, Clone)]
+pub struct USCryptoOverview {
+    pub name: String,
+    pub ticker: String,
+    pub currency: String,
+    pub all_time_high: String,
+    pub all_time_high_date: String,
+    pub all_time_low: String,
+    pub all_time_low_date: String,
+    pub ipo_date: String,
+    pub issue_price: String,
+    pub shares: String,
+    pub official_web_address: String,
+    /// User-facing symbol (e.g. "BTCUSD.BKKT")
+    pub symbol: String,
+    pub base_asset: String,
+    pub logo: String,
+    pub wiki_url: String,
+    /// Profile serialized as JSON string
+    pub profile: String,
+}
+
+impl From<longport::quote::USCryptoOverview> for USCryptoOverview {
+    fn from(v: longport::quote::USCryptoOverview) -> Self {
+        Self {
+            name: v.name,
+            ticker: v.ticker,
+            currency: v.currency,
+            all_time_high: v.all_time_high,
+            all_time_high_date: v.all_time_high_date,
+            all_time_low: v.all_time_low,
+            all_time_low_date: v.all_time_low_date,
+            ipo_date: v.ipo_date,
+            issue_price: v.issue_price,
+            shares: v.shares,
+            official_web_address: v.official_web_address,
+            symbol: v.symbol,
+            base_asset: v.base_asset,
+            logo: v.logo,
+            wiki_url: v.wiki_url,
+            profile: v.profile,
+        }
+    }
 }

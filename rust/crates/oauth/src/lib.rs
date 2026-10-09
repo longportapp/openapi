@@ -1,4 +1,4 @@
-//! OAuth 2.0 authentication support for Longport OpenAPI
+//! OAuth 2.0 authentication support for LongPort OpenAPI
 //!
 //! This crate provides utilities for performing OAuth 2.0 authorization code
 //! flow to obtain access tokens for API authentication.
@@ -294,8 +294,8 @@ mod tests {
             refresh_token: None,
             expires_at: 9999999999,
         });
-        // The builder holds our storage; a second load on a fresh instance returns
-        // None.
+        // The builder holds our storage; a second load on a fresh instance
+        // returns None.
         let fresh = MemoryStorage::default();
         assert!(fresh.load("x").is_none());
         // But our pre-populated one returns the sentinel.

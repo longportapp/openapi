@@ -2,7 +2,7 @@
 name = "longport-wscli"
 version.workspace = true
 edition.workspace = true
-description = "Longport Websocket SDK for Rust"
+description = "LongPort Websocket SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

@@ -180,6 +180,20 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get all executions
+     *
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<AllExecutionsResponse> getAllExecutions(GetAllExecutionsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextAllExecutions(raw(), opts, callback);
+        });
+    }
+
+    /**
      * Get history orders
      * 
      * <pre>
@@ -328,6 +342,49 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Submit a multi-leg option combination order (such as vertical spreads,
+     * straddles, strangles, collars, etc.). All legs are submitted together as
+     * a single strategy order.
+     *
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.trade.*;
+     * import java.math.BigDecimal;
+     *
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
+     *             SubmitMultiLegOrderOptions opts = new SubmitMultiLegOrderOptions(
+     *                     OrderSide.Buy,
+     *                     OrderType.LO,
+     *                     new BigDecimal(1),
+     *                     MultiLegStrategy.VerticalCallSpread,
+     *                     new SubmitMultiLegOrderLeg[] {
+     *                             new SubmitMultiLegOrderLeg("QQQ260731C764000.US", new BigDecimal(1)),
+     *                             new SubmitMultiLegOrderLeg("QQQ260731C767000.US", new BigDecimal(1)),
+     *                     }).setSubmittedPrice(new BigDecimal("1.5"));
+     *             SubmitOrderResponse resp = ctx.submitMultileg(opts).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     *
+     * @param opts Options for this request, not null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<SubmitOrderResponse> submitMultileg(SubmitMultiLegOrderOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextSubmitMultileg(raw(), opts, callback);
+        });
+    }
+
+    /**
      * Cancel order
      * 
      * <pre>
@@ -352,8 +409,27 @@ public class TradeContext implements AutoCloseable {
      * @throws OpenApiException If an error occurs
      */
     public synchronized CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
+        return cancelOrder(orderId, false);
+    }
+
+    /**
+     * Cancel order
+     *
+     * @param orderId    Order ID
+     * @param isAttached When set together with orderId, indicates that orderId is
+     *                   an attached sub-order ID. The server will look up using
+     *                   the attached order ID instead of treating it as a regular
+     *                   order ID.
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<Void> cancelOrder(String orderId, boolean isAttached) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextCancelOrder(raw(), orderId, callback);
+            if (isAttached) {
+                SdkNative.tradeContextCancelOrderAttached(raw(), orderId, callback);
+            } else {
+                SdkNative.tradeContextCancelOrder(raw(), orderId, callback);
+            }
         });
     }
 
@@ -588,6 +664,20 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get order detail for an attached order
+     *
+     * @param orderId Attached order ID
+     * @return A Future representing the result
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<OrderDetail> getOrderDetailAttached(String orderId)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextOrderDetailAttached(raw(), orderId, callback);
+        });
+    }
+
+    /**
      * Estimating the maximum purchase quantity for Hong Kong and US stocks,
      * warrants, and options
      * 
@@ -601,5 +691,15 @@ public class TradeContext implements AutoCloseable {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextEstimateMaxPurchaseQuantity(raw(), opts, callback);
         });
+    }
+
+    /**
+     * Set grid trading order changed event callback. After receiving a grid order
+     * changed event, it will call back to this handler.
+     *
+     * @param handler A grid order changed handler
+     */
+    public void setOnGridOrderChange(GridOrderChangedHandler handler) {
+        SdkNative.tradeContextSetOnGridOrderChanged(raw(), handler);
     }
 }

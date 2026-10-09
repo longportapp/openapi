@@ -2,11 +2,16 @@ use longport_oauth::OAuth;
 
 use crate::HttpClientError;
 
+/// Reads an env var by trying `LONGPORT_<suffix>` first, then falling back
+/// to `LONGPORT_<suffix>`.  Returns `None` if neither is set.
 fn env_var(suffix: &str) -> Option<String> {
-    std::env::var(format!("LONGPORT_{suffix}")).ok()
+    std::env::var(format!("LONGPORT_{suffix}"))
+        .ok()
+        .or_else(|| std::env::var(format!("LONGPORT_{suffix}")).ok())
 }
 
-/// Like [`env_var`] but returns an error when the variable is not set.
+/// Like [`env_var`] but returns an error (using the new `LONGPORT_` name)
+/// when neither variable is set.
 fn env_var_required(suffix: &str) -> Result<String, HttpClientError> {
     env_var(suffix).ok_or_else(|| HttpClientError::MissingEnvVar {
         name: format!("LONGPORT_{suffix}"),

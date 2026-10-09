@@ -731,6 +731,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChai
     context: i64,
     symbol: JString,
     expiry_date: JObject,
+    standard_only: jboolean,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
@@ -741,7 +742,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionChai
         async_util::execute(env, callback, async move {
             Ok(ObjectArray(
                 __owned_ctx
-                    .option_chain_info_by_date(symbol, expiry_date)
+                    .option_chain_info_by_date(symbol, expiry_date, standard_only > 0)
                     .await?,
             ))
         })?;
@@ -1250,14 +1251,14 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextShortTrade
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    count: i32,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let count: i32 = get_field(env, &opts, "count")?;
         let count = count.max(1) as u32;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx.short_trades(symbol, count).await?;
@@ -1309,6 +1310,26 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextOptionVolu
                 .option_volume_daily(symbol, timestamp, count)
                 .await?;
             Ok(resp)
+        })?;
+        Ok(())
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "system" fn Java_com_longport_SdkNative_quoteContextUsCryptoOverview(
+    mut env: JNIEnv,
+    _class: JClass,
+    context: i64,
+    symbol: JObject,
+    callback: JObject,
+) {
+    jni_result(&mut env, (), |env| {
+        let context = &*(context as *const ContextObj);
+        let __owned_ctx = context.ctx.clone();
+        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        async_util::execute(env, callback, async move {
+            let resp = __owned_ctx.us_crypto_overview(symbol).await?;
+            Ok(serde_json::to_string(&resp).unwrap_or_default())
         })?;
         Ok(())
     })

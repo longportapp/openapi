@@ -49,6 +49,8 @@ public class OrderDetail {
     private String platformDeductedCurrency;
     private OrderHistoryDetail[] history;
     private OrderChargeDetail chargeDetail;
+    private AttachedOrderDetail[] attachedOrders = new AttachedOrderDetail[0];
+    private MultiLegInfo multiLeg;
 
     /**
      * Returns the order ID.
@@ -410,6 +412,25 @@ public class OrderDetail {
         return chargeDetail;
     }
 
+    /**
+     * Returns the attached orders.
+     *
+     * @return attached orders
+     */
+    public AttachedOrderDetail[] getAttachedOrders() {
+        return attachedOrders;
+    }
+
+    /**
+     * Returns the multi-leg strategy information (only present for multi-leg
+     * option combination orders).
+     *
+     * @return multi-leg strategy information, or {@code null}
+     */
+    public MultiLegInfo getMultiLeg() {
+        return multiLeg;
+    }
+
     @Override
     public String toString() {
         return "OrderDetail [orderId=" + orderId + ", status=" + status + ", stockName=" + stockName + ", quantity="
@@ -426,7 +447,7 @@ public class OrderDetail {
                 + deductionsCurrency + ", platformDeductedStatus=" + platformDeductedStatus
                 + ", platformDeductedAmount=" + platformDeductedAmount + ", platformDeductedCurrency="
                 + platformDeductedCurrency + ", history=" + Arrays.toString(history) + ", chargeDetail=" + chargeDetail
-                + "]";
+                + ", multiLeg=" + multiLeg + "]";
     }
 
 }

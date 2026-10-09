@@ -2,7 +2,7 @@
 edition.workspace = true
 name = "longport-httpcli"
 version.workspace = true
-description = "Longport HTTP SDK for Rust"
+description = "LongPort HTTP SDK for Rust"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
@@ -11,7 +11,8 @@ longport-oauth.workspace = true
 futures-util.workspace = true
 hmac.workspace = true
 parking_lot.workspace = true
-reqwest = { workspace = true, features = ["rustls-tls", "json"] }
+reqwest = { workspace = true, features = ["rustls-tls", "json", "stream"] }
+eventsource-stream.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["raw_value"] }
 sha1.workspace = true

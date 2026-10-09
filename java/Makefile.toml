@@ -15,7 +15,7 @@ cwd = "java"
 [tasks.javah]
 args = [
   "--release",
-  "8",
+  "9",
   "-h",
   "c",
   "-cp",
@@ -85,7 +85,9 @@ args = [
   "javasrc/src/main/java/com/longport/quote/SecurityDepth.java",
   "javasrc/src/main/java/com/longport/quote/SecurityQuote.java",
   "javasrc/src/main/java/com/longport/quote/SecurityStaticInfo.java",
-  "javasrc/src/main/java/com/longport/quote/StrikePriceInfo.java",
+  "javasrc/src/main/java/com/longport/quote/OptionChainContract.java",
+  "javasrc/src/main/java/com/longport/quote/OptionExpiryCycleType.java",
+  "javasrc/src/main/java/com/longport/quote/OptionStandardAttr.java",
   "javasrc/src/main/java/com/longport/quote/SubFlags.java",
   "javasrc/src/main/java/com/longport/quote/Subscription.java",
   "javasrc/src/main/java/com/longport/quote/Trade.java",

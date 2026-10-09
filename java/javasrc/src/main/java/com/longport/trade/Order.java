@@ -37,6 +37,8 @@ public class Order {
     private Integer triggerCount;
     private BigDecimal monitorPrice;
     private String remark;
+    private AttachedOrderDetail[] attachedOrders = new AttachedOrderDetail[0];
+    private MultiLegInfo multiLeg;
 
     /**
      * Returns the order ID.
@@ -299,6 +301,25 @@ public class Order {
         return monitorPrice;
     }
 
+    /**
+     * Returns the attached orders.
+     *
+     * @return attached orders
+     */
+    public AttachedOrderDetail[] getAttachedOrders() {
+        return attachedOrders;
+    }
+
+    /**
+     * Returns the multi-leg strategy information (only present for multi-leg
+     * option combination orders).
+     *
+     * @return multi-leg strategy information, or {@code null}
+     */
+    public MultiLegInfo getMultiLeg() {
+        return multiLeg;
+    }
+
     @Override
     public String toString() {
         return "Order [orderId=" + orderId + ", status=" + status + ", stockName=" + stockName + ", quantity="
@@ -309,7 +330,8 @@ public class Order {
                 + updatedAt + ", triggerAt=" + triggerAt + ", trailingAmount=" + trailingAmount + ", trailingPercent="
                 + trailingPercent + ", limitOffset=" + limitOffset + ", triggerStatus=" + triggerStatus + ", currency="
                 + currency + ", outsideRth=" + outsideRth + ", limitDepthLevel=" + limitDepthLevel + ", triggerCount="
-                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + "]";
+                + triggerCount + ", monitorPrice=" + monitorPrice + ", remark=" + remark + ", multiLeg=" + multiLeg
+                + "]";
     }
 
 }

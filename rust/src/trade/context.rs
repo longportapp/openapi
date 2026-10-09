@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use longport_httpcli::{HttpClient, Json, Method};
+use longport_httpcli::{DcRegion, HttpClient, Json, Method};
 use longport_wscli::WsClientError;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -10,11 +10,14 @@ use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 use crate::{
     Config, Result, serde_utils,
     trade::{
-        AccountBalance, CashFlow, EstimateMaxPurchaseQuantityOptions, Execution,
-        FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
-        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, MarginRatio, Order, OrderDetail,
-        PushEvent, ReplaceOrderOptions, StockPositionsResponse, SubmitOrderOptions, TopicType,
+        AccountBalance, CancelOrderOptions, CashFlow, EstimateMaxPurchaseQuantityOptions,
+        Execution, FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
+        GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
+        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
+        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
+        USOrderDetailResponse, USRealizedPL,
         core::{Command, Core},
     },
 };
@@ -103,7 +106,7 @@ impl TradeContext {
 
     /// Subscribe
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/trade-push#subscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/trade-push#subscribe>
     ///
     /// # Examples
     ///
@@ -158,7 +161,7 @@ impl TradeContext {
 
     /// Unsubscribe
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/trade-push#cancel-subscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/trade-push#cancel-subscribe>
     pub async fn unsubscribe<I>(&self, topics: I) -> Result<()>
     where
         I: IntoIterator<Item = TopicType>,
@@ -176,7 +179,7 @@ impl TradeContext {
 
     /// Get history executions
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/execution/history_executions>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/execution/history_executions>
     ///
     /// # Examples
     ///
@@ -210,27 +213,55 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryExecutionsOptions>>,
     ) -> Result<Vec<Execution>> {
+        use std::collections::HashSet;
+
         #[derive(Deserialize)]
         struct Response {
+            #[serde(default)]
+            has_more: bool,
             trades: Vec<Execution>,
         }
 
-        Ok(self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/trade/execution/history")
-            .query_params(options.into().unwrap_or_default())
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?
-            .0
-            .trades)
+        // The endpoint caps each response at 1000 records; walk the `page`
+        // param (1-based) until `has_more` is false. Dedupe by
+        // `trade_id` and stop if a page adds nothing new, guarding
+        // against the gateway ignoring `page`. Bounded to 1000 pages as
+        // a runaway guard.
+        let mut options = options.into().unwrap_or_default();
+        let mut all: Vec<Execution> = Vec::new();
+        let mut seen: HashSet<String> = HashSet::new();
+        for page in 1..=1000u32 {
+            options = options.with_page(page);
+            let resp = self
+                .0
+                .http_cli
+                .request(Method::GET, "/v1/trade/execution/history")
+                .query_params(&options)
+                .response::<Json<Response>>()
+                .send()
+                .with_subscriber(self.0.log_subscriber.clone())
+                .await?
+                .0;
+            if resp.trades.is_empty() {
+                break;
+            }
+            let mut added = 0usize;
+            for t in resp.trades {
+                if seen.insert(t.trade_id.clone()) {
+                    all.push(t);
+                    added += 1;
+                }
+            }
+            if !resp.has_more || added == 0 {
+                break;
+            }
+        }
+        Ok(all)
     }
 
     /// Get today executions
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/execution/today_executions>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/execution/today_executions>
     ///
     /// # Examples
     ///
@@ -278,9 +309,29 @@ impl TradeContext {
             .trades)
     }
 
+    // TODO: temporarily disabled — restore when API is available
+    // Get all executions
+    //
+    // Reference: <https://open.longportapp.com/en/docs/trade/execution/all_executions>
+    // pub async fn all_executions(
+    // &self,
+    // options: impl Into<Option<GetAllExecutionsOptions>>,
+    // ) -> Result<AllExecutionsResponse> {
+    // Ok(self
+    // .0
+    // .http_cli
+    // .request(Method::GET, "/v3/trade/execution/all")
+    // .query_params(options.into().unwrap_or_default())
+    // .response::<Json<AllExecutionsResponse>>()
+    // .send()
+    // .with_subscriber(self.0.log_subscriber.clone())
+    // .await?
+    // .0)
+    // }
+
     /// Get history orders
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/history_orders>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/history_orders>
     ///
     /// # Examples
     ///
@@ -337,7 +388,7 @@ impl TradeContext {
 
     /// Get today orders
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/today_orders>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/today_orders>
     ///
     /// # Examples
     ///
@@ -391,7 +442,7 @@ impl TradeContext {
 
     /// Replace order
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/replace>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/replace>
     ///
     /// # Examples
     ///
@@ -433,7 +484,7 @@ impl TradeContext {
 
     /// Submit order
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/submit>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/submit>
     ///
     /// # Examples
     ///
@@ -483,9 +534,70 @@ impl TradeContext {
         Ok(resp)
     }
 
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{
+    ///     Config, decimal,
+    ///     oauth::OAuthBuilder,
+    ///     trade::{
+    ///         MultiLegStrategy, OrderSide, OrderType, SubmitMultiLegOrderLeg,
+    ///         SubmitMultiLegOrderOptions, TradeContext,
+    ///     },
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let (ctx, _) = TradeContext::new(config);
+    ///
+    /// let opts = SubmitMultiLegOrderOptions::new(
+    ///     OrderSide::Buy,
+    ///     OrderType::LO,
+    ///     decimal!(1i32),
+    ///     MultiLegStrategy::VerticalCallSpread,
+    ///     [
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C764000.US", decimal!(1i32)),
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C767000.US", decimal!(1i32)),
+    ///     ],
+    /// )
+    /// .submitted_price(decimal!(1.5));
+    /// let resp = ctx.submit_multileg(opts).await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn submit_multileg(
+        &self,
+        options: SubmitMultiLegOrderOptions,
+    ) -> Result<SubmitOrderResponse> {
+        let resp: SubmitOrderResponse = self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/trade/order/multileg")
+            .body(Json(options))
+            .response::<Json<_>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0;
+        _ = self.0.command_tx.send(Command::SubmittedOrder {
+            order_id: resp.order_id.clone(),
+        });
+        Ok(resp)
+    }
+
     /// Cancel order
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/withdraw>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/withdraw>
     ///
     /// # Examples
     ///
@@ -505,20 +617,13 @@ impl TradeContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn cancel_order(&self, order_id: impl Into<String>) -> Result<()> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            order_id: String,
-        }
-
+    pub async fn cancel_order(&self, options: impl Into<CancelOrderOptions>) -> Result<()> {
         Ok(self
             .0
             .http_cli
             .request(Method::DELETE, "/v1/trade/order")
             .response::<Json<EmptyResponse>>()
-            .query_params(Request {
-                order_id: order_id.into(),
-            })
+            .query_params(options.into())
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await
@@ -527,7 +632,7 @@ impl TradeContext {
 
     /// Get account balance
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/asset/account>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/account>
     ///
     /// # Examples
     ///
@@ -574,7 +679,7 @@ impl TradeContext {
 
     /// Get cash flow
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/asset/cashflow>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/cashflow>
     ///
     /// # Examples
     ///
@@ -622,7 +727,7 @@ impl TradeContext {
 
     /// Get fund positions
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/asset/fund>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/fund>
     ///
     /// # Examples
     ///
@@ -661,7 +766,7 @@ impl TradeContext {
 
     /// Get stock positions
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/asset/stock>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/stock>
     ///
     /// # Examples
     ///
@@ -700,7 +805,7 @@ impl TradeContext {
 
     /// Get margin ratio
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/asset/margin_ratio>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/asset/margin_ratio>
     ///
     /// # Examples
     ///
@@ -743,7 +848,7 @@ impl TradeContext {
 
     /// Get order detail
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/order_detail>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/order_detail>
     ///
     /// # Examples
     ///
@@ -769,20 +874,16 @@ impl TradeContext {
     /// # Ok::<_, Box<dyn std::error::Error>>(())
     /// # });
     /// ```
-    pub async fn order_detail(&self, order_id: impl Into<String>) -> Result<OrderDetail> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            order_id: String,
-        }
-
+    pub async fn order_detail(
+        &self,
+        options: impl Into<GetOrderDetailOptions>,
+    ) -> Result<OrderDetail> {
         Ok(self
             .0
             .http_cli
             .request(Method::GET, "/v1/trade/order")
             .response::<Json<OrderDetail>>()
-            .query_params(Request {
-                order_id: order_id.into(),
-            })
+            .query_params(options.into())
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
@@ -793,7 +894,7 @@ impl TradeContext {
     /// warrants, and options
     ///
     ///
-    /// Reference: <https://open.longport.com/en/docs/trade/order/estimate_available_buy_limit>
+    /// Reference: <https://open.longportapp.com/en/docs/trade/order/estimate_available_buy_limit>
     ///
     /// # Examples
     ///
@@ -835,6 +936,158 @@ impl TradeContext {
             .request(Method::GET, "/v1/trade/estimate/buy_limit")
             .query_params(opts)
             .response::<Json<EstimateMaxPurchaseQuantityResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    // ── US-market APIs
+    // ────────────────────────────────────────────────────────
+
+    /// Query the paginated US order list.
+    ///
+    /// Path: `POST /v1/us/orders/query`
+    ///
+    /// US token required.
+    pub async fn us_query_orders(&self, opts: GetUSHistoryOrders) -> Result<QueryUSOrdersResponse> {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs() as i64;
+
+        let action = match opts.side {
+            OrderSide::Buy => 1,
+            OrderSide::Sell => 2,
+            _ => 0,
+        };
+
+        let symbols = opts
+            .symbol
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .map(|s| vec![s.to_string()])
+            .unwrap_or_default();
+
+        let start_at = if opts.start_at == 0 {
+            (now - 90 * 24 * 3600) as f64
+        } else {
+            opts.start_at as f64
+        };
+        let end_at = if opts.end_at == 0 {
+            now as f64
+        } else {
+            opts.end_at as f64
+        };
+        let page = if opts.page <= 0 { 1 } else { opts.page };
+        let limit = if opts.limit <= 0 { 20 } else { opts.limit };
+
+        let body = super::types::USQueryOrdersBody {
+            account_channel: String::new(),
+            action,
+            start_at,
+            end_at,
+            symbols,
+            security_types: vec![],
+            query_type: opts.query_type,
+            page,
+            limit,
+            query_version: now as f64,
+        };
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/us/orders/query")
+            .dc_restrict(DcRegion::Us)
+            .body(Json(body))
+            .response::<Json<QueryUSOrdersResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get US order detail.
+    ///
+    /// Path: `GET /v1/us/orders/{order_id}`
+    ///
+    /// US token required.
+    pub async fn us_order_detail(
+        &self,
+        order_id: impl Into<String>,
+    ) -> Result<USOrderDetailResponse> {
+        let order_id = order_id.into();
+        let path = format!("/v1/us/orders/{order_id}");
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, path.as_str())
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USOrderDetailResponse>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the full US account asset snapshot (stocks, options, crypto, buying
+    /// power).
+    ///
+    /// Path: `GET /v1/us/assets/overview`
+    ///
+    /// US token required.
+    pub async fn us_asset_overview(&self) -> Result<USAssetOverview> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/overview")
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USAssetOverview>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get realized profit-and-loss for the US account.
+    ///
+    /// `currency`: required, e.g. `"USD"`.
+    /// `category`: optional filter — `"ALL"`, `"STOCK"`, `"OPTION"`, or
+    /// `"CRYPTO"`.
+    ///
+    /// Path: `GET /v1/us/assets/pl/realized`
+    ///
+    /// US token required.
+    pub async fn us_realized_pl(&self, opts: GetUSRealizedPLOptions) -> Result<USRealizedPL> {
+        #[derive(Serialize)]
+        struct Query {
+            currency: String,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            category: Option<String>,
+        }
+
+        let currency = if opts.currency.is_empty() {
+            "USD".to_string()
+        } else {
+            opts.currency
+        };
+        let category = if opts.category.is_empty() {
+            None
+        } else {
+            Some(opts.category)
+        };
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/pl/realized")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query { currency, category })
+            .response::<Json<USRealizedPL>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
             .await?

@@ -1,3 +1,11 @@
+// `longport::Error` is intentionally larger than clippy's default
+// `result_large_err` threshold (kept rich for diagnostics); the core
+// `longport` crate allows this crate-wide (rust/src/lib.rs) for the same
+// reason, and it also surfaces here once blocking calls are wrapped in
+// `py.detach(|| ...)` closures (e.g. `agent::context`).
+#![allow(clippy::result_large_err)]
+
+mod agent;
 mod alert;
 mod asset;
 mod async_callback;
@@ -7,7 +15,10 @@ mod content;
 mod dca;
 mod decimal;
 mod error;
+mod forex;
+mod fund;
 mod fundamental;
+mod grid;
 mod http_client;
 mod market;
 mod oauth;
@@ -33,12 +44,16 @@ fn longport(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     openapi.add_class::<types::PushCandlestickMode>()?;
     openapi.add_class::<http_client::HttpClient>()?;
     openapi.add_class::<error::ErrorKind>()?;
+    agent::register_types(&openapi)?;
     asset::register_types(&openapi)?;
     alert::register_types(&openapi)?;
     dca::register_types(&openapi)?;
     sharelist::register_types(&openapi)?;
     calendar::register_types(&openapi)?;
+    fund::register_types(&openapi)?;
+    forex::register_types(&openapi)?;
     fundamental::register_types(&openapi)?;
+    grid::register_types(&openapi)?;
     market::register_types(&openapi)?;
     portfolio::register_types(&openapi)?;
     quote::register_types(&openapi)?;

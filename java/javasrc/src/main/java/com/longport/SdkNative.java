@@ -2,6 +2,7 @@ package com.longport;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.concurrent.Flow;
 import java.util.function.Consumer;
 import org.scijava.nativelib.NativeLoader;
 
@@ -9,6 +10,7 @@ import com.longport.asset.*;
 import com.longport.content.*;
 import com.longport.quote.*;
 import com.longport.trade.*;
+import com.longport.grid.*;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -51,6 +53,8 @@ public class SdkNative {
         public static native long configSetEnablePrintQuotePackages(long config, boolean enable);
 
         public static native long configSetLogPath(long config, String logPath);
+
+        public static native long configSetEnablePapertrading(long config);
 
         public static native void configRefreshAccessToken(long config, OffsetDateTime expiredAt,
                         AsyncCallback callback);
@@ -149,7 +153,7 @@ public class SdkNative {
                         AsyncCallback callback);
 
         public static native void quoteContextOptionChainInfoByDate(long context, String symbol, LocalDate expiryDate,
-                        AsyncCallback callback);
+                        boolean standardOnly, AsyncCallback callback);
 
         public static native void quoteContextWarrantIssuers(long context, AsyncCallback callback);
 
@@ -219,6 +223,9 @@ public class SdkNative {
         public static native void tradeContextTodayExecutions(long context, GetTodayExecutionsOptions opts,
                         AsyncCallback callback);
 
+        public static native void tradeContextAllExecutions(long context, GetAllExecutionsOptions opts,
+                        AsyncCallback callback);
+
         public static native void tradeContextHistoryOrders(long context, GetHistoryOrdersOptions opts,
                         AsyncCallback callback);
 
@@ -231,7 +238,13 @@ public class SdkNative {
         public static native void tradeContextSubmitOrder(long context, SubmitOrderOptions opts,
                         AsyncCallback callback);
 
+        public static native void tradeContextSubmitMultileg(long context, SubmitMultiLegOrderOptions opts,
+                        AsyncCallback callback);
+
         public static native void tradeContextCancelOrder(long context, String orderId, AsyncCallback callback);
+
+        public static native void tradeContextCancelOrderAttached(long context, String orderId,
+                        AsyncCallback callback);
 
         public static native void tradeContextAccountBalance(long context, String currency, AsyncCallback callback);
 
@@ -247,8 +260,145 @@ public class SdkNative {
 
         public static native void tradeContextOrderDetail(long context, String orderId, AsyncCallback callback);
 
+        public static native void tradeContextOrderDetailAttached(long context, String orderId, Object callback);
+
         public static native void tradeContextEstimateMaxPurchaseQuantity(long context,
                         EstimateMaxPurchaseQuantityOptions opts,
+                        AsyncCallback callback);
+
+
+        // ── FundContext ───────────────────────────────────────────────
+        public static native long newFundContext(long config);
+
+        public static native void freeFundContext(long context);
+
+        public static native void fundContextHotFunds(long context, AsyncCallback callback);
+
+        public static native void fundContextFunds(long context, com.longport.fund.GetFundsOptions opts,
+                        AsyncCallback callback);
+
+        public static native void fundContextFilters(long context, AsyncCallback callback);
+
+        public static native void fundContextDetail(long context, String counterId, AsyncCallback callback);
+
+        public static native void fundContextAnalysis(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextAnalysisDetail(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextTrend(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextAnnualReturns(long context, String counterId,
+                        com.longport.fund.FundPageOptions opts, AsyncCallback callback);
+
+        public static native void fundContextQuarterlyReturns(long context, String counterId,
+                        com.longport.fund.FundPageOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPerformance(long context, String counterId, AsyncCallback callback);
+
+        public static native void fundContextPerformanceComparison(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextNav(long context, String counterId, AsyncCallback callback);
+
+        public static native void fundContextNavHistory(long context, String counterId,
+                        com.longport.fund.FundPageOptions opts, AsyncCallback callback);
+
+        public static native void fundContextNavRange(long context, String counterId,
+                        com.longport.fund.FundNavRangeOptions opts, AsyncCallback callback);
+
+        public static native void fundContextHoldings(long context, String counterId,
+                        com.longport.fund.GetFundHoldingsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextStockHoldings(long context, String counterId,
+                        com.longport.fund.GetFundStockHoldingsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositions(long context,
+                        com.longport.fund.GetFundPositionsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPosition(long context, String counterId,
+                        com.longport.fund.GetFundPositionOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositionPerformance(long context, String counterId,
+                        AsyncCallback callback);
+
+        public static native void fundContextPositionProfits(long context, String counterId,
+                        com.longport.fund.GetFundPositionProfitsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositionNav(long context, String counterId,
+                        com.longport.fund.FundNavRangeOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositionDividends(long context, String counterId,
+                        com.longport.fund.GetFundPositionDividendsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextOrders(long context,
+                        com.longport.fund.GetFundOrdersOptions opts, AsyncCallback callback);
+
+        public static native void fundContextOrder(long context, long orderId, AsyncCallback callback);
+
+        public static native void fundContextTransactions(long context,
+                        com.longport.fund.GetFundTransactionsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextValidateOrder(long context,
+                        com.longport.fund.ValidateFundOrderOptions opts, AsyncCallback callback);
+
+        public static native void fundContextSubmitOrder(long context,
+                        com.longport.fund.SubmitFundOrderOptions opts, AsyncCallback callback);
+
+        public static native void fundContextCancelOrder(long context, long orderId, AsyncCallback callback);
+
+
+        // ── Grid trading push (stays on the trade side) ───────────────
+        public static native void tradeContextSetOnGridOrderChanged(long context, GridOrderChangedHandler handler);
+
+        // ── GridContext ───────────────────────────────────────────────
+        public static native long newGridContext(long config);
+
+        public static native void freeGridContext(long context);
+
+        public static native void gridContextSubmit(long context, SubmitGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextReplace(long context, ReplaceGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextList(long context, GetGridOrdersOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextListByIds(long context, String[] orderIds,
+                        AsyncCallback callback);
+
+        public static native void gridContextDetail(long context, GetGridOrderDetailOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextTriggerHistory(long context, GetGridTriggerHistoryOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextCancel(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextSuspend(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextRestart(long context, String orderId, AsyncCallback callback);
+
+
+        public static native void gridContextSymbolInfo(long context, String symbol, AsyncCallback callback);
+
+
+        // ── ForexContext ──────────────────────────────────────────────
+        public static native long newForexContext(long config);
+
+        public static native void freeForexContext(long context);
+
+        public static native void forexContextQuote(long context, String from, String to,
+                        java.math.BigDecimal amount, java.math.BigDecimal targetAmount,
+                        AsyncCallback callback);
+
+        public static native void forexContextSubmitOrder(long context, String quoteId,
+                        String clientOrderId, AsyncCallback callback);
+
+        public static native void forexContextOrder(long context, String clientOrderId,
                         AsyncCallback callback);
 
         // ── DCAContext ────────────────────────────────────────────────
@@ -284,8 +434,7 @@ public class SdkNative {
         public static native void freeAlertContext(long context);
         public static native void alertContextList(long context, AsyncCallback callback);
         public static native void alertContextAdd(long context, Object opts, AsyncCallback callback);
-        public static native void alertContextEnable(long context, String alertId, AsyncCallback callback);
-        public static native void alertContextDisable(long context, String alertId, AsyncCallback callback);
+        public static native void alertContextUpdate(long context, Object item, AsyncCallback callback);
         public static native void alertContextDelete(long context, Object opts, AsyncCallback callback);
 
                 // ── CalendarContext ───────────────────────────────────────────
@@ -305,7 +454,7 @@ public class SdkNative {
 
         // ── QuoteContext extensions (Step 3) ─────────────────────────
 
-        public static native void quoteContextShortPositions(long context, String symbol, AsyncCallback callback);
+        public static native void quoteContextShortPositions(long context, String symbol, int count, AsyncCallback callback);
         public static native void quoteContextOptionVolume(long context, String symbol, AsyncCallback callback);
         public static native void quoteContextOptionVolumeDaily(long context, Object opts, AsyncCallback callback);
 
@@ -464,6 +613,31 @@ public class SdkNative {
 
         public static native void quoteContextUpdatePinned(long context, Object req,
                         AsyncCallback callback);
+
+        // ── AgentContext ──────────────────────────────────────────────
+
+        public static native long newAgentContext(long config);
+        public static native void freeAgentContext(long context);
+
+        public static native void agentContextWorkspaces(long context, AsyncCallback callback);
+        public static native void agentContextAgents(long context, String workspaceId, Object opts,
+                        AsyncCallback callback);
+        public static native void agentContextPublicAgents(long context, Object opts,
+                        AsyncCallback callback);
+        public static native void agentContextConversation(long context, String agentId, String query,
+                        String chatUid, String parentMessageId, AsyncCallback callback);
+        public static native void agentContextContinueConversation(long context, String agentId, String chatUid,
+                        String messageId, String answersByToolCallJson, AsyncCallback callback);
+
+        public static native void agentContextConversationStreamSubscribe(long context, String agentId, String query,
+                        String chatUid, String parentMessageId, Flow.Subscriber<?> subscriber);
+        public static native void agentContextContinueConversationStreamSubscribe(long context, String agentId,
+                        String chatUid, String messageId, String answersByToolCallJson,
+                        Flow.Subscriber<?> subscriber);
+
+        public static native void conversationStreamSubscriptionRequest(long handle, long n);
+        public static native void conversationStreamSubscriptionCancel(long handle);
+        public static native void freeConversationStreamSubscription(long handle);
 
         static {
                 try {

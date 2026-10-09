@@ -10,6 +10,7 @@ use crate::types::ClassLoader;
 
 pub(crate) static INTEGER_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static LONG_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static DOUBLE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static STRING_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DECIMAL_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static TIME_INSTANT_CLASS: OnceLock<GlobalRef> = OnceLock::new();
@@ -20,6 +21,7 @@ pub(crate) static TIME_LOCALDATETIME_CLASS: OnceLock<GlobalRef> = OnceLock::new(
 pub(crate) static TIME_ZONE_ID: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static DERIVATIVE_TYPE_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 pub(crate) static OPENAPI_EXCEPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
+pub(crate) static CONVERSATION_STREAM_SUBSCRIPTION_CLASS: OnceLock<GlobalRef> = OnceLock::new();
 
 fn init_timezone_id(env: &mut JNIEnv) {
     let utc = env.new_string("UTC").unwrap();
@@ -60,6 +62,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         env,
         (INTEGER_CLASS, "java/lang/Integer"),
         (LONG_CLASS, "java/lang/Long"),
+        (DOUBLE_CLASS, "java/lang/Double"),
         (STRING_CLASS, "java/lang/String"),
         (DECIMAL_CLASS, "java/math/BigDecimal"),
         (TIME_INSTANT_CLASS, "java/time/Instant"),
@@ -68,7 +71,11 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         (TIME_LOCALTIME_CLASS, "java/time/LocalTime"),
         (TIME_LOCALDATETIME_CLASS, "java/time/LocalDateTime"),
         (DERIVATIVE_TYPE_CLASS, "com/longport/quote/DerivativeType"),
-        (OPENAPI_EXCEPTION_CLASS, "com/longport/OpenApiException")
+        (OPENAPI_EXCEPTION_CLASS, "com/longport/OpenApiException"),
+        (
+            CONVERSATION_STREAM_SUBSCRIPTION_CLASS,
+            "com/longport/agent/ConversationStreamSubscription"
+        )
     );
 
     init_timezone_id(&mut env);
@@ -85,6 +92,8 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::quote::TradeDirection,
         longport::quote::OptionType,
         longport::quote::OptionDirection,
+        longport::quote::OptionExpiryCycleType,
+        longport::quote::OptionStandardAttr,
         longport::quote::WarrantType,
         longport::quote::WarrantStatus,
         longport::quote::SortOrderType,
@@ -112,6 +121,10 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::trade::CommissionFreeStatus,
         longport::trade::DeductionStatus,
         longport::trade::ChargeCategoryCode,
+        longport::trade::AttachedOrderType,
+        longport::trade::MultiLegStrategy,
+        longport::trade::MultiLegPosition,
+        longport::trade::ContractDirection,
         longport::quote::PinnedMode,
         longport::portfolio::types::FlowDirection,
         longport::portfolio::types::AssetType,
@@ -124,7 +137,13 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::dca::types::DCAStatus,
         longport::alert::types::AlertCondition,
         longport::alert::types::AlertFrequency,
-        longport::calendar::types::CalendarCategory
+        longport::calendar::types::CalendarCategory,
+        longport::calendar::types::CalendarPageDirection,
+        longport::agent::ConversationStatus,
+        longport::forex::ForexOrderStatus,
+        longport::grid::TriggerPriceType,
+        longport::grid::GridLimitEvent,
+        longport::grid::GridTimeInForce
     );
 
     // classes
@@ -149,7 +168,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::quote::ParticipantInfo,
         longport::quote::IntradayLine,
         longport::quote::Candlestick,
-        longport::quote::StrikePriceInfo,
+        longport::quote::OptionChainContract,
         longport::quote::IssuerInfo,
         longport::quote::WarrantInfo,
         longport::quote::MarketTradingSession,
@@ -168,8 +187,12 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::quote::MarketTemperature,
         longport::quote::HistoryMarketTemperatureResponse,
         longport::quote::FilingItem,
+        longport::trade::AttachedOrderDetail,
+        longport::trade::MultiLegOrderLeg,
+        longport::trade::MultiLegInfo,
         longport::trade::PushOrderChanged,
         longport::trade::Execution,
+        longport::trade::AllExecutionsResponse,
         longport::trade::Order,
         longport::trade::SubmitOrderResponse,
         longport::trade::CashInfo,
@@ -189,6 +212,62 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::trade::OrderChargeDetail,
         longport::trade::OrderDetail,
         longport::trade::EstimateMaxPurchaseQuantityResponse,
+        // Grid trading (GridContext types live in `longport::grid`)
+        longport::grid::SubmitGridOrderResponse,
+        longport::grid::GridOrder,
+        longport::grid::GridOrderSubOrder,
+        longport::grid::GridOrderHistory,
+        longport::grid::GridOrderDetail,
+        longport::grid::TriggerOrder,
+        longport::grid::GridBidSize,
+        longport::grid::GridChannelInfo,
+        longport::grid::GridSymbolInfo,
+        // Grid push stays on the trade side
+        longport::trade::PushGridOrderChanged,
+        crate::types::GridOrdersResponse,
+        crate::types::GridTriggerHistoryResponse,
+        // FundContext (types live in `longport::fund`)
+        longport::fund::FundNavValue,
+        longport::fund::FundPerformancePoint,
+        longport::fund::HotFund,
+        longport::fund::FundBrief,
+        longport::fund::FundFilters,
+        longport::fund::FundAssetAllocationItem,
+        longport::fund::FundAssetAllocation,
+        longport::fund::FundDetail,
+        longport::fund::FundAnalysis,
+        longport::fund::FundAnalysisDetail,
+        longport::fund::FundTrendContrast,
+        longport::fund::FundTrend,
+        longport::fund::FundNamedContrast,
+        longport::fund::FundPerformanceComparison,
+        longport::fund::FundAnnualReturn,
+        longport::fund::FundQuarterlyReturn,
+        longport::fund::FundPerformance,
+        longport::fund::FundHolding,
+        longport::fund::FundHoldings,
+        longport::fund::FundStockHolding,
+        longport::fund::FundPosition,
+        longport::fund::FundPositions,
+        longport::fund::FundDatedValue,
+        longport::fund::FundUnitValue,
+        longport::fund::FundPositionDetailValues,
+        longport::fund::FundPositionDetail,
+        longport::fund::FundPositionPerformance,
+        longport::fund::FundPositionProfits,
+        longport::fund::FundPositionNav,
+        longport::fund::FundDividend,
+        longport::fund::FundDividends,
+        longport::fund::FundOrder,
+        longport::fund::FundOrderKeyword,
+        longport::fund::FundOrderStage,
+        longport::fund::FundOrderInfo,
+        longport::fund::FundOrderDetail,
+        longport::fund::FundTransaction,
+        longport::fund::FundOrderValidation,
+        longport::fund::FundOrderSubmitResponse,
+        longport::forex::ForexQuote,
+        longport::forex::ForexOrderDetail,
         longport::content::TopicItem,
         longport::content::NewsItem,
         longport::content::TopicAuthor,
@@ -223,6 +302,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::dca::DcaSupportInfo,
         longport::dca::DcaSupportList,
         // AlertContext
+        longport::alert::AlertValueMap,
         longport::alert::AlertItem,
         longport::alert::AlertSymbolGroup,
         longport::alert::AlertList,
@@ -390,10 +470,30 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::fundamental::ValuationHistoryPoint,
         longport::fundamental::ValuationComparisonItem,
         longport::fundamental::ValuationComparisonResponse,
+        // FundamentalContext: industry rank / peers
+        longport::fundamental::IndustryRankItem,
+        longport::fundamental::IndustryRankGroup,
+        longport::fundamental::IndustryRankResponse,
+        longport::fundamental::IndustryPeersTop,
+        longport::fundamental::IndustryPeerNode,
+        longport::fundamental::IndustryPeersResponse,
+        // FundamentalContext: business segments / rating views / snapshot
+        longport::fundamental::BusinessSegmentItem,
+        longport::fundamental::BusinessSegments,
+        longport::fundamental::BusinessSegmentHistoryItem,
+        longport::fundamental::BusinessSegmentsHistoricalItem,
+        longport::fundamental::BusinessSegmentsHistory,
+        longport::fundamental::InstitutionRatingViewItem,
+        longport::fundamental::InstitutionRatingViews,
+        longport::fundamental::SnapshotForecastMetric,
+        longport::fundamental::SnapshotReportedMetric,
+        longport::fundamental::FinancialReportSnapshot,
         // MarketContext: top movers / rank
         longport::market::TopMoversStock,
         longport::market::TopMoversEvent,
         longport::market::TopMoversResponse,
+        longport::market::RankSubCategory,
+        longport::market::RankCategory,
         longport::market::RankCategoriesResponse,
         longport::market::RankListItem,
         longport::market::RankListResponse,
@@ -407,6 +507,44 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::portfolio::FlowItem,
         longport::portfolio::ProfitAnalysisFlows,
         // DCAContext
-        longport::dca::DcaCreateResult
+        longport::dca::DcaCreateResult,
+        // AgentContext
+        longport::agent::Workspace,
+        longport::agent::WorkspacesResponse,
+        longport::agent::Agent,
+        longport::agent::AgentsResponse,
+        longport::agent::Reference,
+        longport::agent::QuestionOption,
+        longport::agent::Question,
+        longport::agent::HumanInteraction,
+        longport::agent::Interrupt,
+        longport::agent::AgentError,
+        longport::agent::ChatStartedPayload,
+        longport::agent::WorkflowStartedInputs,
+        longport::agent::WorkflowStartedPayload,
+        longport::agent::MessagePayload,
+        crate::types::PingEvent,
+        longport::agent::ThinkingStartedPayload,
+        longport::agent::ThinkingFinishedPayload,
+        longport::agent::NodeToolUseStartedPayload,
+        crate::types::NodeToolUseOutputs,
+        longport::agent::NodeToolUseFinishedPayload,
+        longport::agent::SubagentStartedPayload,
+        longport::agent::SubagentProgressPayload,
+        crate::types::SubagentOutputs,
+        longport::agent::SubagentFinishedPayload,
+        longport::agent::AgentToolStartedPayload,
+        longport::agent::AgentToolProgressPayload,
+        longport::agent::AgentToolFinishedPayload,
+        crate::types::ConversationResponse,
+        crate::types::HumanInteractionRequiredEvent,
+        longport::agent::QueryMaskedPayload,
+        longport::agent::PlanChangedPayload,
+        longport::agent::ContextCompressStartedPayload,
+        longport::agent::ContextCompressFinishedPayload,
+        longport::agent::ChatFinishedPayload,
+        crate::types::WorkflowFinishedEvent,
+        longport::agent::ChatTitleUpdatedPayload,
+        crate::types::OtherEvent
     );
 }

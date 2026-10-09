@@ -1,6 +1,6 @@
-# Longport OpenAPI SDK for Python
+# LongPort OpenAPI SDK for Python
 
-`longport` provides an easy-to-use interface for invoking [`Longport OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 
 ## Context Types
@@ -21,8 +21,8 @@
 
 ## Documentation
 
-- SDK docs: https://longportapp.github.io/openapi/python/index.html
-- Longport OpenAPI: https://open.longportapp.com/en/
+- SDK docs: https://longport.github.io/openapi/python/index.html
+- LongPort OpenAPI: https://open.longportapp.com/en/
 
 ## Examples
 
@@ -50,21 +50,21 @@ Runnable examples live in `examples/python/`, grouped as follows.
 
 ## References
 
-- [Config](https://longportapp.github.io/openapi/python/config/)
+- [Config](https://longport.github.io/openapi/python/config/)
 
   The configuration of the SDK.
    
-- [QuoteContext](https://longportapp.github.io/openapi/python/quote_context/)
+- [QuoteContext](https://longport.github.io/openapi/python/quote_context/)
 
   The Quote API part of the SDK, e.g.: get basic information of securities, subscribe quotes...
 
-- [TradeContext](https://longportapp.github.io/openapi/python/trade_context/)
+- [TradeContext](https://longport.github.io/openapi/python/trade_context/)
 
   The Trade API part of the SDK, e.g.: submit order, get order status...
 
 ## Quickstart
 
-_Install Longport OpenAPI SDK_
+_Install LongPort OpenAPI SDK_
 
 ```bash
 pip install longport
@@ -72,7 +72,7 @@ pip install longport
 
 ### Authentication
 
-Longport OpenAPI supports two authentication methods:
+LongPort OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
@@ -181,6 +181,7 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 | LONGPORT_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                 |
 | LONGPORT_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)        |
 | LONGPORT_LOG_PATH              | Set the path of the log files (Default: `no logs`)                              |
+| LONGPORT_PAPERTRADING          | Enable paper trading mode, `true` or `false` (Default: `false`). See [Paper Trading](#paper-trading). |
 
 Then create a config from the environment:
 
@@ -291,6 +292,38 @@ asyncio.run(main())
 ```
 
 See the `*_async.py` examples in `examples/python/` for full async flows.
+
+## Paper Trading
+
+If your account is a **paper trading** (simulation) account and you want to
+place orders, you must explicitly enable paper trading mode.  When enabled, all
+API calls target the paper trading environment and the server validates the
+token — if the token belongs to a real-money account the server returns an
+error.
+
+By default this option is **off**: the server imposes no restrictions and
+accepts requests from both paper trading and real-money accounts.
+
+**Via environment variable** (applies automatically to all constructor methods):
+
+```bash
+export LONGPORT_PAPERTRADING=true   # macOS / Linux
+```
+
+```powershell
+$env:LONGPORT_PAPERTRADING = "true"   # Windows PowerShell
+```
+
+**Programmatically:**
+
+```python
+from longport.openapi import Config
+
+config = Config.from_apikey(
+    "app-key", "app-secret", "access-token",
+    enable_papertrading=True,
+)
+```
 
 ## Troubleshooting
 

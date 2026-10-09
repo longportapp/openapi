@@ -1,5 +1,6 @@
 #pragma once
 
+#include "agent_context.hpp"
 #include "asset_context.hpp"
 #include "config.hpp"
 #include "decimal.hpp"
@@ -16,3 +17,6 @@
 #include "content_context.hpp"
 #include "quote_context.hpp"
 #include "trade_context.hpp"
+#include "forex_context.hpp"
+#include "fund_context.hpp"
+#include "grid_context.hpp"
