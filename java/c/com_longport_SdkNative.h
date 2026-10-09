@@ -1530,10 +1530,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_portfolioContextProfitAnalysi
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextShortPositions
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;ILcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextShortPositions
-  (JNIEnv *, jclass, jlong, jstring, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jint, jobject);
 
 /*
  * Class:     com_longport_SdkNative
