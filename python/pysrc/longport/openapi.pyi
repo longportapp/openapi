@@ -6174,6 +6174,16 @@ class MultiLegStrategy:
         Strangle
         """
 
+    class CalendarCallSpread(MultiLegStrategy):
+        """
+        Calendar call spread
+        """
+
+    class CalendarPutSpread(MultiLegStrategy):
+        """
+        Calendar put spread
+        """
+
 class MultiLegPosition:
     """
     Multi-leg position direction
