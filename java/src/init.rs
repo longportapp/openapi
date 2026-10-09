@@ -134,7 +134,10 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::alert::types::AlertFrequency,
         longport::calendar::types::CalendarCategory,
         longport::agent::ConversationStatus,
-        longport::forex::ForexOrderStatus
+        longport::forex::ForexOrderStatus,
+        longport::grid::TriggerPriceType,
+        longport::grid::GridLimitEvent,
+        longport::grid::GridTimeInForce
     );
 
     // classes
@@ -201,6 +204,20 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::trade::OrderChargeDetail,
         longport::trade::OrderDetail,
         longport::trade::EstimateMaxPurchaseQuantityResponse,
+        // Grid trading (GridContext types live in `longport::grid`)
+        longport::grid::SubmitGridOrderResponse,
+        longport::grid::GridOrder,
+        longport::grid::GridOrderSubOrder,
+        longport::grid::GridOrderHistory,
+        longport::grid::GridOrderDetail,
+        longport::grid::TriggerOrder,
+        longport::grid::GridBidSize,
+        longport::grid::GridChannelInfo,
+        longport::grid::GridSymbolInfo,
+        // Grid push stays on the trade side
+        longport::trade::PushGridOrderChanged,
+        crate::types::GridOrdersResponse,
+        crate::types::GridTriggerHistoryResponse,
         // FundContext (types live in `longport::fund`)
         longport::fund::FundNavValue,
         longport::fund::FundPerformancePoint,
