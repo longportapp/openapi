@@ -852,7 +852,8 @@ impl TradeContext {
             .0)
     }
 
-    // ── US-market APIs ────────────────────────────────────────────────────────
+    // ── US-market APIs
+    // ────────────────────────────────────────────────────────
 
     /// Query the paginated US order list.
     ///

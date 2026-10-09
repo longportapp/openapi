@@ -136,8 +136,8 @@ impl TradeContext {
 
     // TODO: temporarily disabled — restore when API is available
     // Get all executions
-    // #[pyo3(signature = (symbol = None, order_id = None, start_at = None, end_at =
-    // None, page = None))] fn all_executions(
+    // #[pyo3(signature = (symbol = None, order_id = None, start_at = None,
+    // end_at = None, page = None))] fn all_executions(
     // &self,
     // symbol: Option<String>,
     // order_id: Option<String>,
