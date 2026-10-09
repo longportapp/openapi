@@ -742,6 +742,8 @@ pub struct CExecution {
     pub quantity: *const CDecimal,
     /// Executed price
     pub price: *const CDecimal,
+    /// Order side
+    pub side: COrderSide,
 }
 
 #[derive(Debug)]
@@ -752,6 +754,7 @@ pub(crate) struct CExecutionOwned {
     trade_done_at: i64,
     quantity: CDecimal,
     price: CDecimal,
+    side: OrderSide,
 }
 
 impl From<Execution> for CExecutionOwned {
@@ -763,6 +766,7 @@ impl From<Execution> for CExecutionOwned {
             trade_done_at,
             quantity,
             price,
+            side,
         } = execution;
         CExecutionOwned {
             order_id: order_id.into(),
@@ -771,6 +775,7 @@ impl From<Execution> for CExecutionOwned {
             trade_done_at: trade_done_at.unix_timestamp(),
             quantity: quantity.into(),
             price: price.into(),
+            side,
         }
     }
 }
@@ -786,6 +791,7 @@ impl ToFFI for CExecutionOwned {
             trade_done_at,
             quantity,
             price,
+            side,
         } = self;
         CExecution {
             order_id: order_id.to_ffi_type(),
@@ -794,6 +800,7 @@ impl ToFFI for CExecutionOwned {
             trade_done_at: *trade_done_at,
             quantity: quantity.to_ffi_type(),
             price: price.to_ffi_type(),
+            side: (*side).into(),
         }
     }
 }

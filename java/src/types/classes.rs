@@ -684,7 +684,15 @@ impl_java_class!(
 impl_java_class!(
     "com/longport/trade/Execution",
     longport::trade::Execution,
-    [order_id, trade_id, symbol, trade_done_at, quantity, price]
+    [
+        order_id,
+        trade_id,
+        symbol,
+        trade_done_at,
+        quantity,
+        price,
+        side
+    ]
 );
 
 impl_java_class!(
