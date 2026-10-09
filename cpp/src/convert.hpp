@@ -31,8 +31,11 @@ using longport::quote::IssuerInfo;
 using longport::quote::MarketTemperature;
 using longport::quote::MarketTradingDays;
 using longport::quote::MarketTradingSession;
+using longport::quote::OptionChainContract;
 using longport::quote::OptionDirection;
+using longport::quote::OptionExpiryCycleType;
 using longport::quote::OptionQuote;
+using longport::quote::OptionStandardAttr;
 using longport::quote::OptionType;
 using longport::quote::ParticipantInfo;
 using longport::quote::Period;
@@ -54,7 +57,6 @@ using longport::quote::SecurityListCategory;
 using longport::quote::SecurityQuote;
 using longport::quote::SecurityStaticInfo;
 using longport::quote::SortOrderType;
-using longport::quote::StrikePriceInfo;
 using longport::quote::SubFlags;
 using longport::quote::Subscription;
 using longport::quote::Trade;
@@ -553,6 +555,38 @@ convert(lb_option_direction_t ty)
   }
 }
 
+inline OptionExpiryCycleType
+convert(lb_option_expiry_cycle_type_t ty)
+{
+  switch (ty) {
+    case OptionExpiryCycleTypeUnknown:
+      return OptionExpiryCycleType::Unknown;
+    case OptionExpiryCycleTypeMonthly:
+      return OptionExpiryCycleType::Monthly;
+    case OptionExpiryCycleTypeWeekly:
+      return OptionExpiryCycleType::Weekly;
+    case OptionExpiryCycleTypeQuarterly:
+      return OptionExpiryCycleType::Quarterly;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline OptionStandardAttr
+convert(lb_option_standard_attr_t ty)
+{
+  switch (ty) {
+    case OptionStandardAttrUnknown:
+      return OptionStandardAttr::Unknown;
+    case OptionStandardAttrNormal:
+      return OptionStandardAttr::Normal;
+    case OptionStandardAttrOld:
+      return OptionStandardAttr::Old;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
 inline Date
 convert(const lb_date_t* date)
 {
@@ -915,14 +949,17 @@ convert(AdjustType ty)
   }
 }
 
-inline StrikePriceInfo
-convert(const lb_strike_price_info_t* info)
+inline OptionChainContract
+convert(const lb_option_chain_contract_t* info)
 {
-  return StrikePriceInfo{
-    Decimal(info->price),
-    info->call_symbol,
-    info->put_symbol,
-    info->standard,
+  return OptionChainContract{
+    info->symbol,
+    convert(&info->expiry_date),
+    Decimal(info->strike_price),
+    convert(info->direction),
+    convert(info->option_type),
+    convert(info->standard_attr),
+    info->days_to_expiry,
   };
 }
 
