@@ -5626,7 +5626,7 @@ export interface CompanyOverview {
   category: string
   /** Fiscal year end */
   yearEnd: string
-  /** Number of employees */
+  /** Number of employees (returned as a string by the API, e.g. `"10000"`) */
   employees: string
   /** Phone number */
   phone: string
