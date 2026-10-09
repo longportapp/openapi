@@ -833,6 +833,246 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextEstimateMaxPurcha
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    newFundContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newFundContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeFundContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeFundContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextHotFunds
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextHotFunds
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextFunds
+ * Signature: (JLcom/longport/fund/GetFundsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextFunds
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextFilters
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextFilters
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextDetail
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextAnalysis
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextAnalysis
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextAnalysisDetail
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextAnalysisDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextTrend
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextTrend
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextAnnualReturns
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundPageOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextAnnualReturns
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextQuarterlyReturns
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundPageOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextQuarterlyReturns
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPerformance
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPerformance
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPerformanceComparison
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPerformanceComparison
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextNav
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextNav
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextNavHistory
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundPageOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextNavHistory
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextNavRange
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundNavRangeOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextNavRange
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextHoldings
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundHoldingsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextHoldings
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextStockHoldings
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundStockHoldingsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextStockHoldings
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositions
+ * Signature: (JLcom/longport/fund/GetFundPositionsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPosition
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundPositionOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPosition
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionPerformance
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionPerformance
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionProfits
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundPositionProfitsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionProfits
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionNav
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundNavRangeOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionNav
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionDividends
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundPositionDividendsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionDividends
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextOrders
+ * Signature: (JLcom/longport/fund/GetFundOrdersOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextOrders
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextOrder
+ * Signature: (JJLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextOrder
+  (JNIEnv *, jclass, jlong, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextTransactions
+ * Signature: (JLcom/longport/fund/GetFundTransactionsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextTransactions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextValidateOrder
+ * Signature: (JLcom/longport/fund/ValidateFundOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextValidateOrder
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextSubmitOrder
+ * Signature: (JLcom/longport/fund/SubmitFundOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextSubmitOrder
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextCancelOrder
+ * Signature: (JJLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextCancelOrder
+  (JNIEnv *, jclass, jlong, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    newForexContext
  * Signature: (J)J
  */

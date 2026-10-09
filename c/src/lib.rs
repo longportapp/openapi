@@ -11,6 +11,7 @@ mod content_context;
 mod dca_context;
 mod error;
 mod forex_context;
+mod fund_context;
 mod fundamental_context;
 mod http_client;
 mod market_context;

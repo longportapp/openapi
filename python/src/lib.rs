@@ -16,6 +16,7 @@ mod dca;
 mod decimal;
 mod error;
 mod forex;
+mod fund;
 mod fundamental;
 mod http_client;
 mod market;
@@ -48,6 +49,7 @@ fn longport(py: Python<'_>, m: Bound<PyModule>) -> PyResult<()> {
     dca::register_types(&openapi)?;
     sharelist::register_types(&openapi)?;
     calendar::register_types(&openapi)?;
+    fund::register_types(&openapi)?;
     forex::register_types(&openapi)?;
     fundamental::register_types(&openapi)?;
     market::register_types(&openapi)?;
