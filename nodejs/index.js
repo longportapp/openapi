@@ -939,6 +939,7 @@ module.exports.BalanceType = nativeBinding.BalanceType
 module.exports.BrokerHoldingPeriod = nativeBinding.BrokerHoldingPeriod
 module.exports.CalcIndex = nativeBinding.CalcIndex
 module.exports.CalendarCategory = nativeBinding.CalendarCategory
+module.exports.CalendarPageDirection = nativeBinding.CalendarPageDirection
 module.exports.CashFlowDirection = nativeBinding.CashFlowDirection
 module.exports.ChargeCategoryCode = nativeBinding.ChargeCategoryCode
 module.exports.CommissionFreeStatus = nativeBinding.CommissionFreeStatus

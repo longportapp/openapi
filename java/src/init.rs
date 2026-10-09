@@ -136,6 +136,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::alert::types::AlertCondition,
         longport::alert::types::AlertFrequency,
         longport::calendar::types::CalendarCategory,
+        longport::calendar::types::CalendarPageDirection,
         longport::agent::ConversationStatus,
         longport::forex::ForexOrderStatus,
         longport::grid::TriggerPriceType,

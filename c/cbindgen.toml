@@ -312,6 +312,7 @@ cpp_compat = true
 "CDCAStatus" = "lb_dca_status_t"
 # CalendarContext enums
 "CCalendarCategory" = "lb_calendar_category_t"
+"CCalendarPageDirection" = "lb_calendar_page_direction_t"
 # FundamentalContext enums
 "CFinancialReportKind" = "lb_financial_report_kind_t"
 "CFinancialReportPeriod" = "lb_financial_report_period_t"
@@ -574,7 +575,7 @@ include = [
     "CDcaCreateResult", "CDcaCalcDateResult",
     "CDcaHistoryRecord", "CDcaHistoryResponse",
     # CalendarContext enums
-    "CCalendarCategory",
+    "CCalendarCategory", "CCalendarPageDirection",
     # FundamentalContext enums
     "CFinancialReportKind", "CFinancialReportPeriod", "CInstitutionRecommend",
     # MarketContext enums

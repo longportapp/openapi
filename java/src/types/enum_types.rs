@@ -521,6 +521,11 @@ impl_java_enum!(
     ]
 );
 impl_java_enum!(
+    "com/longport/calendar/CalendarPageDirection",
+    longport::calendar::types::CalendarPageDirection,
+    [Later, Earlier]
+);
+impl_java_enum!(
     "com/longport/fundamental/FinancialReportKind",
     longport::fundamental::types::FinancialReportKind,
     [IncomeStatement, BalanceSheet, CashFlow, All]
