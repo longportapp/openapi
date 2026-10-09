@@ -753,6 +753,14 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextSubmitOrder
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    tradeContextSubmitMultileg
+ * Signature: (JLcom/longport/trade/SubmitMultiLegOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextSubmitMultileg
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    tradeContextCancelOrder
  * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
  */

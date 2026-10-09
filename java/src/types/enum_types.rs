@@ -465,6 +465,33 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longport/trade/MultiLegStrategy",
+    longport::trade::MultiLegStrategy,
+    [
+        Unknown,
+        CoveredCall,
+        CoveredPut,
+        VerticalCallSpread,
+        VerticalPutSpread,
+        Collar,
+        Straddle,
+        Strangle
+    ]
+);
+
+impl_java_enum!(
+    "com/longport/trade/MultiLegPosition",
+    longport::trade::MultiLegPosition,
+    [Unknown, Long, Short]
+);
+
+impl_java_enum!(
+    "com/longport/trade/ContractDirection",
+    longport::trade::ContractDirection,
+    [Unknown, Call, Put]
+);
+
+impl_java_enum!(
     "com/longport/alert/AlertCondition",
     longport::alert::types::AlertCondition,
     [PriceRise, PriceFall, PercentRise, PercentFall]
