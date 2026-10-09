@@ -349,7 +349,8 @@ impl FundamentalContextSync {
         })
     }
 
-    // ── US-market blocking wrappers ───────────────────────────────────────────
+    // ── US-market blocking wrappers
+    // ───────────────────────────────────────────
 
     /// Get US company overview (blocking)
     pub fn us_company_overview(

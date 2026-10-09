@@ -362,7 +362,8 @@ impl AsyncFundamentalContext {
         .map(|b| b.unbind())
     }
 
-    // ── US-market async methods ───────────────────────────────────────────────
+    // ── US-market async methods
+    // ───────────────────────────────────────────────
 
     /// Get US company overview. US token required. Returns awaitable.
     fn us_company_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {

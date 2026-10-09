@@ -262,6 +262,90 @@ public class SdkNative {
                         EstimateMaxPurchaseQuantityOptions opts,
                         AsyncCallback callback);
 
+
+        // ── FundContext ───────────────────────────────────────────────
+        public static native long newFundContext(long config);
+
+        public static native void freeFundContext(long context);
+
+        public static native void fundContextHotFunds(long context, AsyncCallback callback);
+
+        public static native void fundContextFunds(long context, com.longport.fund.GetFundsOptions opts,
+                        AsyncCallback callback);
+
+        public static native void fundContextFilters(long context, AsyncCallback callback);
+
+        public static native void fundContextDetail(long context, String counterId, AsyncCallback callback);
+
+        public static native void fundContextAnalysis(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextAnalysisDetail(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextTrend(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextAnnualReturns(long context, String counterId,
+                        com.longport.fund.FundPageOptions opts, AsyncCallback callback);
+
+        public static native void fundContextQuarterlyReturns(long context, String counterId,
+                        com.longport.fund.FundPageOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPerformance(long context, String counterId, AsyncCallback callback);
+
+        public static native void fundContextPerformanceComparison(long context, String counterId,
+                        com.longport.fund.GetFundAnalysisOptions opts, AsyncCallback callback);
+
+        public static native void fundContextNav(long context, String counterId, AsyncCallback callback);
+
+        public static native void fundContextNavHistory(long context, String counterId,
+                        com.longport.fund.FundPageOptions opts, AsyncCallback callback);
+
+        public static native void fundContextNavRange(long context, String counterId,
+                        com.longport.fund.FundNavRangeOptions opts, AsyncCallback callback);
+
+        public static native void fundContextHoldings(long context, String counterId,
+                        com.longport.fund.GetFundHoldingsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextStockHoldings(long context, String counterId,
+                        com.longport.fund.GetFundStockHoldingsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositions(long context,
+                        com.longport.fund.GetFundPositionsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPosition(long context, String counterId,
+                        com.longport.fund.GetFundPositionOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositionPerformance(long context, String counterId,
+                        AsyncCallback callback);
+
+        public static native void fundContextPositionProfits(long context, String counterId,
+                        com.longport.fund.GetFundPositionProfitsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositionNav(long context, String counterId,
+                        com.longport.fund.FundNavRangeOptions opts, AsyncCallback callback);
+
+        public static native void fundContextPositionDividends(long context, String counterId,
+                        com.longport.fund.GetFundPositionDividendsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextOrders(long context,
+                        com.longport.fund.GetFundOrdersOptions opts, AsyncCallback callback);
+
+        public static native void fundContextOrder(long context, long orderId, AsyncCallback callback);
+
+        public static native void fundContextTransactions(long context,
+                        com.longport.fund.GetFundTransactionsOptions opts, AsyncCallback callback);
+
+        public static native void fundContextValidateOrder(long context,
+                        com.longport.fund.ValidateFundOrderOptions opts, AsyncCallback callback);
+
+        public static native void fundContextSubmitOrder(long context,
+                        com.longport.fund.SubmitFundOrderOptions opts, AsyncCallback callback);
+
+        public static native void fundContextCancelOrder(long context, long orderId, AsyncCallback callback);
+
+
         // ── ForexContext ──────────────────────────────────────────────
         public static native long newForexContext(long config);
 
