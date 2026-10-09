@@ -490,10 +490,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextOptionChainExpiry
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextOptionChainInfoByDate
- * Signature: (JLjava/lang/String;Ljava/time/LocalDate;Lcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;Ljava/time/LocalDate;ZLcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextOptionChainInfoByDate
-  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jobject, jboolean, jobject);
 
 /*
  * Class:     com_longport_SdkNative
