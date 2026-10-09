@@ -13,6 +13,7 @@ mod error;
 mod forex_context;
 mod fund_context;
 mod fundamental_context;
+mod grid_context;
 mod http_client;
 mod init;
 mod market_context;

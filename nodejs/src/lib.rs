@@ -12,6 +12,7 @@ mod error;
 mod forex;
 mod fund;
 mod fundamental;
+mod grid;
 mod http_client;
 mod market;
 mod oauth;

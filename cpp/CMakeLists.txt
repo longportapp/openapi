@@ -19,6 +19,7 @@ set(SOURCES
     src/trade_context.cpp
     src/forex_context.cpp
     src/fund_context.cpp
+    src/grid_context.cpp
     src/oauth.cpp
 )
 add_library(
