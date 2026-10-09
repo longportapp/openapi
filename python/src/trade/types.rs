@@ -415,6 +415,10 @@ pub(crate) enum MultiLegStrategy {
     Straddle,
     /// Strangle
     Strangle,
+    /// Calendar call spread
+    CalendarCallSpread,
+    /// Calendar put spread
+    CalendarPutSpread,
 }
 
 /// Multi-leg position direction

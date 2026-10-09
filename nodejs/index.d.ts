@@ -7260,6 +7260,10 @@ export declare const enum MultiLegStrategy {
   Straddle = 6,
   /** Strangle */
   Strangle = 7,
+  /** Calendar call spread */
+  CalendarCallSpread = 8,
+  /** Calendar put spread */
+  CalendarPutSpread = 9,
 }
 
 /** Options for listing topics created by the current authenticated user */
