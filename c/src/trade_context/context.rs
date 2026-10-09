@@ -30,7 +30,7 @@ use crate::{
             CSubmitOrderResponseOwned,
         },
     },
-    types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust},
+    types::{CCow, CVec, ToFFI, cstr_array_to_rust, cstr_to_rust, slice_from_raw_parts},
 };
 
 pub type COnOrderChangedCallback =
@@ -177,7 +177,7 @@ pub unsafe extern "C" fn lb_trade_context_subscribe(
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let topics = std::slice::from_raw_parts(topics, num_topics)
+    let topics = slice_from_raw_parts(topics, num_topics)
         .iter()
         .copied()
         .map(Into::into)
@@ -196,7 +196,7 @@ pub unsafe extern "C" fn lb_trade_context_unsubscribe(
     userdata: *mut c_void,
 ) {
     let ctx_inner = (*ctx).ctx.clone();
-    let topics = std::slice::from_raw_parts(topics, num_topics)
+    let topics = slice_from_raw_parts(topics, num_topics)
         .iter()
         .copied()
         .map(Into::into)
@@ -323,7 +323,7 @@ pub unsafe extern "C" fn lb_trade_context_history_orders(
             opts2 = opts2.symbol(cstr_to_rust((*opts).symbol));
         }
         if !(*opts).status.is_null() {
-            let status = std::slice::from_raw_parts((*opts).status, (*opts).num_status);
+            let status = slice_from_raw_parts((*opts).status, (*opts).num_status);
             opts2 = opts2.status(status.iter().copied().map(Into::into));
         }
         if !(*opts).side.is_null() {
@@ -366,7 +366,7 @@ pub unsafe extern "C" fn lb_trade_context_today_orders(
             opts2 = opts2.symbol(cstr_to_rust((*opts).symbol));
         }
         if !(*opts).status.is_null() {
-            let status = std::slice::from_raw_parts((*opts).status, (*opts).num_status);
+            let status = slice_from_raw_parts((*opts).status, (*opts).num_status);
             opts2 = opts2.status(status.iter().copied().map(Into::into));
         }
         if !(*opts).side.is_null() {
