@@ -4,7 +4,7 @@ use jni::{
     JNIEnv, JavaVM,
     errors::Result,
     objects::{GlobalRef, JClass, JObject, JObjectArray, JString},
-    sys::{jboolean, jobjectArray},
+    sys::jobjectArray,
 };
 use longport::{
     Config, Decimal, Market, TradeContext,
@@ -14,9 +14,8 @@ use longport::{
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
         MultiLegStrategy, OrderSide, OrderStatus, OrderType, OutsideRTH, PushEvent,
-        QueryUSOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams,
-        SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions, TimeInForceType,
-        TopicType,
+        ReplaceAttachedParams, ReplaceOrderOptions, SubmitAttachedParams, SubmitMultiLegOrderLeg,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, TimeInForceType, TopicType,
     },
 };
 use parking_lot::Mutex;

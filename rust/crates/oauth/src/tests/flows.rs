@@ -1078,7 +1078,6 @@ fn authorization_endpoint_selection_uses_isolated_environments() {
                 "--nocapture",
             ])
             .env("LONGPORT_REGION", region)
-            .env_remove("LONGPORT_REGION")
             .env("TEST_OAUTH_EXPECTED_AUTHORIZATION_URL", expected_url);
         if let Some(environment) = environment {
             command.env("LONGPORT_ENV", environment);

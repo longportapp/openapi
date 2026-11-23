@@ -871,7 +871,8 @@ pub struct WarrantInfo {
     /// Turnover
     turnover: Decimal,
     /// Expiry date
-    expiry_date: NaiveDate,
+    #[js(opt)]
+    expiry_date: Option<NaiveDate>,
     /// Strike price
     #[js(opt)]
     strike_price: Option<Decimal>,
@@ -922,6 +923,8 @@ pub struct WarrantInfo {
 #[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
 #[js(remote = "longport::quote::WarrantStatus")]
 pub enum WarrantStatus {
+    /// Unknown
+    Unknown,
     /// Suspend
     Suspend,
     /// Prepare List

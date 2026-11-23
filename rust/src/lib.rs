@@ -49,8 +49,9 @@ pub use fund::FundContext;
 pub use fundamental::FundamentalContext;
 // US-market type re-exports
 pub use fundamental::types::{
-    USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
-    USETFFilesResponse, USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
+    FinancialStatementKind, IndustryRankIndicator, IndustryRankSortType, USCompanyDividends,
+    USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile, USETFFilesResponse,
+    USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
 };
 pub use grid::GridContext;
 pub use longport_httpcli as httpclient;

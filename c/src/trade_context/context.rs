@@ -669,7 +669,7 @@ pub unsafe extern "C" fn lb_trade_context_submit_multileg(
     let order_type = (*opts).order_type.into();
     let submitted_quantity = (*(*opts).submitted_quantity).value;
     let strategy = (*opts).strategy.into();
-    let legs = std::slice::from_raw_parts((*opts).legs, (*opts).num_legs)
+    let legs = slice_from_raw_parts((*opts).legs, (*opts).num_legs)
         .iter()
         .map(|leg| {
             SubmitMultiLegOrderLeg::new(cstr_to_rust(leg.symbol), (*leg.ratio_quantity).value)

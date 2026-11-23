@@ -4,7 +4,7 @@ use longport_httpcli::{DcRegion, HttpClient, Json, Method};
 use serde::{Serialize, de::DeserializeOwned};
 use tracing::{Subscriber, dispatcher, instrument::WithSubscriber};
 
-use crate::{Config, Result, fundamental::types::*};
+use crate::{Config, Market, Result, fundamental::types::*};
 
 /// Convert a Unix-seconds string to RFC 3339.
 fn unix_secs_str_to_rfc3339(s: &str) -> String {
@@ -378,12 +378,14 @@ impl FundamentalContext {
     pub async fn executive(&self, symbol: impl Into<String>) -> Result<ExecutiveList> {
         #[derive(Serialize)]
         struct Query {
-            symbol: String,
+            // The endpoint takes a comma-separated list, so the parameter is
+            // plural: `symbol=` is silently ignored and returns an empty group.
+            symbols: String,
         }
         self.get(
             "/v1/quote/company-professionals",
             Query {
-                symbol: symbol.into(),
+                symbols: symbol.into(),
             },
         )
         .await
@@ -512,22 +514,23 @@ impl FundamentalContext {
 
     // ── ratings ───────────────────────────────────────────────────
 
-    /// Get stock ratings for a security.
-    ///
-    /// Path: `GET /v1/quote/ratings`
-    pub async fn ratings(&self, symbol: impl Into<String>) -> Result<StockRatings> {
-        #[derive(Serialize)]
-        struct Query {
-            symbol: String,
-        }
-        self.get(
-            "/v1/quote/ratings",
-            Query {
-                symbol: symbol.into(),
-            },
-        )
-        .await
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings for a security.
+    // ///
+    // /// Path: `GET /v1/quote/ratings`
+    // pub async fn ratings(&self, symbol: impl Into<String>) ->
+    // Result<StockRatings> {     #[derive(Serialize)]
+    //     struct Query {
+    //         symbol: String,
+    //     }
+    //     self.get(
+    //         "/v1/quote/ratings",
+    //         Query {
+    //             symbol: symbol.into(),
+    //         },
+    //     )
+    //     .await
+    // }
 
     // ── business_segments ────────────────────────────────────────
 
@@ -653,27 +656,34 @@ impl FundamentalContext {
 
     /// Get industry rank for a market.
     ///
+    /// `limit` is the number of results to return; the server defaults to 20
+    /// when it is `0`.
+    ///
     /// Path: `GET /v1/quote/industry/rank`
     pub async fn industry_rank(
         &self,
-        market: impl Into<String>,
-        indicator: impl Into<String>,
-        sort_type: impl Into<String>,
+        market: Market,
+        indicator: IndustryRankIndicator,
+        sort_type: IndustryRankSortType,
         limit: u32,
     ) -> Result<IndustryRankResponse> {
         #[derive(Serialize)]
         struct Query {
-            market: String,
-            indicator: String,
-            sort_type: String,
+            market: Market,
+            indicator: &'static str,
+            sort_type: &'static str,
+            #[serde(skip_serializing_if = "is_zero")]
             limit: u32,
+        }
+        fn is_zero(v: &u32) -> bool {
+            *v == 0
         }
         self.get(
             "/v1/quote/industry/rank",
             Query {
-                market: market.into(),
-                indicator: indicator.into(),
-                sort_type: sort_type.into(),
+                market,
+                indicator: indicator.as_str(),
+                sort_type: sort_type.as_str(),
                 limit,
             },
         )
@@ -1120,8 +1130,9 @@ impl FundamentalContext {
 
     /// Get US financial statement detail (IS / BS / CF).
     ///
-    /// `kind`: `"IS"` (income statement), `"BS"` (balance sheet), `"CF"` (cash
-    /// flow). `report`: `"annual"` or `"quarterly"`.
+    /// `kind` selects one statement — the endpoint has no "all statements"
+    /// mode and answers with an empty list when `kind` is `ALL` or missing.
+    /// `report`: `"annual"` or `"quarterly"`.
     ///
     /// Path: `GET /v1/us/quote/financials/statements`
     ///
@@ -1129,20 +1140,20 @@ impl FundamentalContext {
     pub async fn us_financial_statement(
         &self,
         symbol: impl Into<String>,
-        kind: impl Into<String>,
+        kind: FinancialStatementKind,
         report: impl Into<String>,
     ) -> Result<USFinancialStatement> {
         #[derive(Serialize)]
         struct Query {
             symbol: String,
-            kind: String,
+            kind: &'static str,
             report: String,
         }
         self.get_dc(
             "/v1/us/quote/financials/statements",
             Query {
                 symbol: symbol.into(),
-                kind: kind.into(),
+                kind: kind.as_str(),
                 report: report.into(),
             },
             DcRegion::Us,

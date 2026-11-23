@@ -1171,6 +1171,8 @@ enum class FilterWarrantInOutBoundsType
 /// Warrant status
 enum class WarrantStatus
 {
+  /// Unknown
+  Unknown,
   /// Suspend
   Suspend,
   /// Prepare List
@@ -1199,7 +1201,10 @@ struct WarrantInfo
   /// Turnover
   Decimal turnover;
   /// Expiry date
-  Date expiry_date;
+  ///
+  /// `std::nullopt` if the server does not report an expiry date for this
+  /// warrant.
+  std::optional<Date> expiry_date;
   /// Strike price
   std::optional<Decimal> strike_price;
   /// Upper strike price
@@ -2041,7 +2046,10 @@ struct SubmitMultiLegOrderLeg
 {
   /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
   std::string symbol;
-  /// Leg ratio quantity
+  /// Leg ratio quantity — must be a positive number. The direction of each leg
+  /// is implied by the strategy together with the order side, not by the sign
+  /// of this value; a negative or zero ratio is rejected by the server with
+  /// `602001`.
   Decimal ratio_quantity;
 };
 

@@ -6,8 +6,8 @@ use longport::trade::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-    GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions, ReplaceOrderOptions,
-    SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions, TradeContext,
+    GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions, SubmitMultiLegOrderLeg,
+    SubmitMultiLegOrderOptions, SubmitOrderOptions, TradeContext,
 };
 use parking_lot::Mutex;
 use pyo3::{prelude::*, types::PyType};

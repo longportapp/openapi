@@ -4,7 +4,7 @@ use jni::{
     JNIEnv,
     objects::{JClass, JObject},
 };
-use longport::{Config, FundamentalContext, fundamental::types::*};
+use longport::{Config, FundamentalContext, Market, fundamental::types::*};
 
 use crate::{
     async_util,
@@ -76,9 +76,9 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetI
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let market: String = get_field(env, &opts, "market")?;
-        let indicator: String = get_field(env, &opts, "indicator")?;
-        let sort_type: String = get_field(env, &opts, "sortType")?;
+        let market: Market = get_field(env, &opts, "market")?;
+        let indicator: IndustryRankIndicator = get_field(env, &opts, "indicator")?;
+        let sort_type: IndustryRankSortType = get_field(env, &opts, "sortType")?;
         let limit: i32 = get_field(env, &opts, "limit")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
@@ -298,25 +298,26 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetB
     })
 }
 
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetRatings(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    symbol: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        async_util::execute(env, callback, async move {
-            let resp = __owned_ctx.ratings(symbol).await?;
-            Ok(resp)
-        })?;
-        Ok(())
-    })
-}
+// TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+// #[unsafe(no_mangle)]
+// pub unsafe extern "system" fn
+// Java_com_longport_SdkNative_fundamentalContextGetRatings(     mut env:
+// JNIEnv,     _class: JClass,
+//     context: i64,
+//     symbol: JObject,
+//     callback: JObject,
+// ) {
+//     jni_result(&mut env, (), |env| {
+//         let context = &*(context as *const ContextObj);
+//         let __owned_ctx = context.ctx.clone();
+//         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+//         async_util::execute(env, callback, async move {
+//             let resp = __owned_ctx.ratings(symbol).await?;
+//             Ok(resp)
+//         })?;
+//         Ok(())
+//     })
+// }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextShareholderTop(
@@ -550,7 +551,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextUsFi
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        let kind: String = FromJValue::from_jvalue(env, kind.into())?;
+        let kind: FinancialStatementKind = FromJValue::from_jvalue(env, kind.into())?;
         let report: String = FromJValue::from_jvalue(env, report.into())?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx

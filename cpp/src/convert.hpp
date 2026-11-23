@@ -1,9 +1,9 @@
 #pragma once
 
 #include "longport.h"
+#include "fund_ffi.hpp"
 #include "types.hpp"
 #include "portfolio_context.hpp"
-#include "fund_ffi.hpp"
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
@@ -162,6 +162,9 @@ using longport::fund::FundOrderValidation;
 using longport::fund::FundPerformance;
 using longport::fund::FundPerformanceComparison;
 using longport::fund::FundPerformancePoint;
+// NB: `FundPosition` is intentionally NOT imported here — it collides with
+// `longport::trade::FundPosition`. The fund converters qualify it as
+// `fund::FundPosition`.
 using longport::fund::FundPositionDetail;
 using longport::fund::FundPositionDetailValues;
 using longport::fund::FundPositionNav;
@@ -2889,6 +2892,8 @@ inline lb_warrant_status_t
 convert(WarrantStatus ty)
 {
   switch (ty) {
+    case WarrantStatus::Unknown:
+      return WarrantStatusUnknown;
     case WarrantStatus::Suspend:
       return WarrantStatusSuspend;
     case WarrantStatus::PrepareList:
@@ -2904,6 +2909,8 @@ inline WarrantStatus
 convert(lb_warrant_status_t ty)
 {
   switch (ty) {
+    case WarrantStatusUnknown:
+      return WarrantStatus::Unknown;
     case WarrantStatusSuspend:
       return WarrantStatus::Suspend;
     case WarrantStatusPrepareList:
@@ -2927,7 +2934,8 @@ convert(lb_warrant_info_t info)
     Decimal(info.change_value),
     info.volume,
     Decimal(info.turnover),
-    convert(&info.expiry_date),
+    info.expiry_date ? std::optional{ convert(info.expiry_date) }
+                     : std::nullopt,
     info.strike_price ? std::optional{ Decimal(info.strike_price) }
                       : std::nullopt,
     info.upper_strike_price ? std::optional{ Decimal(info.upper_strike_price) }
@@ -4825,7 +4833,6 @@ convert(const fund::ffi::CFundOrderSubmitResponse* r)
     r->units,
   };
 }
-
 
 } // namespace convert
 

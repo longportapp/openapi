@@ -8,9 +8,9 @@ import org.scijava.nativelib.NativeLoader;
 
 import com.longport.asset.*;
 import com.longport.content.*;
+import com.longport.grid.*;
 import com.longport.quote.*;
 import com.longport.trade.*;
-import com.longport.grid.*;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -274,6 +274,39 @@ public class SdkNative {
                         EstimateMaxPurchaseQuantityOptions opts,
                         AsyncCallback callback);
 
+        // ── Grid trading push (stays on the trade side) ───────────────
+        public static native void tradeContextSetOnGridOrderChanged(long context, GridOrderChangedHandler handler);
+
+        // ── GridContext ───────────────────────────────────────────────
+        public static native long newGridContext(long config);
+
+        public static native void freeGridContext(long context);
+
+        public static native void gridContextSubmit(long context, SubmitGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextReplace(long context, ReplaceGridOrderOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextList(long context, GetGridOrdersOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextListByIds(long context, String[] orderIds,
+                        AsyncCallback callback);
+
+        public static native void gridContextDetail(long context, GetGridOrderDetailOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextTriggerHistory(long context, GetGridTriggerHistoryOptions opts,
+                        AsyncCallback callback);
+
+        public static native void gridContextCancel(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextSuspend(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextRestart(long context, String orderId, AsyncCallback callback);
+
+        public static native void gridContextSymbolInfo(long context, String symbol, AsyncCallback callback);
 
         // ── FundContext ───────────────────────────────────────────────
         public static native long newFundContext(long config);
@@ -356,43 +389,6 @@ public class SdkNative {
                         com.longport.fund.SubmitFundOrderOptions opts, AsyncCallback callback);
 
         public static native void fundContextCancelOrder(long context, long orderId, AsyncCallback callback);
-
-
-        // ── Grid trading push (stays on the trade side) ───────────────
-        public static native void tradeContextSetOnGridOrderChanged(long context, GridOrderChangedHandler handler);
-
-        // ── GridContext ───────────────────────────────────────────────
-        public static native long newGridContext(long config);
-
-        public static native void freeGridContext(long context);
-
-        public static native void gridContextSubmit(long context, SubmitGridOrderOptions opts,
-                        AsyncCallback callback);
-
-        public static native void gridContextReplace(long context, ReplaceGridOrderOptions opts,
-                        AsyncCallback callback);
-
-        public static native void gridContextList(long context, GetGridOrdersOptions opts,
-                        AsyncCallback callback);
-
-        public static native void gridContextListByIds(long context, String[] orderIds,
-                        AsyncCallback callback);
-
-        public static native void gridContextDetail(long context, GetGridOrderDetailOptions opts,
-                        AsyncCallback callback);
-
-        public static native void gridContextTriggerHistory(long context, GetGridTriggerHistoryOptions opts,
-                        AsyncCallback callback);
-
-        public static native void gridContextCancel(long context, String orderId, AsyncCallback callback);
-
-        public static native void gridContextSuspend(long context, String orderId, AsyncCallback callback);
-
-        public static native void gridContextRestart(long context, String orderId, AsyncCallback callback);
-
-
-        public static native void gridContextSymbolInfo(long context, String symbol, AsyncCallback callback);
-
 
         // ── DCAContext ────────────────────────────────────────────────
         public static native long newDcaContext(long config);
@@ -569,8 +565,9 @@ public class SdkNative {
         public static native void fundamentalContextGetBuyback(long context, String symbol,
                         AsyncCallback callback);
 
-        public static native void fundamentalContextGetRatings(long context, String symbol,
-                        AsyncCallback callback);
+        // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+        // public static native void fundamentalContextGetRatings(long context, String symbol,
+        //                 AsyncCallback callback);
 
         public static native void fundamentalContextGetBusinessSegments(long context, String symbol,
                         AsyncCallback callback);

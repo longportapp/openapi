@@ -6,9 +6,8 @@ use longport::{
         CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
         GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
         GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
-        GetTodayExecutionsOptions, GetTodayOrdersOptions, QueryUSOrdersOptions,
-        ReplaceOrderOptions, SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions,
-        SubmitOrderOptions,
+        GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceOrderOptions,
+        SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions,
     },
 };
 use parking_lot::Mutex;

@@ -23,6 +23,7 @@ impl_java_enum!(
     longport::Language,
     [ZH_CN, ZH_HK, EN]
 );
+
 impl_java_enum!(
     "com/longport/PushCandlestickMode",
     longport::PushCandlestickMode,
@@ -294,7 +295,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longport/quote/WarrantStatus",
     longport::quote::WarrantStatus,
-    [Suspend, PrepareList, Normal]
+    [Unknown, Suspend, PrepareList, Normal]
 );
 
 impl_java_enum!(
@@ -544,6 +545,30 @@ impl_java_enum!(
     [IncomeStatement, BalanceSheet, CashFlow, All]
 );
 impl_java_enum!(
+    "com/longport/fundamental/FinancialStatementKind",
+    longport::fundamental::types::FinancialStatementKind,
+    [IncomeStatement, BalanceSheet, CashFlow]
+);
+impl_java_enum!(
+    "com/longport/fundamental/IndustryRankIndicator",
+    longport::fundamental::types::IndustryRankIndicator,
+    [
+        LeadingGainer,
+        TodayTrend,
+        Popularity,
+        MarketCap,
+        Revenue,
+        RevenueGrowth,
+        NetProfit,
+        NetProfitGrowth
+    ]
+);
+impl_java_enum!(
+    "com/longport/fundamental/IndustryRankSortType",
+    longport::fundamental::types::IndustryRankSortType,
+    [Single, Multi]
+);
+impl_java_enum!(
     "com/longport/fundamental/FinancialReportPeriod",
     longport::fundamental::types::FinancialReportPeriod,
     [Annual, SemiAnnual, Q1, Q2, Q3, QuarterlyFull, ThreeQ]
@@ -593,7 +618,7 @@ impl_java_enum!(
 // The Java side is a plain enum, so an unknown wire value maps to `Unknown` and
 // back to `Unknown(0)`.
 #[allow(non_upper_case_globals)]
-static com_longbridge_grid_TriggerPriceType: std::sync::OnceLock<jni::objects::GlobalRef> =
+static com_longport_grid_TriggerPriceType: std::sync::OnceLock<jni::objects::GlobalRef> =
     std::sync::OnceLock::new();
 
 impl ClassLoader for longport::grid::TriggerPriceType {
@@ -603,11 +628,11 @@ impl ClassLoader for longport::grid::TriggerPriceType {
             env,
         )
         .expect("com/longport/grid/TriggerPriceType");
-        let _ = com_longbridge_grid_TriggerPriceType.set(env.new_global_ref(&*cls).unwrap());
+        let _ = com_longport_grid_TriggerPriceType.set(env.new_global_ref(&*cls).unwrap());
     }
 
     fn class_ref() -> jni::objects::GlobalRef {
-        com_longbridge_grid_TriggerPriceType.get().cloned().unwrap()
+        com_longport_grid_TriggerPriceType.get().cloned().unwrap()
     }
 }
 
@@ -670,7 +695,7 @@ impl IntoJValue for longport::grid::TriggerPriceType {
 // The Java side is a plain enum, so an unknown wire value maps to `Unknown` and
 // back to `Unknown(0)`.
 #[allow(non_upper_case_globals)]
-static com_longbridge_grid_GridLimitEvent: std::sync::OnceLock<jni::objects::GlobalRef> =
+static com_longport_grid_GridLimitEvent: std::sync::OnceLock<jni::objects::GlobalRef> =
     std::sync::OnceLock::new();
 
 impl ClassLoader for longport::grid::GridLimitEvent {
@@ -680,11 +705,11 @@ impl ClassLoader for longport::grid::GridLimitEvent {
             env,
         )
         .expect("com/longport/grid/GridLimitEvent");
-        let _ = com_longbridge_grid_GridLimitEvent.set(env.new_global_ref(&*cls).unwrap());
+        let _ = com_longport_grid_GridLimitEvent.set(env.new_global_ref(&*cls).unwrap());
     }
 
     fn class_ref() -> jni::objects::GlobalRef {
-        com_longbridge_grid_GridLimitEvent.get().cloned().unwrap()
+        com_longport_grid_GridLimitEvent.get().cloned().unwrap()
     }
 }
 
@@ -747,7 +772,7 @@ impl IntoJValue for longport::grid::GridLimitEvent {
 // The Java side is a plain enum, so an unknown wire value maps to `Unknown` and
 // back to `Unknown(0)`.
 #[allow(non_upper_case_globals)]
-static com_longbridge_grid_GridTimeInForce: std::sync::OnceLock<jni::objects::GlobalRef> =
+static com_longport_grid_GridTimeInForce: std::sync::OnceLock<jni::objects::GlobalRef> =
     std::sync::OnceLock::new();
 
 impl ClassLoader for longport::grid::GridTimeInForce {
@@ -757,11 +782,11 @@ impl ClassLoader for longport::grid::GridTimeInForce {
             env,
         )
         .expect("com/longport/grid/GridTimeInForce");
-        let _ = com_longbridge_grid_GridTimeInForce.set(env.new_global_ref(&*cls).unwrap());
+        let _ = com_longport_grid_GridTimeInForce.set(env.new_global_ref(&*cls).unwrap());
     }
 
     fn class_ref() -> jni::objects::GlobalRef {
-        com_longbridge_grid_GridTimeInForce.get().cloned().unwrap()
+        com_longport_grid_GridTimeInForce.get().cloned().unwrap()
     }
 }
 

@@ -837,7 +837,8 @@ pub(crate) struct WarrantInfo {
     /// Turnover
     turnover: PyDecimal,
     /// Expiry date
-    expiry_date: PyDateWrapper,
+    #[py(opt)]
+    expiry_date: Option<PyDateWrapper>,
     /// Strike price
     #[py(opt)]
     strike_price: Option<PyDecimal>,
@@ -888,6 +889,8 @@ pub(crate) struct WarrantInfo {
 #[derive(PyEnum, Debug, Copy, Clone, Hash, Eq, PartialEq)]
 #[py(remote = "longport::quote::WarrantStatus")]
 pub enum WarrantStatus {
+    /// Unknown
+    Unknown,
     /// Suspend
     Suspend,
     /// Prepare List

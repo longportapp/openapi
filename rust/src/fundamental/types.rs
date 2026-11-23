@@ -1096,6 +1096,106 @@ pub enum FinancialReportKind {
     All,
 }
 
+/// Financial statement kind
+///
+/// Used by [`crate::FundamentalContext::us_financial_statement`], which needs
+/// exactly one statement per request.  Unlike [`FinancialReportKind`] there is
+/// deliberately no `All` variant and no `Default`: the endpoint answers with an
+/// empty list for `ALL` (and for a missing `kind`), so a default would silently
+/// return nothing.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum FinancialStatementKind {
+    /// Income statement
+    #[serde(rename = "IS")]
+    IncomeStatement,
+    /// Balance sheet
+    #[serde(rename = "BS")]
+    BalanceSheet,
+    /// Cash flow statement
+    #[serde(rename = "CF")]
+    CashFlow,
+}
+
+impl FinancialStatementKind {
+    /// The value sent as the `kind` query parameter.
+    #[inline]
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            FinancialStatementKind::IncomeStatement => "IS",
+            FinancialStatementKind::BalanceSheet => "BS",
+            FinancialStatementKind::CashFlow => "CF",
+        }
+    }
+}
+
+/// Ranking indicator for [`crate::FundamentalContext::industry_rank`]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum IndustryRankIndicator {
+    /// Leading gainer
+    #[serde(rename = "leading-gainer")]
+    LeadingGainer,
+    /// Today's trend
+    #[serde(rename = "today-trend")]
+    TodayTrend,
+    /// Popularity
+    #[serde(rename = "popularity")]
+    Popularity,
+    /// Market capitalisation
+    #[serde(rename = "market-cap")]
+    MarketCap,
+    /// Revenue
+    #[serde(rename = "revenue")]
+    Revenue,
+    /// Revenue growth
+    #[serde(rename = "revenue-growth")]
+    RevenueGrowth,
+    /// Net profit
+    #[serde(rename = "net-profit")]
+    NetProfit,
+    /// Net profit growth
+    #[serde(rename = "net-profit-growth")]
+    NetProfitGrowth,
+}
+
+impl IndustryRankIndicator {
+    /// The value sent as the `indicator` query parameter.
+    #[inline]
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            IndustryRankIndicator::LeadingGainer => "leading-gainer",
+            IndustryRankIndicator::TodayTrend => "today-trend",
+            IndustryRankIndicator::Popularity => "popularity",
+            IndustryRankIndicator::MarketCap => "market-cap",
+            IndustryRankIndicator::Revenue => "revenue",
+            IndustryRankIndicator::RevenueGrowth => "revenue-growth",
+            IndustryRankIndicator::NetProfit => "net-profit",
+            IndustryRankIndicator::NetProfitGrowth => "net-profit-growth",
+        }
+    }
+}
+
+/// Sort mode for [`crate::FundamentalContext::industry_rank`]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub enum IndustryRankSortType {
+    /// Rank by the single selected indicator
+    #[serde(rename = "single")]
+    Single,
+    /// Rank by a composite of several indicators
+    #[serde(rename = "multi")]
+    Multi,
+}
+
+impl IndustryRankSortType {
+    /// The value sent as the `sort_type` query parameter.
+    #[inline]
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            IndustryRankSortType::Single => "single",
+            IndustryRankSortType::Multi => "multi",
+        }
+    }
+}
+
 // ── business_segments ─────────────────────────────────────────────
 
 /// Response for [`crate::FundamentalContext::business_segments`]

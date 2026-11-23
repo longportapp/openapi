@@ -2591,7 +2591,7 @@ pub struct CWarrantInfo {
     /// Turnover
     pub turnover: *const CDecimal,
     /// Expiry date
-    pub expiry_date: CDate,
+    pub expiry_date: *const CDate,
     /// Strike price
     pub strike_price: *const CDecimal,
     /// Upper strike price
@@ -2644,7 +2644,7 @@ pub(crate) struct CWarrantInfoOwned {
     /// Turnover
     pub turnover: CDecimal,
     /// Expiry date
-    pub expiry_date: CDate,
+    pub expiry_date: COption<CDate>,
     /// Strike price
     pub strike_price: Option<CDecimal>,
     /// Upper strike price

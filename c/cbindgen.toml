@@ -173,6 +173,25 @@ cpp_compat = true
 "COrderChargeItem" = "lb_order_charge_item_t"
 "COrderChargeDetail" = "lb_order_charge_detail_t"
 "COrderDetail" = "lb_order_detail_t"
+"CGridTradeRule" = "lb_grid_trade_rule_t"
+"CSubmitGridOrderOptions" = "lb_submit_grid_order_options_t"
+"CReplaceGridOrderOptions" = "lb_replace_grid_order_options_t"
+"CGetGridOrdersOptions" = "lb_get_grid_orders_options_t"
+"CGetGridOrdersByIdsOptions" = "lb_get_grid_orders_by_ids_options_t"
+"CGetGridOrderDetailOptions" = "lb_get_grid_order_detail_options_t"
+"CGetGridTriggerHistoryOptions" = "lb_get_grid_trigger_history_options_t"
+"CSubmitGridOrderResponse" = "lb_submit_grid_order_response_t"
+"CGridOrder" = "lb_grid_order_t"
+"CGridOrderSubOrder" = "lb_grid_order_sub_order_t"
+"CGridOrderHistory" = "lb_grid_order_history_t"
+"CGridOrderDetail" = "lb_grid_order_detail_t"
+"CTriggerOrder" = "lb_trigger_order_t"
+"CGridBidSize" = "lb_grid_bid_size_t"
+"CGridChannelInfo" = "lb_grid_channel_info_t"
+"CGridSymbolInfo" = "lb_grid_symbol_info_t"
+"CGridOrdersResponse" = "lb_grid_orders_response_t"
+"CGridTriggerHistoryResponse" = "lb_grid_trigger_history_response_t"
+"CPushGridOrderChanged" = "lb_push_grid_order_changed_t"
 "CEstimateMaxPurchaseQuantityOptions" = "lb_estimate_max_purchase_quantity_options_t"
 "CEstimateMaxPurchaseQuantityResponse" = "lb_estimate_max_purchase_quantity_response_t"
 "CCreateWatchlistGroup" = "lb_create_watchlist_group_t"
@@ -205,26 +224,6 @@ cpp_compat = true
 "CFundamentalContext" = "lb_fundamental_context_t"
 "CAlertContext" = "lb_alert_context_t"
 "CDCAContext" = "lb_dca_context_t"
-# --- grid module ---
-"CGridTradeRule" = "lb_grid_trade_rule_t"
-"CSubmitGridOrderOptions" = "lb_submit_grid_order_options_t"
-"CReplaceGridOrderOptions" = "lb_replace_grid_order_options_t"
-"CGetGridOrdersOptions" = "lb_get_grid_orders_options_t"
-"CGetGridOrdersByIdsOptions" = "lb_get_grid_orders_by_ids_options_t"
-"CGetGridOrderDetailOptions" = "lb_get_grid_order_detail_options_t"
-"CGetGridTriggerHistoryOptions" = "lb_get_grid_trigger_history_options_t"
-"CSubmitGridOrderResponse" = "lb_submit_grid_order_response_t"
-"CGridOrder" = "lb_grid_order_t"
-"CGridOrderSubOrder" = "lb_grid_order_sub_order_t"
-"CGridOrderHistory" = "lb_grid_order_history_t"
-"CGridOrderDetail" = "lb_grid_order_detail_t"
-"CTriggerOrder" = "lb_trigger_order_t"
-"CGridBidSize" = "lb_grid_bid_size_t"
-"CGridChannelInfo" = "lb_grid_channel_info_t"
-"CGridSymbolInfo" = "lb_grid_symbol_info_t"
-"CGridOrdersResponse" = "lb_grid_orders_response_t"
-"CGridTriggerHistoryResponse" = "lb_grid_trigger_history_response_t"
-"CPushGridOrderChanged" = "lb_push_grid_order_changed_t"
 "CGridContext" = "lb_grid_context_t"
 "CSharelistContext" = "lb_sharelist_context_t"
 "CCalendarContext" = "lb_calendar_context_t"
@@ -318,6 +317,8 @@ cpp_compat = true
 "CCalendarPageDirection" = "lb_calendar_page_direction_t"
 # FundamentalContext enums
 "CFinancialReportKind" = "lb_financial_report_kind_t"
+"CIndustryRankIndicator" = "lb_industry_rank_indicator_t"
+"CIndustryRankSortType" = "lb_industry_rank_sort_type_t"
 "CFinancialReportPeriod" = "lb_financial_report_period_t"
 "CInstitutionRecommend" = "lb_institution_recommend_t"
 # MarketContext enums
@@ -499,7 +500,6 @@ include = [
     "CRiskAssessmentApproval",
     "CRiskAssessmentDeadline",
     "COrderDetail",
-    "CEstimateMaxPurchaseQuantityResponse",
     # AssetContext: statements (reachable only via void* async data pointer)
     "CStatementItem",
     # GridContext: grid trading (reachable only via void* async data pointer)
@@ -507,8 +507,6 @@ include = [
     "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",
     "CTriggerOrder", "CGridBidSize", "CGridChannelInfo", "CGridSymbolInfo",
     "CGridOrdersResponse", "CGridTriggerHistoryResponse",
-    # TradeContext: grid trading push (stays on trade side)
-    "CPushGridOrderChanged",
     # FundContext: mutual-fund response views (via void* async data pointer)
     "CFundAnalysis", "CFundAnalysisDetail", "CFundAnnualReturn", "CFundAssetAllocation",
     "CFundAssetAllocationItem", "CFundBrief", "CFundDatedValue", "CFundDetail",
@@ -520,6 +518,9 @@ include = [
     "CFundPositionNav", "CFundPositionPerformance", "CFundPositionProfits", "CFundPositions",
     "CFundQuarterlyReturn", "CFundStockHolding", "CFundTransaction", "CFundTrend",
     "CFundTrendContrast", "CFundUnitValue", "CHotFund",
+    # TradeContext: grid trading push (stays on trade side)
+    "CPushGridOrderChanged",
+    "CEstimateMaxPurchaseQuantityResponse",
     "CSecurityCalcIndex",
     "CWarrantInfo",
     "CQuotePackageDetail",
@@ -584,6 +585,7 @@ include = [
     "CCalendarCategory", "CCalendarPageDirection",
     # FundamentalContext enums
     "CFinancialReportKind", "CFinancialReportPeriod", "CInstitutionRecommend",
+    "CIndustryRankIndicator", "CIndustryRankSortType",
     # MarketContext enums
     "CBrokerHoldingPeriod", "CAhPremiumPeriod",
     # PortfolioContext enums
