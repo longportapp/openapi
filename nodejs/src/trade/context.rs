@@ -341,7 +341,7 @@ impl TradeContext {
         opts: ReplaceOrderOptions<'env>,
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = self.ctx.clone();
-        let opts = longport::trade::ReplaceOrderOptions::from(opts);
+        let opts = longport::trade::ReplaceOrderOptions::try_from(opts)?;
         env.spawn_future(async move {
             ctx.replace_order(opts).await.map_err(ErrorNewType)?;
             Ok(())
@@ -381,7 +381,7 @@ impl TradeContext {
         opts: SubmitOrderOptions<'env>,
     ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
         let ctx = self.ctx.clone();
-        let opts = longport::trade::SubmitOrderOptions::from(opts);
+        let opts = longport::trade::SubmitOrderOptions::try_from(opts)?;
         env.spawn_future(async move {
             let res = ctx.submit_order(opts).await.map_err(ErrorNewType)?;
             SubmitOrderResponse::try_from(res)
@@ -426,7 +426,7 @@ impl TradeContext {
         opts: SubmitMultiLegOrderOptions<'env>,
     ) -> Result<PromiseRaw<'env, SubmitOrderResponse>> {
         let ctx = self.ctx.clone();
-        let opts = longport::trade::SubmitMultiLegOrderOptions::from(opts);
+        let opts = longport::trade::SubmitMultiLegOrderOptions::try_from(opts)?;
         env.spawn_future(async move {
             let res = ctx.submit_multileg(opts).await.map_err(ErrorNewType)?;
             SubmitOrderResponse::try_from(res)

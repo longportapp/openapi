@@ -1,8 +1,10 @@
+use chrono::{DateTime, Utc};
 use napi::bindgen_prelude::ClassInstance;
 
 use crate::{
     decimal::Decimal,
     trade::types::{MultiLegStrategy, OrderSide, OrderType},
+    utils::try_from_datetime,
 };
 
 /// A leg of a multi-leg combination order to submit
@@ -10,7 +12,10 @@ use crate::{
 pub struct SubmitMultiLegOrderLeg<'env> {
     /// Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`)
     pub symbol: String,
-    /// Leg ratio quantity
+    /// Leg ratio quantity — must be a positive number.  The direction of each
+    /// leg is implied by `strategy` together with the order `side`, not by the
+    /// sign of this value; a negative or zero ratio is rejected by the server
+    /// with `602001`.
     pub ratio_quantity: ClassInstance<'env, Decimal>,
 }
 
@@ -35,11 +40,19 @@ pub struct SubmitMultiLegOrderOptions<'env> {
     /// If not specified, idempotency control is skipped.
     /// The server caches this ID for 10 minutes.
     pub client_request_id: Option<String>,
+    /// Time-condition submit time. The order is held in `DelayedNotReported`
+    /// status and only submitted at this time, which must be later than now
+    /// and no more than 90 days ahead. Only `LO` / `MO` support time
+    /// conditions.
+    pub delayed_until: Option<DateTime<Utc>>,
 }
 
-impl<'env> From<SubmitMultiLegOrderOptions<'env>> for longport::trade::SubmitMultiLegOrderOptions {
-    #[inline]
-    fn from(opts: SubmitMultiLegOrderOptions<'env>) -> Self {
+impl<'env> TryFrom<SubmitMultiLegOrderOptions<'env>>
+    for longport::trade::SubmitMultiLegOrderOptions
+{
+    type Error = napi::Error;
+
+    fn try_from(opts: SubmitMultiLegOrderOptions<'env>) -> napi::Result<Self> {
         let legs = opts.legs.into_iter().map(|leg| {
             longport::trade::SubmitMultiLegOrderLeg::new(leg.symbol, leg.ratio_quantity.0)
         });
@@ -59,6 +72,9 @@ impl<'env> From<SubmitMultiLegOrderOptions<'env>> for longport::trade::SubmitMul
         if let Some(id) = opts.client_request_id {
             opts2 = opts2.client_request_id(id);
         }
-        opts2
+        if let Some(delayed_until) = opts.delayed_until {
+            opts2 = opts2.delayed_until(try_from_datetime("delayedUntil", delayed_until)?);
+        }
+        Ok(opts2)
     }
 }

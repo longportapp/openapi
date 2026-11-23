@@ -18,7 +18,7 @@ use crate::{
     config::Config,
     decimal::PyDecimal,
     error::ErrorNewType,
-    time::{PyDateWrapper, PyOffsetDateTimeWrapper},
+    time::{PyDateWrapper, PyInstantWrapper, PyOffsetDateTimeWrapper},
     trade::{
         push::handle_push_event,
         types::{
@@ -259,7 +259,7 @@ impl TradeContext {
     }
 
     /// Replace order
-    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, attached_params = None))]
+    #[pyo3(signature = (order_id, quantity, price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, attached_params = None, delayed_until = None, clear_delayed_until = false))]
     #[allow(clippy::too_many_arguments)]
     fn replace_order(
         &self,
@@ -275,6 +275,8 @@ impl TradeContext {
         monitor_price: Option<PyDecimal>,
         remark: Option<String>,
         attached_params: Option<ReplaceAttachedParams>,
+        delayed_until: Option<PyInstantWrapper>,
+        clear_delayed_until: bool,
     ) -> PyResult<()> {
         let mut opts = ReplaceOrderOptions::new(order_id, quantity.into());
 
@@ -308,13 +310,18 @@ impl TradeContext {
         if let Some(p) = attached_params {
             opts = opts.attached_params(p.0);
         }
+        if clear_delayed_until {
+            opts = opts.clear_delayed_until();
+        } else if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
 
         self.ctx.replace_order(opts).map_err(ErrorNewType)?;
         Ok(())
     }
 
     /// Submit order
-    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None, attached_params = None))]
+    #[pyo3(signature = (symbol, order_type, side, submitted_quantity, time_in_force, submitted_price = None, trigger_price = None, limit_offset = None, trailing_amount = None, trailing_percent = None, expire_date = None, outside_rth = None, limit_depth_level = None, trigger_count = None, monitor_price = None, remark = None, client_request_id = None, attached_params = None, delayed_until = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_order(
         &self,
@@ -336,6 +343,7 @@ impl TradeContext {
         remark: Option<String>,
         client_request_id: Option<String>,
         attached_params: Option<SubmitAttachedParams>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<SubmitOrderResponse> {
         let mut opts = SubmitOrderOptions::new(
             symbol,
@@ -384,6 +392,9 @@ impl TradeContext {
         if let Some(p) = attached_params {
             opts = opts.attached_params(p.0);
         }
+        if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
+        }
 
         self.ctx
             .submit_order(opts)
@@ -396,7 +407,7 @@ impl TradeContext {
     /// as a single strategy order.
     ///
     /// `legs` is a list of `(symbol, ratio_quantity)` tuples.
-    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None))]
+    #[pyo3(signature = (side, order_type, submitted_quantity, strategy, legs, submitted_price = None, remark = None, client_request_id = None, delayed_until = None))]
     #[allow(clippy::too_many_arguments)]
     fn submit_multileg(
         &self,
@@ -408,6 +419,7 @@ impl TradeContext {
         submitted_price: Option<PyDecimal>,
         remark: Option<String>,
         client_request_id: Option<String>,
+        delayed_until: Option<PyInstantWrapper>,
     ) -> PyResult<SubmitOrderResponse> {
         let legs = legs
             .into_iter()
@@ -430,6 +442,9 @@ impl TradeContext {
         }
         if let Some(id) = client_request_id {
             opts = opts.client_request_id(id);
+        }
+        if let Some(delayed_until) = delayed_until {
+            opts = opts.delayed_until(delayed_until.0);
         }
         self.ctx
             .submit_multileg(opts)

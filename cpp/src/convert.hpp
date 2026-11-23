@@ -1140,6 +1140,8 @@ convert(lb_order_status_t status)
       return OrderStatus::Expired;
     case OrderStatusPartialWithdrawal:
       return OrderStatus::PartialWithdrawal;
+    case OrderStatusDelayedNotReported:
+      return OrderStatus::DelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1185,6 +1187,8 @@ convert(OrderStatus status)
       return OrderStatusExpired;
     case OrderStatus::PartialWithdrawal:
       return OrderStatusPartialWithdrawal;
+    case OrderStatus::DelayedNotReported:
+      return OrderStatusDelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1731,6 +1735,8 @@ convert(const lb_order_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     attached_orders,
     order->has_multi_leg ? std::optional{ convert(&order->multi_leg) }
                          : std::nullopt,
@@ -2164,6 +2170,8 @@ convert(const lb_order_detail_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     convert(order->free_status),
     order->free_amount ? std::optional{ Decimal(order->free_amount) }
                        : std::nullopt,

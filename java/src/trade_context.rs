@@ -547,6 +547,15 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextReplaceOrd
         if let Some(remark) = remark {
             new_opts = new_opts.remark(remark);
         }
+        let clear_delayed_until: bool = get_field(env, &opts, "clearDelayedUntil")?;
+        if clear_delayed_until {
+            new_opts = new_opts.clear_delayed_until();
+        } else {
+            let delayed_until: Option<OffsetDateTime> = get_field(env, &opts, "delayedUntil")?;
+            if let Some(delayed_until) = delayed_until {
+                new_opts = new_opts.delayed_until(delayed_until);
+            }
+        }
         let attached_params_obj = env.get_field(
             &opts,
             "attachedParams",
@@ -637,6 +646,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitOrde
         if let Some(id) = client_request_id {
             new_opts = new_opts.client_request_id(id);
         }
+        let delayed_until: Option<OffsetDateTime> = get_field(env, &opts, "delayedUntil")?;
+        if let Some(delayed_until) = delayed_until {
+            new_opts = new_opts.delayed_until(delayed_until);
+        }
         let attached_params_obj = env.get_field(
             &opts,
             "attachedParams",
@@ -709,6 +722,10 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_tradeContextSubmitMult
         let client_request_id: Option<String> = get_field(env, &opts, "clientRequestId")?;
         if let Some(id) = client_request_id {
             new_opts = new_opts.client_request_id(id);
+        }
+        let delayed_until: Option<OffsetDateTime> = get_field(env, &opts, "delayedUntil")?;
+        if let Some(delayed_until) = delayed_until {
+            new_opts = new_opts.delayed_until(delayed_until);
         }
 
         async_util::execute(env, callback, async move {

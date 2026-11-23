@@ -398,6 +398,7 @@ impl_java_enum!(
         Canceled,
         Expired,
         PartialWithdrawal,
+        DelayedNotReported,
     ]
 );
 

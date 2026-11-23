@@ -417,6 +417,8 @@ TradeContext::replace_order(const ReplaceOrderOptions& opts,
     nullptr,
     nullptr,
     nullptr,
+    nullptr,
+    false,
   };
   longport::convert::CReplaceAttachedParamsStorage attached_params_storage;
 
@@ -445,6 +447,9 @@ TradeContext::replace_order(const ReplaceOrderOptions& opts,
     attached_params_storage = convert_replace_attached(*opts.attached_params);
     opts2.attached_params = &attached_params_storage.params;
   }
+  opts2.delayed_until =
+    opts.delayed_until ? &opts.delayed_until.value() : nullptr;
+  opts2.clear_delayed_until = opts.clear_delayed_until;
 
   lb_trade_context_replace_order(
     ctx_,
@@ -482,6 +487,7 @@ TradeContext::submit_order(
     nullptr,
     nullptr,
     opts.remark ? opts.remark->c_str() : nullptr,
+    nullptr,
     nullptr,
     nullptr,
   };
@@ -527,6 +533,9 @@ TradeContext::submit_order(
   if (opts.attached_params) {
     attached_params_storage = convert_submit_attached(*opts.attached_params);
     opts2.attached_params = &attached_params_storage.params;
+  }
+  if (opts.delayed_until) {
+    opts2.delayed_until = &opts.delayed_until.value();
   }
 
   lb_trade_context_submit_order(
@@ -576,6 +585,7 @@ TradeContext::submit_multileg(
     nullptr,
     nullptr,
     nullptr,
+    nullptr,
   };
 
   if (opts.submitted_price) {
@@ -586,6 +596,9 @@ TradeContext::submit_multileg(
   }
   if (opts.client_request_id) {
     opts2.client_request_id = opts.client_request_id->c_str();
+  }
+  if (opts.delayed_until) {
+    opts2.delayed_until = &opts.delayed_until.value();
   }
 
   lb_trade_context_submit_multileg(
