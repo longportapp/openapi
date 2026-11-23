@@ -48,10 +48,14 @@ jobs:
           cache-bin: false
 
       - name: Check with clippy
-        run: cargo clippy -p longport --all-features
+        run: |
+          cargo clippy -p longport --all-features
+          cargo clippy -p longport-oauth --all-features --all-targets -- -D warnings
 
       - name: Test
-        run: cargo test -p longport --all-features
+        run: |
+          cargo test -p longport --all-features
+          cargo test -p longport-oauth --all-features
 
   check-python-sdk:
     needs:

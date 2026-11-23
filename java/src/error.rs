@@ -29,7 +29,7 @@ impl From<longport::Error> for JniError {
 
 impl From<longport::oauth::OAuthError> for JniError {
     fn from(e: longport::oauth::OAuthError) -> Self {
-        JniError::Other(e.to_string())
+        JniError::OpenApi(Box::new(longport::Error::OAuth(e)))
     }
 }
 
