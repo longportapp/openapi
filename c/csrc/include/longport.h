@@ -430,6 +430,58 @@ typedef enum lb_market_t {
 } lb_market_t;
 
 /**
+ * Ranking indicator for industry rank
+ */
+typedef enum lb_industry_rank_indicator_t {
+  /**
+   * Leading gainer
+   */
+  IndustryRankIndicatorLeadingGainer,
+  /**
+   * Today's trend
+   */
+  IndustryRankIndicatorTodayTrend,
+  /**
+   * Popularity
+   */
+  IndustryRankIndicatorPopularity,
+  /**
+   * Market capitalisation
+   */
+  IndustryRankIndicatorMarketCap,
+  /**
+   * Revenue
+   */
+  IndustryRankIndicatorRevenue,
+  /**
+   * Revenue growth
+   */
+  IndustryRankIndicatorRevenueGrowth,
+  /**
+   * Net profit
+   */
+  IndustryRankIndicatorNetProfit,
+  /**
+   * Net profit growth
+   */
+  IndustryRankIndicatorNetProfitGrowth,
+} lb_industry_rank_indicator_t;
+
+/**
+ * Sort mode for industry rank
+ */
+typedef enum lb_industry_rank_sort_type_t {
+  /**
+   * Rank by the single selected indicator
+   */
+  IndustryRankSortTypeSingle,
+  /**
+   * Rank by a composite of several indicators
+   */
+  IndustryRankSortTypeMulti,
+} lb_industry_rank_sort_type_t;
+
+/**
  * Broker holding lookback period
  */
 typedef enum lb_broker_holding_period_t {
@@ -871,6 +923,10 @@ typedef enum lb_filter_warrant_in_out_bounds_type_t {
  * Warrant status
  */
 typedef enum lb_warrant_status_t {
+  /**
+   * Unknown
+   */
+  WarrantStatusUnknown,
   /**
    * Suspend
    */
@@ -4787,7 +4843,10 @@ typedef struct CSubmitMultiLegOrderLeg {
    */
   const char *symbol;
   /**
-   * Leg ratio quantity
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by the strategy together with the order side, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
    */
   const struct lb_decimal_t *ratio_quantity;
 } CSubmitMultiLegOrderLeg;
@@ -6649,20 +6708,6 @@ typedef struct lb_order_detail_t {
    */
   const int64_t *delayed_until;
 } lb_order_detail_t;
-
-/**
- * Options for estimate maximum purchase quantity
- */
-typedef struct lb_estimate_max_purchase_quantity_response_t {
-  /**
-   * Cash available quantity
-   */
-  const struct lb_decimal_t *cash_max_qty;
-  /**
-   * Margin available quantity
-   */
-  const struct lb_decimal_t *margin_max_qty;
-} lb_estimate_max_purchase_quantity_response_t;
 
 /**
  * Statement item
@@ -9155,6 +9200,20 @@ typedef struct lb_hot_fund_t {
 } lb_hot_fund_t;
 
 /**
+ * Options for estimate maximum purchase quantity
+ */
+typedef struct lb_estimate_max_purchase_quantity_response_t {
+  /**
+   * Cash available quantity
+   */
+  const struct lb_decimal_t *cash_max_qty;
+  /**
+   * Margin available quantity
+   */
+  const struct lb_decimal_t *margin_max_qty;
+} lb_estimate_max_purchase_quantity_response_t;
+
+/**
  * Security calc index response
  */
 typedef struct lb_security_calc_index_t {
@@ -9371,7 +9430,7 @@ typedef struct lb_warrant_info_t {
   /**
    * Expiry date
    */
-  struct lb_date_t expiry_date;
+  const struct lb_date_t *expiry_date;
   /**
    * Strike price
    */
@@ -15255,14 +15314,6 @@ void lb_fundamental_context_buyback(const struct lb_fundamental_context_t *ctx,
                                     void *userdata);
 
 /**
- * Get stock ratings. Returns `CStockRatings`.
- */
-void lb_fundamental_context_ratings(const struct lb_fundamental_context_t *ctx,
-                                    const char *symbol,
-                                    lb_async_callback_t callback,
-                                    void *userdata);
-
-/**
  * Get ranked list of top shareholders. Returns `CShareholderTopResponse`.
  */
 void lb_fundamental_context_shareholder_top(const struct lb_fundamental_context_t *ctx,
@@ -15315,9 +15366,9 @@ void lb_fundamental_context_institution_rating_views(const struct lb_fundamental
  * Returns `CIndustryRankResponse`.
  */
 void lb_fundamental_context_industry_rank(const struct lb_fundamental_context_t *ctx,
-                                          const char *market,
-                                          const char *indicator,
-                                          const char *sort_type,
+                                          enum lb_market_t market,
+                                          enum lb_industry_rank_indicator_t indicator,
+                                          enum lb_industry_rank_sort_type_t sort_type,
                                           uint32_t limit,
                                           lb_async_callback_t callback,
                                           void *userdata);

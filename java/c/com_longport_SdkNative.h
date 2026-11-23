@@ -129,6 +129,14 @@ JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetPushCandlestickMode
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    configSetQuoteTransport
+ * Signature: (JLcom/longport/QuoteTransport;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetQuoteTransport
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    configSetEnablePrintQuotePackages
  * Signature: (JZ)J
  */
@@ -174,6 +182,22 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeConfig
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_oauthBuild
   (JNIEnv *, jclass, jstring, jint, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    oauthRevoke
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_oauthRevoke
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    oauthClear
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_oauthClear
+  (JNIEnv *, jclass, jlong, jobject);
 
 /*
  * Class:     com_longport_SdkNative
@@ -817,6 +841,14 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextMarginRatio
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    tradeContextRiskAssessment
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextRiskAssessment
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    tradeContextOrderDetail
  * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
  */
@@ -838,6 +870,110 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextOrderDetailAttach
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextEstimateMaxPurchaseQuantity
   (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    tradeContextSetOnGridOrderChanged
+ * Signature: (JLcom/longport/trade/GridOrderChangedHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextSetOnGridOrderChanged
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newGridContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newGridContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeGridContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeGridContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextSubmit
+ * Signature: (JLcom/longport/grid/SubmitGridOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSubmit
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextReplace
+ * Signature: (JLcom/longport/grid/ReplaceGridOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextReplace
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextList
+ * Signature: (JLcom/longport/grid/GetGridOrdersOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextList
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextListByIds
+ * Signature: (J[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextListByIds
+  (JNIEnv *, jclass, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextDetail
+ * Signature: (JLcom/longport/grid/GetGridOrderDetailOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextDetail
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextTriggerHistory
+ * Signature: (JLcom/longport/grid/GetGridTriggerHistoryOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextTriggerHistory
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextCancel
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextCancel
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextSuspend
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSuspend
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextRestart
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextRestart
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextSymbolInfo
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSymbolInfo
+  (JNIEnv *, jclass, jlong, jstring, jobject);
 
 /*
  * Class:     com_longport_SdkNative
@@ -1078,110 +1214,6 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextSubmitOrder
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextCancelOrder
   (JNIEnv *, jclass, jlong, jlong, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    tradeContextSetOnGridOrderChanged
- * Signature: (JLcom/longport/trade/GridOrderChangedHandler;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextSetOnGridOrderChanged
-  (JNIEnv *, jclass, jlong, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    newGridContext
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newGridContext
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    freeGridContext
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeGridContext
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextSubmit
- * Signature: (JLcom/longport/grid/SubmitGridOrderOptions;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSubmit
-  (JNIEnv *, jclass, jlong, jobject, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextReplace
- * Signature: (JLcom/longport/grid/ReplaceGridOrderOptions;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextReplace
-  (JNIEnv *, jclass, jlong, jobject, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextList
- * Signature: (JLcom/longport/grid/GetGridOrdersOptions;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextList
-  (JNIEnv *, jclass, jlong, jobject, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextListByIds
- * Signature: (J[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextListByIds
-  (JNIEnv *, jclass, jlong, jobjectArray, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextDetail
- * Signature: (JLcom/longport/grid/GetGridOrderDetailOptions;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextDetail
-  (JNIEnv *, jclass, jlong, jobject, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextTriggerHistory
- * Signature: (JLcom/longport/grid/GetGridTriggerHistoryOptions;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextTriggerHistory
-  (JNIEnv *, jclass, jlong, jobject, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextCancel
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextCancel
-  (JNIEnv *, jclass, jlong, jstring, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextSuspend
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSuspend
-  (JNIEnv *, jclass, jlong, jstring, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextRestart
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextRestart
-  (JNIEnv *, jclass, jlong, jstring, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    gridContextSymbolInfo
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSymbolInfo
-  (JNIEnv *, jclass, jlong, jstring, jobject);
 
 /*
  * Class:     com_longport_SdkNative
@@ -1877,14 +1909,6 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextOperating
  * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetBuyback
-  (JNIEnv *, jclass, jlong, jstring, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    fundamentalContextGetRatings
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetRatings
   (JNIEnv *, jclass, jlong, jstring, jobject);
 
 /*

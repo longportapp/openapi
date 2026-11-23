@@ -238,6 +238,8 @@ export declare class AttachedOrderDetail {
   get activateRth(): OutsideRTH | null
   /** Submit price */
   get submitPrice(): Decimal | null
+  /** Bid/ask depth level of the limit order submitted price */
+  get limitDepthLevel(): number | null
 }
 
 /** Brokers */
@@ -376,7 +378,8 @@ export declare class Config {
    * (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`,
    * `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
    * `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
-   * `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`).  Fields
+   * `LONGPORT_QUOTE_TRANSPORT`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+   * `LONGPORT_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param appKey       Application key
@@ -416,6 +419,8 @@ export declare class Config {
    *   `false` (Default: `false`)
    * - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
    *   `realtime`)
+   * - `LONGPORT_QUOTE_TRANSPORT` - Transport for quote pull APIs, `ws` or
+   *   `http` (Default: `ws`)
    * - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
    *   `true` or `false` (Default: `true`)
    * - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
@@ -431,7 +436,8 @@ export declare class Config {
    * (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`,
    * `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
    * `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
-   * `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`).  Fields
+   * `LONGPORT_QUOTE_TRANSPORT`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+   * `LONGPORT_LOG_PATH`).  Fields
    * set in `extra` override the corresponding environment variables.
    *
    * @param oauth  OAuth handle obtained from `OAuth.build(...)`
@@ -719,7 +725,10 @@ export declare class Execution {
   get quantity(): Decimal
   /** Executed price */
   get price(): Decimal
-  /** Order side */
+  /**
+   * Order side. `Unknown` when the response omits it (LongPort US
+   * `/v1/trade/execution/history`)
+   */
   get side(): OrderSide
 }
 
@@ -793,8 +802,6 @@ export declare class FundamentalContext {
   operating(symbol: string): Promise<OperatingList>
   /** Get buyback data for a security */
   buyback(symbol: string): Promise<BuybackData>
-  /** Get stock ratings for a security */
-  ratings(symbol: string): Promise<StockRatings>
   /** Get ranked list of top shareholders */
   shareholderTop(symbol: string): Promise<ShareholderTopResponse>
   /** Get holding history and detail for one shareholder */
@@ -816,8 +823,11 @@ export declare class FundamentalContext {
   usValuationOverview(symbol: string): Promise<USValuationOverview>
   /** Get US financial overview. US token required. */
   usFinancialOverview(symbol: string, report: string): Promise<USFinancialOverview>
-  /** Get US financial statement v3. kind: "IS"/"BS"/"CF". US token required. */
-  usFinancialStatement(symbol: string, kind: string, report: string): Promise<USFinancialStatement>
+  /**
+   * Get US financial statement v3. `kind` selects one statement (there is
+   * no "all" mode). US token required.
+   */
+  usFinancialStatement(symbol: string, kind: FinancialStatementKind, report: string): Promise<USFinancialStatement>
   /** Get US key financial metrics. US token required. */
   usKeyFinancialMetrics(symbol: string, report: string): Promise<USKeyFinancialMetrics>
   /** Get US analyst consensus estimates. US token required. */
@@ -2550,6 +2560,33 @@ export declare class OAuth {
    *          `HttpClient.fromOAuth`
    */
   static build(clientId: string, onOpenUrl: ((err: Error | null, arg: string) => void), callbackPort?: number | undefined | null): Promise<OAuth>
+  /**
+   * Revoke the current token on the server (RFC 7009).
+   *
+   * The refresh token is revoked when present, otherwise the access token.
+   * Only the server is contacted; the cached token on disk is left
+   * untouched (see `clear`).
+   *
+   * @example
+   * ```javascript
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Open:', url));
+   * await oauth.revoke();
+   * ```
+   */
+  revoke(): Promise<void>
+  /**
+   * Clear the token locally.
+   *
+   * Drops the in-memory token and deletes the cached token file
+   * (`~/.longport/openapi/tokens/<clientId>`). The server is not
+   * contacted (see `revoke`).
+   *
+   * @example
+   * ```javascript
+   * await oauth.clear();
+   * ```
+   */
+  clear(): Promise<void>
 }
 
 /**
@@ -2727,6 +2764,11 @@ export declare class Order {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
   /** Attached orders */
   get attachedOrders(): Array<AttachedOrderDetail>
   /**
@@ -2836,6 +2878,11 @@ export declare class OrderDetail {
   get monitorPrice(): Decimal | null
   /** Remark */
   get remark(): string
+  /**
+   * Time-condition submit time (not set when the order is not a
+   * time-condition order)
+   */
+  get delayedUntil(): Date | null
   /** Commission-free Status */
   get freeStatus(): CommissionFreeStatus
   /** Commission-free amount */
@@ -2945,7 +2992,12 @@ export declare class ParticipantInfo {
 export declare class PortfolioContext {
   /** Create a new PortfolioContext. */
   static new(config: Config): PortfolioContext
-  /** Get exchange rates for supported currencies. */
+  /**
+   * Get exchange rates for supported currencies.
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `TradeContext.usExchangeRates` instead.
+   */
   exchangeRate(): Promise<ExchangeRates>
   /**
    * Get portfolio P&L analysis (summary + per-security breakdown).
@@ -4306,6 +4358,8 @@ export declare class TradeContext {
   /**
    * Get history executions
    *
+   * `side` may be `Unknown` on LongPort US accounts.
+   *
    * #### Example
    *
    * ```javascript
@@ -4497,6 +4551,9 @@ export declare class TradeContext {
   /**
    * Get account balance
    *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usCashAndBuyPower` (or `usAssetOverview`) instead.
+   *
    * #### Example
    *
    * ```javascript
@@ -4513,6 +4570,9 @@ export declare class TradeContext {
   accountBalance(currency?: string | undefined | null): Promise<Array<AccountBalance>>
   /**
    * Get cash flow
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usTransactionHistory` instead.
    *
    * #### Example
    *
@@ -4534,6 +4594,9 @@ export declare class TradeContext {
   /**
    * Get fund positions
    *
+   * AP accounts only: US data-center accounts have no fund holdings and
+   * get a region error. No US equivalent.
+   *
    * #### Example
    *
    * ```javascript
@@ -4548,6 +4611,9 @@ export declare class TradeContext {
   fundPositions(symbols?: Array<string> | undefined | null): Promise<FundPositionsResponse>
   /**
    * Get stock positions
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usAssetOverview` (`stockList`) instead.
    *
    * #### Example
    *
@@ -4564,6 +4630,10 @@ export declare class TradeContext {
   /**
    * Get margin ratio
    *
+   * AP accounts only: US data-center accounts get a region error. No US
+   * equivalent; for US margin info see `usCashAndBuyPower`
+   * (`marginStatus`).
+   *
    * #### Example
    *
    * ```javascript
@@ -4577,7 +4647,26 @@ export declare class TradeContext {
    */
   marginRatio(symbol: string): Promise<MarginRatio>
   /**
+   * Get the risk assessment (suitability questionnaire) result of the
+   * current member
+   *
+   * #### Example
+   *
+   * ```javascript
+   * const { OAuth, Config, TradeContext } = require('longport')
+   *
+   * const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+   * const ctx = TradeContext.new(Config.fromOAuth(oauth));
+   * const resp = await ctx.riskAssessment();
+   * console.log(resp);
+   * ```
+   */
+  riskAssessment(): Promise<RiskAssessment>
+  /**
    * Get order detail
+   *
+   * AP accounts only: US data-center accounts get a region error; use
+   * `usOrderDetail` instead.
    *
    * #### Example
    *
@@ -4602,6 +4691,28 @@ export declare class TradeContext {
   usAssetOverview(): Promise<USAssetOverview>
   /** Get US realized P&L. US token required. */
   usRealizedPl(currency: string, category?: string | undefined | null): Promise<USRealizedPL>
+  /**
+   * Get cash, buying power and margin status for the US account. US token
+   * required.
+   *
+   * `currency`: optional, e.g. `"USD"`.
+   */
+  usCashAndBuyPower(currency?: string | undefined | null): Promise<USCashAndBuyPower>
+  /**
+   * Get the quantity of a US holding that is available to trade. US token
+   * required.
+   *
+   * `equityType`: `"STOCK"` (default), `"OPTION"` or `"CRYPTO"`;
+   * `positionSide`: `"LONG"` (default) or `"SHORT"`.
+   */
+  usAvailableHolding(symbol: string, equityType?: string | undefined | null, positionSide?: string | undefined | null): Promise<USAvailableHolding>
+  /**
+   * Get the US account transaction history, one page at a time. US token
+   * required.
+   */
+  usTransactionHistory(opts: GetUSTransactionHistoryOptions): Promise<USTransactionHistory>
+  /** Get the exchange rates used by the US account. US token required. */
+  usExchangeRates(): Promise<USExchangeRates>
   orderDetailAttached(orderId: string): Promise<OrderDetail>
   /**
    * Estimating the maximum purchase quantity for Hong Kong and US stocks,
@@ -4704,7 +4815,7 @@ export declare class WarrantInfo {
   /** Turnover */
   get turnover(): Decimal
   /** Expiry date */
-  get expiryDate(): NaiveDate
+  get expiryDate(): NaiveDate | null
   /** Strike price */
   get strikePrice(): Decimal | null
   /** Upper strike price */
@@ -6222,6 +6333,14 @@ export interface ExtraConfigParams {
   /** Push candlesticks mode (default: PushCandlestickMode.Realtime) */
   pushCandlestickMode?: PushCandlestickMode
   /**
+   * Transport for quote pull (request/response) APIs (default:
+   * QuoteTransport.WebSocket)
+   *
+   * Subscriptions and push events always use the WebSocket connection; this
+   * only selects how request/response quote APIs reach the server.
+   */
+  quoteTransport?: QuoteTransport
+  /**
    * Enable printing the opened quote packages when connected to the server
    * (default: true).  Set to `false` to suppress the output.
    */
@@ -6314,6 +6433,21 @@ export declare const enum FinancialReportPeriod {
 export interface FinancialReports {
   /** Raw nested financial data object */
   list: any
+}
+
+/**
+ * Financial statement kind
+ *
+ * Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+ * needs one specific statement per request.
+ */
+export declare const enum FinancialStatementKind {
+  /** Income statement */
+  IncomeStatement = 0,
+  /** Balance sheet */
+  BalanceSheet = 1,
+  /** Cash flow statement */
+  CashFlow = 2,
 }
 
 export declare const enum FlowDirection {
@@ -6683,6 +6817,28 @@ export interface GetTodayOrdersOptions {
    * Order entry (not the parent order). Has no effect without order_id.
    */
   isAttached?: boolean
+}
+
+/** Options for the US transaction history request */
+export interface GetUSTransactionHistoryOptions {
+  /** Start time (inclusive) */
+  startAt: Date
+  /** End time (inclusive) */
+  endAt: Date
+  /** Page number, starting at 1 (default 1) */
+  page?: number
+  /** Page size (default 20) */
+  size?: number
+  /**
+   * Transaction types to include; empty means all. Values:
+   * `TT_DEPOSIT_AND_WITHDRAWAL`, `TT_STOCKS_AND_ETFS_TRADING`,
+   * `TT_OPTIONS_TRADING`, `TT_CRYPTO_TRADING`, `TT_CORPORATE_ACTION`,
+   * `TT_TRANSFER_IN_AND_OUT`, `TT_CRYPTO_TRANSFER`, `TT_MARGIN_FINANCING`,
+   * `TT_OTHER`
+   */
+  types?: Array<string>
+  /** Currency filter, e.g. `USD`; empty means all */
+  currency?: string
 }
 
 /** Data granularity */
@@ -7498,6 +7654,8 @@ export declare const enum OrderStatus {
   Expired = 16,
   /** Partial Withdrawal */
   PartialWithdrawal = 17,
+  /** Monitoring (Time-Conditional Order) */
+  DelayedNotReported = 18,
 }
 
 /** Order tag */
@@ -7903,6 +8061,17 @@ export interface QuestionOption {
   description: string
 }
 
+export declare const enum QuoteTransport {
+  /** Send pull requests over the quote WebSocket connection (default) */
+  WebSocket = 0,
+  /**
+   * Send pull requests over HTTP (`POST /quote/*`) where the API has a REST
+   * equivalent, falling back to the WebSocket for the rest. Using only
+   * HTTP-backed APIs never opens a WebSocket connection.
+   */
+  Http = 1,
+}
+
 /** Rank categories response. */
 export interface RankCategoriesResponse {
   /** All top-level rank categories */
@@ -8085,6 +8254,16 @@ export interface ReplaceAttachedParams {
   quantity?: Decimal
   /** Market price */
   marketPrice?: Decimal
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
 }
 
 /** Options for replace grid trading order request */
@@ -8121,6 +8300,64 @@ export interface ReplaceOrderOptions {
   remark?: string
   /** Attached order parameters */
   attachedParams?: ReplaceAttachedParams
+  /**
+   * New time-condition submit time, which must be later than now and no
+   * more than 90 days ahead. Leave unset to keep the current time condition.
+   */
+  delayedUntil?: Date
+  /**
+   * Clear the time condition, turning the order into a regular order (takes
+   * precedence over `delayedUntil`)
+   */
+  clearDelayedUntil?: boolean
+}
+
+/** Risk assessment (suitability questionnaire) result of the current member */
+export interface RiskAssessment {
+  /**
+   * Risk level of the latest questionnaire (e.g. `A5`). The server does
+   * not document the scale, so do not infer an ordering between levels.
+   */
+  risk: string
+  /**
+   * Professional investor (PI) status code. The server does not document
+   * the code values; treat it as opaque.
+   */
+  pi: number
+  /**
+   * Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`).
+   * Values are strings, not booleans: `is_corporate_client` arrives as
+   * `"true"` / `"false"`.
+   */
+  approvals: Record<string, string>
+  /** Re-authentication flag, as returned by the server (empty when not set) */
+  reAuthentication: string
+  /**
+   * Professional investor status end time, as returned by the server (`0`
+   * when not set). Raw integer: the unit (seconds or milliseconds) is not
+   * documented, so it is not converted to a timestamp.
+   */
+  piEndAt: number
+  /**
+   * Deadlines keyed by item, as returned by the server. Raw integers with
+   * the same undocumented unit as `piEndAt`.
+   */
+  deadlines: Record<string, number>
+  /**
+   * Date of the latest risk assessment, as returned by the server (e.g.
+   * `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is
+   * not documented to be guaranteed. May be empty; a null or absent value
+   * also decodes to an empty string, so emptiness does not by itself mean
+   * "never assessed".
+   */
+  riskAssessmentAt: string
+  /** Questionnaire score */
+  score: number
+  /**
+   * Strategy risk levels of the member. The server does not document what
+   * these levels permit, so do not read them as a trading entitlement.
+   */
+  strategyRiskLevels: Array<string>
 }
 
 /** A filter condition for screener_search Mode B. */
@@ -8570,6 +8807,16 @@ export interface SubmitAttachedParams {
   stopLossSubmitPrice?: Decimal
   /** Activate RTH */
   activateRth?: OutsideRTH
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  profitTakerDepthLevel?: number
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activateOrderType` is `LIT`
+   */
+  stopLossDepthLevel?: number
 }
 
 /** Options for submitting a fund order. */
@@ -8610,7 +8857,12 @@ export interface SubmitGridOrderOptions {
 export interface SubmitMultiLegOrderLeg {
   /** Option symbol, in `ticker.region` format (e.g. `QQQ260731C764000.US`) */
   symbol: string
-  /** Leg ratio quantity */
+  /**
+   * Leg ratio quantity — must be a positive number.  The direction of each
+   * leg is implied by `strategy` together with the order `side`, not by the
+   * sign of this value; a negative or zero ratio is rejected by the server
+   * with `602001`.
+   */
   ratioQuantity: Decimal
 }
 
@@ -8636,6 +8888,13 @@ export interface SubmitMultiLegOrderOptions {
    * The server caches this ID for 10 minutes.
    */
   clientRequestId?: string
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead. Only `LO` / `MO` support time
+   * conditions.
+   */
+  delayedUntil?: Date
 }
 
 /** Options for submit order request */
@@ -8683,6 +8942,12 @@ export interface SubmitOrderOptions {
   clientRequestId?: string
   /** Attached order parameters */
   attachedParams?: SubmitAttachedParams
+  /**
+   * Time-condition submit time. The order is held in `DelayedNotReported`
+   * status and only submitted at this time, which must be later than now
+   * and no more than 90 days ahead.
+   */
+  delayedUntil?: Date
 }
 
 /** Quote type of subscription */
@@ -8971,11 +9236,48 @@ export interface USAttachedOrder {
   withdrawn: boolean
 }
 
+/** Quantity of a US holding that is available to trade */
+export interface USAvailableHolding {
+  availableQty: string
+}
+
 /** Action-button state for an order. */
 export interface USButtonControl {
   withdraw: number
   replace: number
   exceptionable: Array<string>
+}
+
+/** Buying power in USCashAndBuyPower */
+export interface USBuyLimitInfo {
+  currency: string
+  cashBuyPower: string
+  overnightBuyPower: string
+  dayTradeBuyPower: string
+  instantBuyPower: string
+  intradayMarginBuyPower: string
+  optionBuyPower: string
+  cryptoBuyPower: string
+  mme: string
+}
+
+/** Cash, buying power and margin status of a US account */
+export interface USCashAndBuyPower {
+  buyLimitInfo: USBuyLimitInfo
+  cashList: Array<USCashDetail>
+  marginStatus: USMarginStatus
+}
+
+/** One cash currency entry in USCashAndBuyPower */
+export interface USCashDetail {
+  currency: string
+  totalAmount: string
+  availableCash: string
+  withdrawCash: string
+  frozenCash: string
+  settledCash: string
+  outstanding: string
+  externalAmount: string
 }
 
 /** One cash currency entry in USAssetOverview */
@@ -9038,9 +9340,26 @@ export interface USConsensusItem {
 /** One cryptocurrency holding in USAssetOverview */
 export interface USCryptoEntry {
   assetType: string
-  averageCost: string
   symbol: string
+  quantity: string
   currency: string
+  averageCost: string
+  market: string
+  tradeStatus: string
+  prevClose: string
+  lastDone: string
+  marketPrice: string
+  pretradeClose: string
+  stockInvestOfToday: string
+  todayPl: string
+  pretradeStockInvestOfToday: string
+  pretradeTodayPl: string
+  nightLastDone: string
+  nightPrevClose: string
+  positionSide: string
+  openPositionTime: string
+  name: string
+  industryCounterId: string
   industryName: string
 }
 
@@ -9126,6 +9445,22 @@ export interface USETFFile {
 /** US ETF files response */
 export interface USETFFilesResponse {
   files: Array<USETFFile>
+}
+
+/** One exchange rate in USExchangeRates */
+export interface USExchangeRate {
+  universalKey: string
+  specKey: string
+  baseCurrency: string
+  otherCurrency: string
+  bidRate: string
+  offerRate: string
+  averageRate: string
+}
+
+/** Exchange rates of a US account */
+export interface USExchangeRates {
+  exchanges: Array<USExchangeRate>
 }
 
 /** One balance-sheet entry in USFinancialOverview. */
@@ -9216,6 +9551,17 @@ export interface USKeyMetricItem {
   reportTxt: string
   rptDate: string
   fields: Array<any>
+}
+
+/** Margin account status in USCashAndBuyPower */
+export interface USMarginStatus {
+  currency: string
+  nlv: string
+  marginEquity: string
+  marginMaintenanceExcess: string
+  mmr: string
+  regTExcess: string
+  sma: string
 }
 
 /** Full typed order object within USOrderDetailResponse. */
@@ -9404,6 +9750,31 @@ export interface USStockEntry {
   industryName: string
 }
 
+/** One record in USTransactionHistory */
+export interface USTransaction {
+  title: string
+  bizCode: string
+  bizCodeName: string
+  amount: string
+  currency: string
+  symbol: string
+  market: string
+  equityType: string
+  positionSide: string
+  quantity: string
+  quantityDescription: string
+  refNo: string
+  remark: string
+  createAt?: Date
+  doneAt?: Date
+}
+
+/** One page of US account transaction history */
+export interface USTransactionHistory {
+  currentPage: number
+  items: Array<USTransaction>
+}
+
 /** One valuation metric entry in USValuationOverview.metrics */
 export interface USValuationMetric {
   circle: string
@@ -9560,9 +9931,15 @@ export interface ValuationHistoryResponse {
 export interface ValuationMetricData {
   /** Description */
   desc: string
-  /** Historical high */
+  /**
+   * Upper bound of the fair-value band (not the period maximum; the series
+   * can rise above it)
+   */
   high?: string
-  /** Historical low */
+  /**
+   * Lower bound of the fair-value band (not the period minimum; the series
+   * can fall below it)
+   */
   low?: string
   /** Historical median */
   median?: string
@@ -9640,12 +10017,14 @@ export declare const enum WarrantSortBy {
 
 /** Warrant status */
 export declare const enum WarrantStatus {
+  /** Unknown */
+  Unknown = 0,
   /** Suspend */
-  Suspend = 0,
+  Suspend = 1,
   /** Prepare List */
-  PrepareList = 1,
+  PrepareList = 2,
   /** Normal */
-  Normal = 2,
+  Normal = 3,
 }
 
 /** Warrant type */
