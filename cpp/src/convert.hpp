@@ -136,9 +136,6 @@ using longport::grid::GridTriggerHistoryResponse;
 using longport::trade::PushGridOrderChanged;
 using longport::grid::SubmitGridOrderResponse;
 using longport::grid::TriggerOrder;
-using longport::forex::ForexOrderDetail;
-using longport::forex::ForexOrderStatus;
-using longport::forex::ForexQuote;
 using longport::fund::FundAnalysis;
 using longport::fund::FundAnalysisDetail;
 using longport::fund::FundAnnualReturn;
@@ -4030,44 +4027,6 @@ inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event
       throw std::invalid_argument("unreachable");
   }
   return event;
-}
-
-inline ForexOrderStatus
-convert(lb_forex_order_status_t state)
-{
-  switch (state) {
-    case ForexOrderStatusProcessing:
-      return ForexOrderStatus::Processing;
-    case ForexOrderStatusSuccess:
-      return ForexOrderStatus::Success;
-    case ForexOrderStatusFailed:
-      return ForexOrderStatus::Failed;
-    default:
-      return ForexOrderStatus::Processing;
-  }
-}
-
-inline ForexQuote
-convert(const lb_forex_quote_t* q)
-{
-  return ForexQuote{
-    q->quote_id,
-    Decimal(q->rate),
-    q->expire_at,
-    q->ccy_pair,
-  };
-}
-
-inline ForexOrderDetail
-convert(const lb_forex_order_detail_t* d)
-{
-  return ForexOrderDetail{
-    convert(d->state),
-    d->rate ? std::optional{ Decimal(d->rate) } : std::nullopt,
-    d->from_amount ? std::optional{ Decimal(d->from_amount) } : std::nullopt,
-    d->to_amount ? std::optional{ Decimal(d->to_amount) } : std::nullopt,
-    d->fail_reason,
-  };
 }
 
 // ── fund converters ──────────────────────────────────────────────────────────

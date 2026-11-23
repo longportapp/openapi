@@ -18,7 +18,6 @@ set(SOURCES
     src/types.cpp
     src/quote_context.cpp
     src/trade_context.cpp
-    src/forex_context.cpp
     src/fund_context.cpp
     src/grid_context.cpp
     src/oauth.cpp

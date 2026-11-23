@@ -1185,46 +1185,6 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSymbolInfo
 
 /*
  * Class:     com_longport_SdkNative
- * Method:    newForexContext
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newForexContext
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    freeForexContext
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeForexContext
-  (JNIEnv *, jclass, jlong);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    forexContextQuote
- * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/math/BigDecimal;Ljava/math/BigDecimal;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_forexContextQuote
-  (JNIEnv *, jclass, jlong, jstring, jstring, jobject, jobject, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    forexContextSubmitOrder
- * Signature: (JLjava/lang/String;Ljava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_forexContextSubmitOrder
-  (JNIEnv *, jclass, jlong, jstring, jstring, jobject);
-
-/*
- * Class:     com_longport_SdkNative
- * Method:    forexContextOrder
- * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
- */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_forexContextOrder
-  (JNIEnv *, jclass, jlong, jstring, jobject);
-
-/*
- * Class:     com_longport_SdkNative
  * Method:    newDcaContext
  * Signature: (J)J
  */

@@ -386,21 +386,6 @@ public class SdkNative {
         public static native void gridContextSymbolInfo(long context, String symbol, AsyncCallback callback);
 
 
-        // ── ForexContext ──────────────────────────────────────────────
-        public static native long newForexContext(long config);
-
-        public static native void freeForexContext(long context);
-
-        public static native void forexContextQuote(long context, String from, String to,
-                        java.math.BigDecimal amount, java.math.BigDecimal targetAmount,
-                        AsyncCallback callback);
-
-        public static native void forexContextSubmitOrder(long context, String quoteId,
-                        String clientOrderId, AsyncCallback callback);
-
-        public static native void forexContextOrder(long context, String clientOrderId,
-                        AsyncCallback callback);
-
         // ── DCAContext ────────────────────────────────────────────────
         public static native long newDcaContext(long config);
         public static native void freeDcaContext(long context);

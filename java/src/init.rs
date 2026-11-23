@@ -140,7 +140,6 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::calendar::types::CalendarCategory,
         longport::calendar::types::CalendarPageDirection,
         longport::agent::ConversationStatus,
-        longport::forex::ForexOrderStatus,
         longport::grid::TriggerPriceType,
         longport::grid::GridLimitEvent,
         longport::grid::GridTimeInForce
@@ -266,8 +265,6 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::fund::FundTransaction,
         longport::fund::FundOrderValidation,
         longport::fund::FundOrderSubmitResponse,
-        longport::forex::ForexQuote,
-        longport::forex::ForexOrderDetail,
         longport::content::TopicItem,
         longport::content::NewsItem,
         longport::content::TopicAuthor,

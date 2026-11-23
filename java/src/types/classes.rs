@@ -3831,18 +3831,6 @@ impl crate::types::IntoJValue for longport::agent::ConversationStreamEvent {
     }
 }
 
-impl_java_class!(
-    "com/longport/forex/ForexQuote",
-    longport::forex::ForexQuote,
-    [quote_id, rate, expire_at, ccy_pair]
-);
-
-impl_java_class!(
-    "com/longport/forex/ForexOrderDetail",
-    longport::forex::ForexOrderDetail,
-    [state, rate, from_amount, to_amount, fail_reason]
-);
-
 // ── Fund (mutual fund) types ───────────────────────────────────────
 
 impl_java_class!(

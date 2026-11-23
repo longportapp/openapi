@@ -24,12 +24,6 @@ impl_java_enum!(
     [ZH_CN, ZH_HK, EN]
 );
 impl_java_enum!(
-    "com/longport/forex/ForexOrderStatus",
-    longport::forex::ForexOrderStatus,
-    [Processing, Success, Failed]
-);
-
-impl_java_enum!(
     "com/longport/PushCandlestickMode",
     longport::PushCandlestickMode,
     [Realtime, Confirmed]

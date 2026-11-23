@@ -201,11 +201,6 @@ cpp_compat = true
 "CFundamentalContext" = "lb_fundamental_context_t"
 "CAlertContext" = "lb_alert_context_t"
 "CDCAContext" = "lb_dca_context_t"
-# --- forex module: context + response views ---
-"CForexContext" = "lb_forex_context_t"
-"CForexQuote" = "lb_forex_quote_t"
-"CForexOrderDetail" = "lb_forex_order_detail_t"
-"CForexOrderStatus" = "lb_forex_order_status_t"
 # --- grid module ---
 "CGridTradeRule" = "lb_grid_trade_rule_t"
 "CSubmitGridOrderOptions" = "lb_submit_grid_order_options_t"
@@ -500,8 +495,6 @@ include = [
     "CEstimateMaxPurchaseQuantityResponse",
     # AssetContext: statements (reachable only via void* async data pointer)
     "CStatementItem",
-    # ForexContext: currency-exchange response views (via void* async data pointer)
-    "CForexQuote", "CForexOrderDetail", "CForexOrderStatus",
     # GridContext: grid trading (reachable only via void* async data pointer)
     "CSubmitGridOrderResponse",
     "CGridOrder", "CGridOrderSubOrder", "CGridOrderHistory", "CGridOrderDetail",
