@@ -25,7 +25,7 @@ use crate::{
             AccountBalance, AllExecutionsResponse, BalanceType, CashFlow,
             EstimateMaxPurchaseQuantityResponse, Execution, FundPositionsResponse, MarginRatio,
             MultiLegStrategy, Order, OrderDetail, OrderSide, OrderStatus, OrderType, OutsideRTH,
-            ReplaceAttachedParams, StockPositionsResponse, SubmitAttachedParams,
+            ReplaceAttachedParams, RiskAssessment, StockPositionsResponse, SubmitAttachedParams,
             SubmitOrderResponse, TimeInForceType, TopicType,
         },
     },
@@ -551,6 +551,12 @@ impl TradeContext {
             .margin_ratio(symbol)
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    /// Get the risk assessment (suitability questionnaire) result of the
+    /// current member
+    fn risk_assessment(&self) -> PyResult<RiskAssessment> {
+        Ok(self.ctx.risk_assessment().map_err(ErrorNewType)?.into())
     }
 
     /// Get order detail

@@ -17,7 +17,8 @@ use crate::{
         types::{
             AccountBalance, CashFlow, EstimateMaxPurchaseQuantityResponse, Execution,
             FundPositionsResponse, MarginRatio, Order, OrderDetail, PushGridOrderChanged,
-            PushOrderChanged, StockPositionsResponse, SubmitOrderResponse, TopicType,
+            PushOrderChanged, RiskAssessment, StockPositionsResponse, SubmitOrderResponse,
+            TopicType,
         },
     },
     utils::JsCallback,
@@ -596,6 +597,29 @@ impl TradeContext {
             .await
             .map_err(ErrorNewType)?
             .try_into()
+    }
+
+    /// Get the risk assessment (suitability questionnaire) result of the
+    /// current member
+    ///
+    /// #### Example
+    ///
+    /// ```javascript
+    /// const { OAuth, Config, TradeContext } = require('longport')
+    ///
+    /// const oauth = await OAuth.build('your-client-id', (_, url) => console.log('Visit:', url));
+    /// const ctx = TradeContext.new(Config.fromOAuth(oauth));
+    /// const resp = await ctx.riskAssessment();
+    /// console.log(resp);
+    /// ```
+    #[napi]
+    pub async fn risk_assessment(&self) -> Result<RiskAssessment> {
+        Ok(self
+            .ctx
+            .risk_assessment()
+            .await
+            .map_err(ErrorNewType)?
+            .into())
     }
 
     /// Get order detail

@@ -27,7 +27,7 @@ use crate::{
             CGetHistoryExecutionsOptions, CGetHistoryOrdersOptions, CGetStockPositionsOptions,
             CGetTodayExecutionsOptions, CGetTodayOrdersOptions, CMarginRatioOwned,
             COrderDetailOwned, COrderOwned, CPushGridOrderChanged, CPushGridOrderChangedOwned,
-            CPushOrderChanged, CPushOrderChangedOwned, CReplaceOrderOptions,
+            CPushOrderChanged, CPushOrderChangedOwned, CReplaceOrderOptions, CRiskAssessmentOwned,
             CStockPositionsResponseOwned, CSubmitMultiLegOrderOptions, CSubmitOrderOptions,
             CSubmitOrderResponseOwned,
         },
@@ -849,6 +849,21 @@ pub unsafe extern "C" fn lb_trade_context_margin_ratio(
     let symbol = cstr_to_rust(symbol);
     execute_async(callback, ctx, userdata, async move {
         let resp: CCow<CMarginRatioOwned> = CCow::new(ctx_inner.margin_ratio(symbol).await?);
+        Ok(resp)
+    });
+}
+
+/// Get the risk assessment (suitability questionnaire) result of the current
+/// member
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_trade_context_risk_assessment(
+    ctx: *const CTradeContext,
+    callback: CAsyncCallback,
+    userdata: *mut c_void,
+) {
+    let ctx_inner = (*ctx).ctx.clone();
+    execute_async(callback, ctx, userdata, async move {
+        let resp: CCow<CRiskAssessmentOwned> = CCow::new(ctx_inner.risk_assessment().await?);
         Ok(resp)
     });
 }

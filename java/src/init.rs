@@ -206,6 +206,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         crate::types::StockPositionChannel,
         crate::types::StockPosition,
         longport::trade::MarginRatio,
+        crate::types::RiskAssessment,
         longport::trade::OrderHistoryDetail,
         longport::trade::OrderChargeFee,
         longport::trade::OrderChargeItem,

@@ -389,9 +389,7 @@ fn error_chain(e: &dyn std::error::Error) -> String {
 /// PKCE (RFC 7636, `S256`) is required by the server for public clients and
 /// ignored for clients that don't need it. The returned verifier must be sent
 /// with the token exchange.
-fn build_authorize_url(
-    client: &LongPortClient,
-) -> (oauth2::url::Url, CsrfToken, PkceCodeVerifier) {
+fn build_authorize_url(client: &LongPortClient) -> (oauth2::url::Url, CsrfToken, PkceCodeVerifier) {
     let (pkce_challenge, pkce_verifier) = PkceCodeChallenge::new_random_sha256();
     let (auth_url, csrf_token) = client
         .authorize_url(CsrfToken::new_random)
