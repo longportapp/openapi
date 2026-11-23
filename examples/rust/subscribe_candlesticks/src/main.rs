@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use longport::{
+    Config,
     oauth::OAuthBuilder,
     quote::{Period, QuoteContext, TradeSessions},
-    Config,
 };
 use tracing_subscriber::EnvFilter;
 

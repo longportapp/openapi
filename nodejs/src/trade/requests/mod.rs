@@ -1,4 +1,5 @@
 mod estimate_max_purchase_quantity;
+mod get_all_executions;
 mod get_cash_flow;
 mod get_history_executions;
 mod get_history_orders;

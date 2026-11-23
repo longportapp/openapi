@@ -1,7 +1,7 @@
 package com.longport;
 
 /**
- * Exception thrown by the Longport OpenAPI SDK.
+ * Exception thrown by the LongPort OpenAPI SDK.
  * <p>
  * Every SDK operation that can fail will throw this exception. It carries three
  * pieces of diagnostic information:

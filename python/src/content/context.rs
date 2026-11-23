@@ -48,7 +48,7 @@ impl ContentContext {
 
     /// Create a new community topic.
     ///
-    /// See: <https://open.longport.com/docs/api?op=create_topic>
+    /// See: <https://open.longportapp.com/docs/api?op=create_topic>
     #[pyo3(signature = (title, body, topic_type = None, tickers = None, hashtags = None))]
     pub fn create_topic(
         &self,
@@ -113,7 +113,7 @@ impl ContentContext {
 
     /// Post a reply to a community topic.
     ///
-    /// See: <https://open.longport.com/docs/api?op=create_topic_reply>
+    /// See: <https://open.longportapp.com/docs/api?op=create_topic_reply>
     #[pyo3(signature = (topic_id, body, reply_to_id = None))]
     pub fn create_topic_reply(
         &self,

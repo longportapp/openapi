@@ -1,6 +1,16 @@
 from datetime import date, datetime, time
 from decimal import Decimal
-from typing import Any, Awaitable, Callable, Coroutine, List, Optional, Type
+from typing import (
+    Any,
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Coroutine,
+    Iterator,
+    List,
+    Optional,
+    Type,
+)
 
 class ErrorKind:
     """
@@ -46,7 +56,7 @@ class OpenApiException(Exception):
 
 class HttpClient:
     """
-    A HTTP client for Longport OpenAPI.
+    A HTTP client for LongPort OpenAPI.
     """
 
     @staticmethod
@@ -189,7 +199,7 @@ class PushCandlestickMode:
 
 class OAuth:
     """
-    OAuth 2.0 client handle for Longport OpenAPI.
+    OAuth 2.0 client handle for LongPort OpenAPI.
 
     Obtain an instance via :meth:`OAuthBuilder.build` (blocking) or
     :meth:`AsyncOAuthBuilder.build` (async).  Pass it to
@@ -201,7 +211,7 @@ class OAuthBuilder:
     Builder for the OAuth 2.0 authorization flow.
 
     Args:
-        client_id: OAuth 2.0 client ID from the Longport developer portal
+        client_id: OAuth 2.0 client ID from the LongPort developer portal
         callback_port: TCP port for the local callback server (default 60355).
             Must match one of the redirect URIs registered for the client.
 
@@ -265,7 +275,7 @@ class OAuthBuilder:
 
 class Config:
     """
-    Configuration options for Longport SDK
+    Configuration options for LongPort SDK
 
     Args:
         app_key: App Key
@@ -295,6 +305,7 @@ class Config:
         push_candlestick_mode: Type[PushCandlestickMode] = PushCandlestickMode.Realtime,
         enable_print_quote_packages: bool = True,
         log_path: Optional[str] = None,
+        enable_papertrading: bool = False,
     ) -> Config:
         """
         Create a new ``Config`` using API Key authentication.
@@ -303,7 +314,8 @@ class Config:
         (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
         ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
         ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
-        ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+        ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``,
+        ``LONGPORT_PAPERTRADING``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -323,6 +335,11 @@ class Config:
             enable_print_quote_packages: Print opened quote packages on
                 connect (default: ``True``)
             log_path: Path for log files (default: no logs)
+            enable_papertrading: When ``True``, all API calls target the
+                paper trading (simulation) environment.  The server validates
+                the token: if it belongs to a real-money account the server
+                returns an error.  Default: ``False`` (no restriction imposed
+                by server).
         """
 
     @classmethod
@@ -365,6 +382,7 @@ class Config:
         push_candlestick_mode: Optional[Type[PushCandlestickMode]] = None,
         enable_print_quote_packages: Optional[bool] = None,
         log_path: Optional[str] = None,
+        enable_papertrading: Optional[bool] = None,
     ) -> Config:
         """
         Create a new ``Config`` for OAuth 2.0 authentication.
@@ -376,7 +394,8 @@ class Config:
         (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
         ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
         ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
-        ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+        ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``,
+        ``LONGPORT_PAPERTRADING``).
         Any explicit parameter overrides the corresponding env variable.
 
         Args:
@@ -395,6 +414,11 @@ class Config:
             enable_print_quote_packages: Print opened quote packages on
                 connect (optional)
             log_path: Path for log files (optional)
+            enable_papertrading: When ``True``, all API calls target the
+                paper trading (simulation) environment.  The server validates
+                the token: if it belongs to a real-money account the server
+                returns an error.  Default: ``None`` (no restriction imposed
+                by server).
 
         Returns:
             Config object
@@ -4020,12 +4044,11 @@ class QuoteContext:
             :class:`ShortTradesResponse` with raw JSON data
         """
 
-    def option_volume(self, symbol: str) -> OptionVolumeStats:
-        """
-        Get real-time option call/put volume for a security.
+    def option_volume(self, symbol: str) -> "OptionVolumeStats":
+        """Get real-time option call/put volume.
 
         Args:
-            symbol: Security code (e.g. ``"AAPL.US"``)
+            symbol: Underlying symbol, e.g. ``"AAPL.US"``
 
         Returns:
             :class:`OptionVolumeStats` with call and put volume strings
@@ -4033,18 +4056,28 @@ class QuoteContext:
 
     def option_volume_daily(
         self, symbol: str, timestamp: int = 0, count: int = 30
-    ) -> OptionVolumeDaily:
-        """
-        Get daily historical option volume for a security.
+    ) -> "OptionVolumeDaily":
+        """Get daily historical option volume.
 
         Args:
-            symbol: Security code (e.g. ``"AAPL.US"``)
-            timestamp: Start timestamp (unix seconds, 0 = latest)
+            symbol: Underlying symbol, e.g. ``"AAPL.US"``
+            timestamp: Start timestamp (0 = most recent)
             count: Number of days to return (default 30)
 
         Returns:
             :class:`OptionVolumeDaily` containing a list of daily stats
         """
+
+    def us_crypto_overview(self, symbol: str) -> "USCryptoOverview":
+        """Get US cryptocurrency market overview. US token required.
+
+        Args:
+            symbol: Trading-pair symbol, e.g. ``"BTCUSD.BKKT"``
+
+        Returns:
+            :class:`USCryptoOverview`
+        """
+        ...
 
 class AsyncQuoteContext:
     """
@@ -5398,12 +5431,11 @@ class AsyncQuoteContext:
         """
         ...
 
-    def option_volume(self, symbol: str) -> Awaitable[OptionVolumeStats]:
-        """
-        Get real-time option call/put volume for a security. Returns awaitable.
+    def option_volume(self, symbol: str) -> "Awaitable[OptionVolumeStats]":
+        """Get real-time option call/put volume. Returns awaitable.
 
         Args:
-            symbol: Security code (e.g. ``"AAPL.US"``)
+            symbol: Underlying symbol, e.g. ``"AAPL.US"``
 
         Returns:
             Awaitable resolving to :class:`OptionVolumeStats`
@@ -5412,17 +5444,27 @@ class AsyncQuoteContext:
 
     def option_volume_daily(
         self, symbol: str, timestamp: int = 0, count: int = 30
-    ) -> Awaitable[OptionVolumeDaily]:
-        """
-        Get daily historical option volume for a security. Returns awaitable.
+    ) -> "Awaitable[OptionVolumeDaily]":
+        """Get daily historical option volume. Returns awaitable.
 
         Args:
-            symbol: Security code (e.g. ``"AAPL.US"``)
-            timestamp: Start timestamp (unix seconds, 0 = latest)
+            symbol: Underlying symbol, e.g. ``"AAPL.US"``
+            timestamp: Start timestamp (0 = most recent)
             count: Number of days to return (default 30)
 
         Returns:
             Awaitable resolving to :class:`OptionVolumeDaily`
+        """
+        ...
+
+    def us_crypto_overview(self, symbol: str) -> "Awaitable[USCryptoOverview]":
+        """Get US cryptocurrency market overview. US token required. Returns awaitable.
+
+        Args:
+            symbol: Trading-pair symbol, e.g. ``"BTCUSD.BKKT"``
+
+        Returns:
+            Awaitable resolving to :class:`USCryptoOverview`
         """
         ...
 
@@ -5641,36 +5683,6 @@ class OrderTag:
         Grey Order
         """
 
-    class MarginCall(OrderTag):
-        """
-        Force Selling
-        """
-
-    class Offline(OrderTag):
-        """
-        OTC
-        """
-
-    class Creditor(OrderTag):
-        """
-        Option Exercise Long
-        """
-
-    class Debtor(OrderTag):
-        """
-        Option Exercise Short
-        """
-
-    class NonExercise(OrderTag):
-        """
-        Wavier Of Option Exercise
-        """
-
-    class AllocatedSub(OrderTag):
-        """
-        Trade Allocation
-        """
-
 class TriggerStatus:
     """
     Trigger status
@@ -5729,6 +5741,21 @@ class Execution:
     price: Decimal
     """
     Executed price
+    """
+
+class AllExecutionsResponse:
+    """
+    Response for get all executions request
+    """
+
+    has_more: bool
+    """
+    Has more records
+    """
+
+    trades: List[Execution]
+    """
+    Execution list
     """
 
 class PushOrderChanged:
@@ -5911,6 +5938,190 @@ class OutsideRTH:
         Overnight
         """
 
+    class OptionPreMarket(OutsideRTH):
+        """
+        Overnight option
+        """
+
+class AttachedOrderType:
+    """
+    Attached order type
+    """
+
+    class Unknown(AttachedOrderType):
+        """
+        Unknown
+        """
+
+    class ProfitTaker(AttachedOrderType):
+        """
+        Take profit
+        """
+
+    class StopLoss(AttachedOrderType):
+        """
+        Stop loss
+        """
+
+    class Bracket(AttachedOrderType):
+        """
+        Bracket order
+        """
+
+class AttachedOrderDetail:
+    """
+    Attached order detail
+    """
+
+    order_id: str
+    """
+    Order ID
+    """
+
+    attached_type_display: Type[AttachedOrderType]
+    """
+    Attached type display (1=take-profit, 2=stop-loss)
+    """
+
+    trigger_price: Optional[Decimal]
+    """
+    Trigger price
+    """
+
+    quantity: Decimal
+    """
+    Quantity
+    """
+
+    executed_qty: Decimal
+    """
+    Executed quantity
+    """
+
+    status: Type[OrderStatus]
+    """
+    Order status
+    """
+
+    updated_at: datetime
+    """
+    Last updated time
+    """
+
+    withdrawn: bool
+    """
+    Withdrawn
+    """
+
+    gtd: Optional[date]
+    """
+    Good till date
+    """
+
+    time_in_force: Type[TimeInForceType]
+    """
+    Time in force type
+    """
+
+    counter_id: str
+    """
+    Counter ID
+    """
+
+    trigger_status: Optional[Type[TriggerStatus]]
+    """
+    Trigger status
+    """
+
+    executed_amount: Decimal
+    """
+    Executed amount
+    """
+
+    tag: Type[OrderTag]
+    """
+    Tag
+    """
+
+    submitted_at: datetime
+    """
+    Submitted time
+    """
+
+    executed_price: Optional[Decimal]
+    """
+    Executed price
+    """
+
+    force_only_rth: Optional[Type[OutsideRTH]]
+    """
+    Enable or disable outside regular trading hours (force only)
+    """
+
+    reviewed: bool
+    """
+    Reviewed
+    """
+
+    activate_order_type: Type[OrderType]
+    """
+    Activate order type
+    """
+
+    activate_rth: Optional[Type[OutsideRTH]]
+    """
+    Activate RTH
+    """
+
+    submit_price: Optional[Decimal]
+    """
+    Submit price
+    """
+
+class SubmitAttachedParams:
+    """
+    Submit attached order parameters
+    """
+
+    def __init__(
+        self,
+        attached_order_type: Type[AttachedOrderType],
+        *,
+        profit_taker_price: Optional[Decimal] = None,
+        stop_loss_price: Optional[Decimal] = None,
+        time_in_force: Optional[Type[TimeInForceType]] = None,
+        expire_time: Optional[int] = None,
+        activate_order_type: Optional[Type[OrderType]] = None,
+        profit_taker_submit_price: Optional[Decimal] = None,
+        stop_loss_submit_price: Optional[Decimal] = None,
+        activate_rth: Optional[Type[OutsideRTH]] = None,
+    ) -> None: ...
+
+class ReplaceAttachedParams:
+    """
+    Replace attached order parameters
+    """
+
+    def __init__(
+        self,
+        attached_order_type: Type[AttachedOrderType],
+        *,
+        profit_taker_price: Optional[Decimal] = None,
+        stop_loss_price: Optional[Decimal] = None,
+        time_in_force: Optional[Type[TimeInForceType]] = None,
+        expire_time: Optional[int] = None,
+        activate_order_type: Optional[Type[OrderType]] = None,
+        profit_taker_submit_price: Optional[Decimal] = None,
+        stop_loss_submit_price: Optional[Decimal] = None,
+        activate_rth: Optional[Type[OutsideRTH]] = None,
+        profit_taker_id: Optional[int] = None,
+        stop_loss_id: Optional[int] = None,
+        cancel_all_attached: Optional[bool] = None,
+        main_id: Optional[int] = None,
+        quantity: Optional[Decimal] = None,
+        market_price: Optional[Decimal] = None,
+    ) -> None: ...
+
 class Order:
     """
     Order
@@ -6059,6 +6270,11 @@ class Order:
     remark: str
     """
     Remark
+    """
+
+    attached_orders: List[AttachedOrderDetail]
+    """
+    Attached orders
     """
 
 class CommissionFreeStatus:
@@ -6436,9 +6652,14 @@ class OrderDetail:
     Order history details
     """
 
-    charge_detail: OrderChargeDetail
+    charge_detail: Optional[OrderChargeDetail]
     """
     Order charges
+    """
+
+    attached_orders: List[AttachedOrderDetail]
+    """
+    Attached orders
     """
 
 class SubmitOrderResponse:
@@ -6935,6 +7156,16 @@ class TradeContext:
                 print(resp)
         """
 
+    # TODO: temporarily disabled — restore when API is available
+    # def all_executions(
+    #     self,
+    #     symbol: Optional[str] = None,
+    #     order_id: Optional[str] = None,
+    #     start_at: Optional[datetime] = None,
+    #     end_at: Optional[datetime] = None,
+    #     page: Optional[int] = None,
+    # ) -> AllExecutionsResponse: ...
+
     def history_orders(
         self,
         symbol: Optional[str] = None,
@@ -6988,6 +7219,7 @@ class TradeContext:
         side: Optional[Type[OrderSide]] = None,
         market: Optional[Type[Market]] = None,
         order_id: Optional[str] = None,
+        is_attached: bool = False,
     ) -> List[Order]:
         """
         Get today orders
@@ -6998,6 +7230,7 @@ class TradeContext:
             side: Filter by order side
             market: Filter by market type
             order_id: Filter by order id
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Returns:
             Order list
@@ -7035,6 +7268,7 @@ class TradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        attached_params: Optional[ReplaceAttachedParams] = None,
     ) -> None:
         """
         Replace order
@@ -7088,6 +7322,8 @@ class TradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
+        attached_params: Optional[SubmitAttachedParams] = None,
     ) -> SubmitOrderResponse:
         """
         Submit order
@@ -7109,6 +7345,8 @@ class TradeContext:
             trigger_count: Trigger count
             monitor_price: Monitor price
             remark: Remark (Maximum 64 characters)
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            attached_params: Attached order parameters
 
         Returns:
             Response
@@ -7137,12 +7375,13 @@ class TradeContext:
                 print(resp)
         """
 
-    def cancel_order(self, order_id: str) -> None:
+    def cancel_order(self, order_id: str, is_attached: bool = False) -> None:
         """
         Cancel order
 
         Args:
             order_id: Order ID
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Examples:
             ::
@@ -7304,12 +7543,13 @@ class TradeContext:
                 print(resp)
         """
 
-    def order_detail(self, order_id: str) -> OrderDetail:
+    def order_detail(self, order_id: str, is_attached: bool = False) -> OrderDetail:
         """
         Get order detail
 
         Args:
             order_id: Order id
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Returns:
             Order detail
@@ -7372,6 +7612,65 @@ class TradeContext:
                 )
                 print(resp)
         """
+
+    def us_query_orders(
+        self,
+        symbol: Optional[str] = None,
+        action: int = 0,
+        start_at: int = 0,
+        end_at: int = 0,
+        query_type: int = 0,
+        page: int = 1,
+        limit: int = 20,
+    ) -> str:
+        """Query US order list (paginated). Returns JSON string. US token required.
+
+        Args:
+            symbol: Optional symbol filter, e.g. ``"AAPL.US"``
+            action: Direction filter: 0=all, 1=buy, 2=sell
+            start_at: Start timestamp (unix seconds); 0 = last 90 days
+            end_at: End timestamp (unix seconds); 0 = now
+            query_type: 0=all (incl. Rejected), 1=pending, 2=history (filled only)
+            page: Page number, 1-based
+            limit: Page size
+
+        Returns:
+            JSON string with order list
+        """
+        ...
+
+    def us_order_detail(self, order_id: str) -> "USOrderDetailResponse":
+        """Get US order detail. US token required.
+
+        Args:
+            order_id: Order ID
+
+        Returns:
+            :class:`USOrderDetailResponse`
+        """
+        ...
+
+    def us_asset_overview(self) -> "USAssetOverview":
+        """Get US account asset overview. US token required.
+
+        Returns:
+            :class:`USAssetOverview` with stock, option, and crypto positions
+            plus purchasing power
+        """
+        ...
+
+    def us_realized_pl(self, currency: str, category: Optional[str] = None) -> "USRealizedPL":
+        """Get realized P&L for the US account. US token required.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``)
+            category: Asset category filter: ``"ALL"``, ``"STOCK"``,
+                ``"OPTION"``, or ``"CRYPTO"``; ``None`` for all
+
+        Returns:
+            :class:`USRealizedPL`
+        """
+        ...
 
 class AsyncTradeContext:
     """
@@ -7562,6 +7861,16 @@ class AsyncTradeContext:
         """
         ...
 
+    # TODO: temporarily disabled — restore when API is available
+    # def all_executions(
+    #     self,
+    #     symbol: Optional[str] = None,
+    #     order_id: Optional[str] = None,
+    #     start_at: Optional[datetime] = None,
+    #     end_at: Optional[datetime] = None,
+    #     page: Optional[int] = None,
+    # ) -> Awaitable[AllExecutionsResponse]: ...
+
     def history_orders(
         self,
         symbol: Optional[str] = None,
@@ -7622,6 +7931,7 @@ class AsyncTradeContext:
         side: Optional[Type[OrderSide]] = None,
         market: Optional[Type[Market]] = None,
         order_id: Optional[str] = None,
+        is_attached: bool = False,
     ) -> Awaitable[List[Order]]:
         """
         Get today orders with optional filters. Returns an awaitable that resolves to order list.
@@ -7632,6 +7942,7 @@ class AsyncTradeContext:
             side: Filter by order side.
             market: Filter by market type.
             order_id: Filter by order ID.
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id.
 
         Examples:
             ::
@@ -7676,6 +7987,7 @@ class AsyncTradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        attached_params: Optional[ReplaceAttachedParams] = None,
     ) -> Awaitable[None]:
         """
         Replace order. Returns an awaitable. Same parameters as sync TradeContext.replace_order.
@@ -7692,6 +8004,7 @@ class AsyncTradeContext:
             trigger_count: Trigger count.
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
+            attached_params: Attached order parameters.
 
         Examples:
             ::
@@ -7734,6 +8047,8 @@ class AsyncTradeContext:
         trigger_count: Optional[int] = None,
         monitor_price: Optional[Decimal] = None,
         remark: Optional[str] = None,
+        client_request_id: Optional[str] = None,
+        attached_params: Optional[SubmitAttachedParams] = None,
     ) -> Awaitable[SubmitOrderResponse]:
         """
         Submit order. Returns an awaitable that resolves to SubmitOrderResponse. Same parameters as sync TradeContext.submit_order.
@@ -7755,6 +8070,8 @@ class AsyncTradeContext:
             trigger_count: Trigger count.
             monitor_price: Monitor price.
             remark: Remark (max 64 characters).
+            client_request_id: Idempotent request ID. If not specified, idempotency control is skipped. The server caches this ID for 10 minutes to prevent duplicate orders.
+            attached_params: Attached order parameters.
 
         Examples:
             ::
@@ -7790,12 +8107,13 @@ class AsyncTradeContext:
         """
         ...
 
-    def cancel_order(self, order_id: str) -> Awaitable[None]:
+    def cancel_order(self, order_id: str, is_attached: bool = False) -> Awaitable[None]:
         """
         Cancel order by order_id. Returns an awaitable.
 
         Args:
             order_id: Order ID.
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id
 
         Examples:
             ::
@@ -7968,12 +8286,13 @@ class AsyncTradeContext:
         """
         ...
 
-    def order_detail(self, order_id: str) -> Awaitable[OrderDetail]:
+    def order_detail(self, order_id: str, is_attached: bool = False) -> Awaitable[OrderDetail]:
         """
         Get order detail by order_id. Returns an awaitable that resolves to order detail.
 
         Args:
             order_id: Order ID.
+            is_attached: When set together with order_id, indicates that order_id is an attached sub-order ID. The server will look up using the attached order ID instead of treating it as a regular order ID. Has no effect without order_id.
 
         Examples:
             ::
@@ -8036,6 +8355,64 @@ class AsyncTradeContext:
                     print(resp)
 
                 asyncio.run(main())
+        """
+        ...
+
+    def us_query_orders(
+        self,
+        symbol: Optional[str] = None,
+        action: int = 0,
+        start_at: int = 0,
+        end_at: int = 0,
+        query_type: int = 0,
+        page: int = 1,
+        limit: int = 20,
+    ) -> "Awaitable[str]":
+        """Query US order list (paginated). Returns awaitable JSON string. US token required.
+
+        Args:
+            symbol: Optional symbol filter, e.g. ``"AAPL.US"``
+            action: Direction filter: 0=all, 1=buy, 2=sell
+            start_at: Start timestamp (unix seconds); 0 = last 90 days
+            end_at: End timestamp (unix seconds); 0 = now
+            query_type: 0=all (incl. Rejected), 1=pending, 2=history (filled only)
+            page: Page number, 1-based
+            limit: Page size
+
+        Returns:
+            Awaitable resolving to JSON string with order list
+        """
+        ...
+
+    def us_order_detail(self, order_id: str) -> "Awaitable[USOrderDetailResponse]":
+        """Get US order detail (async). US token required.
+
+        Args:
+            order_id: Order ID
+
+        Returns:
+            Awaitable[:class:`USOrderDetailResponse`]
+        """
+        ...
+
+    def us_asset_overview(self) -> "Awaitable[USAssetOverview]":
+        """Get US account asset overview. US token required. Returns awaitable.
+
+        Returns:
+            Awaitable resolving to :class:`USAssetOverview`
+        """
+        ...
+
+    def us_realized_pl(self, currency: str, category: Optional[str] = None) -> "Awaitable[USRealizedPL]":
+        """Get realized P&L for the US account. US token required. Returns awaitable.
+
+        Args:
+            currency: Currency (e.g. ``"USD"``)
+            category: Asset category filter: ``"ALL"``, ``"STOCK"``,
+                ``"OPTION"``, or ``"CRYPTO"``; ``None`` for all
+
+        Returns:
+            Awaitable resolving to :class:`USRealizedPL`
         """
         ...
 
@@ -9439,8 +9816,8 @@ class Professional:
 class ExecutiveGroup:
     """Executives for one security."""
 
-    symbol: str
-    """Security symbol"""
+    symbol: Optional[str]
+    """Security symbol (``None`` when the server omits it)"""
     forward_url: str
     """Link to company wiki page"""
     total: int
@@ -9726,16 +10103,16 @@ class StockRatings:
     """Scale display name"""
     report_period_txt: str
     """Report period display text"""
-    multi_score: str
-    """Composite score (string representation)"""
+    multi_score: Optional[float]
+    """Composite score (``None`` when not rated)"""
     multi_letter: str
     """Composite score letter grade"""
     multi_score_change: int
     """Score change vs previous period"""
     industry_name: str
     """Industry name"""
-    industry_rank: int
-    """Industry rank"""
+    industry_rank: Optional[int]
+    """Industry rank (``None`` when unavailable)"""
     ratings_json: str
     """Full ratings array as a JSON string"""
 
@@ -10011,6 +10388,224 @@ class FundamentalContext:
 
         Returns:
             :class:`MacroeconomicResponse`
+        """
+        ...
+
+    def us_company_overview(self, symbol: str) -> "USCompanyOverview":
+        """Get US company overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`USCompanyOverview`
+        """
+        ...
+
+    def us_valuation_overview(self, symbol: str) -> "USValuationOverview":
+        """Get US valuation overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`USValuationOverview`
+        """
+        ...
+
+    def us_financial_overview(self, symbol: str, report: str) -> "USFinancialOverview":
+        """Get US financial overview (revenue, net income, EPS, cash flow). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            :class:`USFinancialOverview`
+        """
+        ...
+
+    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "USFinancialStatement":
+        """Get US financial statement detail (IS/BS/CF). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            :class:`USFinancialStatement`
+        """
+        ...
+
+    def us_key_financial_metrics(self, symbol: str, report: str) -> "USKeyFinancialMetrics":
+        """Get US key financial metrics (ROE, margins, debt ratio). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            :class:`USKeyFinancialMetrics`
+        """
+        ...
+
+    def us_analyst_consensus(self, symbol: str, report: str) -> "USAnalystConsensus":
+        """Get US analyst consensus estimates (EPS, revenue forecasts). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            :class:`USAnalystConsensus`
+        """
+        ...
+
+    def us_etf_dividend_info(self, symbol: str) -> "USETFDividendInfo":
+        """Get US ETF dividend history. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+
+        Returns:
+            :class:`USETFDividendInfo`
+        """
+        ...
+
+    def us_company_dividends(self, symbol: str) -> "USCompanyDividends":
+        """Get US company historical dividends. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            :class:`USCompanyDividends`
+        """
+        ...
+
+    def us_etf_files(self, symbol: str, size: Optional[int] = None) -> "USETFFilesResponse":
+        """Get US ETF document list. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+            size: Number of files to return; ``None`` returns all
+
+        Returns:
+            :class:`USETFFilesResponse`
+        """
+        ...
+
+
+class AsyncFundamentalContext:
+    """Async fundamental data context for use with asyncio. All I/O methods return awaitables."""
+
+    def __init__(self, config: "Config") -> None:
+        """Create an AsyncFundamentalContext."""
+        ...
+
+    def us_company_overview(self, symbol: str) -> "Awaitable[USCompanyOverview]":
+        """Get US company overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USCompanyOverview`]
+        """
+        ...
+
+    def us_valuation_overview(self, symbol: str) -> "Awaitable[USValuationOverview]":
+        """Get US valuation overview. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USValuationOverview`]
+        """
+        ...
+
+    def us_financial_overview(self, symbol: str, report: str) -> "Awaitable[USFinancialOverview]":
+        """Get US financial overview (revenue, net income, EPS, cash flow). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: ``"annual"`` or ``"quarterly"``
+
+        Returns:
+            Awaitable[:class:`USFinancialOverview`]
+        """
+        ...
+
+    def us_financial_statement(self, symbol: str, kind: str, report: str) -> "Awaitable[USFinancialStatement]":
+        """Get US financial statement detail (IS/BS/CF). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            kind: Statement kind: ``"IS"`` (income), ``"BS"`` (balance sheet), ``"CF"`` (cash flow)
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            Awaitable[:class:`USFinancialStatement`]
+        """
+        ...
+
+    def us_key_financial_metrics(self, symbol: str, report: str) -> "Awaitable[USKeyFinancialMetrics]":
+        """Get US key financial metrics (ROE, margins, debt ratio). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            Awaitable[:class:`USKeyFinancialMetrics`]
+        """
+        ...
+
+    def us_analyst_consensus(self, symbol: str, report: str) -> "Awaitable[USAnalystConsensus]":
+        """Get US analyst consensus estimates (EPS, revenue forecasts). US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+            report: Period: ``"q1"`` (Q1), ``"qf"`` (quarterly), ``"saf"`` (semi-annual), ``"3q"`` (Q3), ``"af"`` (annual)
+
+        Returns:
+            Awaitable[:class:`USAnalystConsensus`]
+        """
+        ...
+
+    def us_etf_dividend_info(self, symbol: str) -> "Awaitable[USETFDividendInfo]":
+        """Get US ETF dividend history. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+
+        Returns:
+            Awaitable[:class:`USETFDividendInfo`]
+        """
+        ...
+
+    def us_company_dividends(self, symbol: str) -> "Awaitable[USCompanyDividends]":
+        """Get US company historical dividends. US token required.
+
+        Args:
+            symbol: Symbol, e.g. ``"AAPL.US"``
+
+        Returns:
+            Awaitable[:class:`USCompanyDividends`]
+        """
+        ...
+
+    def us_etf_files(self, symbol: str, size: Optional[int] = None) -> "Awaitable[USETFFilesResponse]":
+        """Get US ETF document list. US token required.
+
+        Args:
+            symbol: ETF symbol, e.g. ``"SPY.US"``
+            size: Number of files to return; ``None`` returns all
+
+        Returns:
+            Awaitable[:class:`USETFFilesResponse`]
         """
         ...
 
@@ -10631,7 +11226,7 @@ class MarketContext:
         Get all available rank category keys and labels.
 
         Returns:
-            :class:`RankCategoriesResponse` with raw JSON data
+            :class:`RankCategoriesResponse` with typed categories
         """
         ...
 
@@ -10696,15 +11291,37 @@ class TopMoversResponse:
 
     events: List[TopMoversEvent]
     """Top-mover events"""
-    next_params: object
-    """Pagination cursor for next page (raw JSON object)"""
+    next_params: str
+    """Pagination cursor for next page (empty string means no more pages)"""
+
+
+class RankSubCategory:
+    """One leaf rank sub-category."""
+
+    key: str
+    """Sub-category key (e.g. ``"hot_all-us"``). Pass to :meth:`MarketContext.rank_list`."""
+    name: str
+    """Display name (e.g. ``"美股总热度"``)"""
+    market: str
+    """Market code (e.g. ``"US"``, ``"HK"``)"""
+
+
+class RankCategory:
+    """A top-level rank category grouping sub-categories."""
+
+    key: str
+    """Top-level key (e.g. ``"hot"``)"""
+    name: str
+    """Display name (e.g. ``"热度排行"``)"""
+    sub_categories: List[RankSubCategory]
+    """Sub-categories"""
 
 
 class RankCategoriesResponse:
-    """Rank categories response. ``data`` is a Python dict/list from JSON."""
+    """Rank categories response."""
 
-    data: object
-    """Raw rank categories data (JSON object / list)"""
+    categories: List[RankCategory]
+    """All top-level rank categories"""
 
 
 class RankListItem:
@@ -11429,8 +12046,8 @@ class FlowItem:
 
     executed_date: str
     """Execution date string, e.g. ``"2024-01-15"``"""
-    executed_timestamp: str
-    """Execution timestamp (string representation)"""
+    executed_timestamp: Optional[str]
+    """Execution timestamp as a Unix-seconds string (``None`` when not yet executed)"""
     code: str
     """Security code / ticker"""
     direction: FlowDirection
@@ -11456,6 +12073,15 @@ class ProfitAnalysisFlows:
 
 # ── AlertContext ──────────────────────────────────────────────────
 
+class AlertValueMap:
+    """Trigger value of a price alert (exactly one field is populated)."""
+
+    price: Optional[Decimal]
+    """Absolute price threshold, e.g. ``500``"""
+    chg: Optional[float]
+    """Percentage-change threshold, e.g. ``5``"""
+
+
 class AlertItem:
     """One price alert."""
 
@@ -11473,6 +12099,8 @@ class AlertItem:
     """Display text, e.g. ``"价格涨到 600"``"""
     state: list[int]
     """Trigger state flags"""
+    value_map: AlertValueMap
+    """Trigger value, e.g. ``{"price":"500"}`` or ``{"chg":"5"}``"""
 
 
 class AlertSymbolGroup:
@@ -12125,7 +12753,7 @@ class OptionVolumeStats:
     """Real-time option call/put volume response."""
 
     symbol: str
-    """Security symbol"""
+    """Underlying security symbol"""
     call_volume: int
     """Total call volume"""
     put_volume: int
@@ -12161,6 +12789,1671 @@ class OptionVolumeDaily:
     """Daily historical option volume response."""
 
     symbol: str
-    """Security symbol"""
-    stats: List[OptionVolumeDailyStat]
-    """Daily option volume statistics"""
+    """Underlying security symbol"""
+    stats: list[OptionVolumeDailyStat]
+    """Daily option volume records"""
+
+
+# ── US-market API types ────────────────────────────────────────────
+
+class USCryptoOverview:
+    """US cryptocurrency market overview. Returned by QuoteContext.us_crypto_overview."""
+
+    symbol: str
+    """User-facing trading-pair symbol, e.g. ``"BTCUSD.BKKT"``"""
+    name: str
+    """Cryptocurrency full name"""
+    ticker: str
+    """Ticker / pair code, e.g. ``"BTCUSD"``"""
+    base_asset: str
+    """Base asset code, e.g. ``"BTC"``"""
+    currency: str
+    """Quote currency"""
+    all_time_high: str
+    """All-time high price"""
+    all_time_high_date: str
+    """All-time high date"""
+    all_time_low: str
+    """All-time low price"""
+    all_time_low_date: str
+    """All-time low date"""
+    ipo_date: str
+    """IPO / genesis date"""
+    issue_price: str
+    """Issue price"""
+    shares: str
+    """Total supply"""
+    official_web_address: str
+    """Official website URL"""
+    logo: str
+    """Logo image URL"""
+    wiki_url: str
+    """In-app wiki URL"""
+    profile: str
+    """Extended profile as JSON string"""
+
+
+class USReportPeriod:
+    """One reporting period window."""
+    start_date: str
+    end_date: str
+    report_txt: str
+
+class USFinancialISItem:
+    """One income-statement entry."""
+    revenue: str
+    net_income: str
+    net_margin: str
+    report: "USReportPeriod"
+
+class USFinancialBSItem:
+    """One balance-sheet entry."""
+    debt_assets_ratio: str
+    total_assets: str
+    total_liabilities: str
+    report: "USReportPeriod"
+
+class USFinancialCFItem:
+    """One cash-flow entry."""
+    operating: str
+    investing: str
+    financing: str
+    report: "USReportPeriod"
+
+class USFinancialOverview:
+    """US financial overview (IS + BS + CF by period)."""
+    ccy_symbol: str
+    report_type: str
+    is_list: List["USFinancialISItem"]
+    bs_list: List["USFinancialBSItem"]
+    cf_list: List["USFinancialCFItem"]
+
+class USKeyMetricItem:
+    """One period entry in key financial metrics."""
+    ff_period: str
+    ff_year: int
+    fp_end: str
+    report_txt: str
+    rpt_date: str
+    fields: List[Any]
+
+class USKeyFinancialMetrics:
+    """US key financial metrics (ROE, margins, debt ratio) by period."""
+    currency: str
+    report: str
+    empty_fields: List[str]
+    list: List["USKeyMetricItem"]
+
+class USAIChatData:
+    """AI chat context in analyst consensus."""
+    agent_id: str
+    handoff_agent_id: str
+    symbol: str
+    text: str
+    chat_type: str
+    workflow_type: str
+
+class USConsensusEstimate:
+    """Actual vs estimated value for one consensus metric."""
+    actual: str
+    estimate: str
+
+
+class USConsensusItem:
+    """One fiscal-year entry in USAnalystConsensus.list."""
+    ebit: "USConsensusEstimate"
+    eps: "USConsensusEstimate"
+    fiscal_year: int
+    report_txt: str
+    revenue: "USConsensusEstimate"
+
+
+class USAnalystConsensus:
+    """US analyst consensus estimates and AI analysis."""
+    ai_summary: str
+    aichat_data: "USAIChatData"
+    currency: str
+    report: str
+    list: List["USConsensusItem"]
+    opt_reports: List[str]
+    h5_data: Any
+
+
+class USCashEntry:
+    """One cash currency entry in USAssetOverview."""
+
+    currency: str
+    """Currency code, e.g. ``"USD"``"""
+    frozen_buy_cash: str
+    """Cash frozen for pending buy orders"""
+    outstanding: str
+    """Unsettled cash (positive = receivable, negative = payable)"""
+    settled_cash: str
+    """Settled cash balance"""
+    total_amount: str
+    """Total cash amount"""
+    total_cash: str
+    """Total available cash"""
+
+
+class USCryptoEntry:
+    """One cryptocurrency holding in USAssetOverview."""
+
+    asset_type: str
+    """Asset type, e.g. ``"CRYPTO"``"""
+    average_cost: str
+    """Average cost price"""
+    symbol: str
+    """Symbol"""
+    currency: str
+    """Settlement currency"""
+    industry_counter_id: str
+    """Industry counter_id"""
+    industry_name: str
+    """Industry name"""
+
+
+class USStockEntry:
+    """One stock/equity position in USAssetOverview."""
+
+    symbol: str
+    """Ticker code, e.g. ``"AAPL"``"""
+    full_symbol: str
+    """Qualified symbol, e.g. ``"AAPL.US"``"""
+    asset_type: str
+    quantity: str
+    currency: str
+    average_cost: str
+    market: str
+    trade_status: str
+    prev_close: str
+    last_done: str
+    market_price: str
+    pretrade_close: str
+    stock_invest_of_today: str
+    today_pl: str
+    pretrade_stock_invest_of_today: str
+    pretrade_today_pl: str
+    night_last_done: str
+    night_prev_close: str
+    position_side: str
+    open_position_time: str
+    name: str
+    industry_counter_id: str
+    industry_name: str
+
+
+class USAssetOverview:
+    """US account asset snapshot. Returned by TradeContext.us_asset_overview."""
+
+    account_type: str
+    """Account type code"""
+    asset_timestamp: int
+    """Snapshot timestamp (Unix seconds)"""
+    cash_buy_power: str
+    """Available cash buying power"""
+    overnight_buy_power: str
+    """Overnight buying power"""
+    currency: str
+    """Account currency"""
+    cash_list: List[USCashEntry]
+    """Cash balances by currency"""
+    stock_list: List["USStockEntry"]
+    """Stock/equity positions"""
+    option_list: List[Any]
+    """Option positions"""
+    crypto_list: List[USCryptoEntry]
+    """Cryptocurrency positions"""
+
+
+class USRealizedPLMetric:
+    """One time-period metric within a USRealizedPLEntry."""
+
+    amount: str
+    """Realized P&L amount"""
+    period: int
+    """Period code (server-defined)"""
+    rate: str
+    """Realized P&L rate"""
+
+
+class USRealizedPLEntry:
+    """One asset-category entry in USRealizedPL. category: 0=all, 1=stock, 2=option, 3=crypto."""
+
+    category: int
+    """Asset category code"""
+    currency: str
+    """Currency"""
+    metrics: List[USRealizedPLMetric]
+    """Time-period metrics"""
+
+
+class USRealizedPL:
+    """Realized P&L response for a US account. Returned by TradeContext.us_realized_pl."""
+
+    realized_pl_list: List[USRealizedPLEntry]
+    """Per-category realized P&L entries"""
+
+
+class USOrderHistory:
+    """One order state-transition entry within USOrderDetail."""
+    exec_type: int
+    status: str
+    price: str
+    qty: str
+    time: str
+    msg: str
+    is_manually: bool
+    opp_party_id: str
+    trd_match_id: str
+    operator: str
+    op_entrust_way: str
+    cxl_rej_response_to: int
+    withdrawal_reason: str
+    opp_name: str
+    exec_id: str
+
+
+class USButtonControl:
+    """Action-button state for an order."""
+    withdraw: int
+    replace: int
+    exceptionable: List[str]
+
+
+class USChargeItem:
+    """One fee category within USChargeDetail."""
+    code: int
+    name: str
+    fees: List[str]
+
+
+class USChargeDetail:
+    """Fee breakdown for an order."""
+    currency: str
+    total_amount: str
+    items: List["USChargeItem"]
+
+
+class USAttachedOrder:
+    """One bracket/conditional sub-order attached to a main order."""
+    attached_type_display: int
+    executed_qty: str
+    quantity: str
+    status: str
+    trigger_price: str
+    order_id: str
+    gtd: str
+    time_in_force: int
+    tag: int
+    activate_order_type: str
+    activate_rth: int
+    submit_price: str
+    symbol: str
+    withdrawn: bool
+
+
+class USOrderDetail:
+    """Full typed order object within USOrderDetailResponse."""
+    id: str
+    aaid: str
+    account_channel: str
+    action: int
+    symbol: str
+    underlying_symbol: str
+    security_type: str
+    name: str
+    currency: str
+    trade_currency: str
+    order_type: str
+    status: str
+    price: str
+    quantity: str
+    executed_qty: str
+    executed_price: str
+    executed_amount: str
+    operate_direction: str
+    time_in_force: int
+    gtd: str
+    tag: int
+    msg: str
+    force_only_rth: int
+    submitted_at: str
+    done_at: str
+    trigger_price: str
+    trigger_at: str
+    trigger_status: int
+    trigger_exchange: str
+    trigger_last_done: str
+    trigger_count: int
+    tailing_amount: str
+    tailing_percent: str
+    limit_offset: str
+    limit_depth_level: int
+    market_price: str
+    submitted_amount: str
+    estimated_fee: str
+    free_status: int
+    free_amount: str
+    free_currency: str
+    deductions_status: int
+    deductions_amount: str
+    deductions_currency: str
+    platform_deductions_status: int
+    platform_deductions_amount: str
+    platform_deductions_currency: str
+    display_account: str
+    settlement_account: str
+    settlement_channel: str
+    customer_name: str
+    real_name: str
+    en_name: str
+    joint_real_name: str
+    joint_en_name: str
+    org_id: str
+    bcan: str
+    op_entrust_way: int
+    op_entrust_way_name: str
+    remark: str
+    notice: str
+    short_sell_type: int
+    ploy_type: str
+    ploy_id: str
+    ploy_status: str
+    trend: int
+    withdrawal_reason: str
+    activate_order_type: str
+    activate_rth: int
+    submit_price: str
+    contract_direction: str
+    strike_price: str
+    contract_size: str
+    monitor_price: str
+    button_control: "USButtonControl"
+    charge_detail: Optional["USChargeDetail"]
+    attached_orders: List["USAttachedOrder"]
+    order_histories: List["USOrderHistory"]
+
+
+class USOrderDetailResponse:
+    """Response for TradeContext.us_order_detail."""
+    order: Optional["USOrderDetail"]
+    current_attached_order: Optional["USOrderDetail"]
+    current_millisecond: str
+
+
+class USRankTag:
+    """A rank tag entry for a US company overview."""
+
+    key: str
+    location: int
+    title: str
+    text: str
+    rank_type: int
+    highlight_text: str
+
+
+class USSharelistItem:
+    """One entry in USCompanyOverview.share_list."""
+    chg: str
+    id: str
+    name: str
+
+
+class USCompanyOverview:
+    """US company overview. Returned by FundamentalContext.us_company_overview."""
+
+    intro: str
+    market_cap: str
+    ccy_symbol: str
+    top_rank_tags: List[USRankTag]
+    detail_url: str
+    share_list: List["USSharelistItem"]
+
+
+class USValuationMetric:
+    """One valuation metric in USValuationOverview.metrics (e.g. key="pe")."""
+
+    circle: str
+    part: str
+    metric: str
+    desc: str
+    industry_median: str
+
+
+class USValuationOverview:
+    """US valuation overview. Returned by FundamentalContext.us_valuation_overview."""
+
+    metrics: Dict[str, "USValuationMetric"]
+    """Map of metric key (e.g. ``"pe"``) to :class:`USValuationMetric`"""
+    indicator: str
+    range: int
+    date: str
+    ccy_symbol: str
+    aichat_data: "USAIChatData"
+    ai_summary: str
+
+
+class USFinancialStatementField:
+    """One financial line item within a USFinancialStatementPeriod."""
+
+    display_order: int
+    field: str
+    id: str
+    level: int
+    name: str
+    value: str
+    value_type: str
+    yoy: str
+
+
+class USFinancialStatementPeriod:
+    """One reporting period in USFinancialStatement."""
+
+    ff_period: str
+    ff_year: int
+    fields: List["USFinancialStatementField"]
+    fp_end: str
+    report_txt: str
+    rpt_date: str
+
+
+class USFinancialStatement:
+    """US financial statement (IS/BS/CF). Returned by FundamentalContext.us_financial_statement."""
+
+    currency: str
+    report: str
+    list: List["USFinancialStatementPeriod"]
+    empty_fields: List[str]
+    """Currency"""
+
+
+class USFiscalYearDividend:
+    """Per-fiscal-year dividend row for a US ETF."""
+
+    dividend: str
+    dividend_yield: str
+    fiscal_year: str
+    currency: str
+    fiscal_year_range: str
+
+
+class USETFDividendInfo:
+    """US ETF dividend history. Returned by FundamentalContext.us_etf_dividend_info."""
+
+    dividend_ttm: str
+    """TTM dividend per share"""
+    dividend_yield_ttm: str
+    """TTM dividend yield"""
+    dividend_frequency: str
+    """Distribution frequency"""
+    currency: str
+    """Currency"""
+    fiscal_year_info: List["USFiscalYearDividend"]
+    """Per-fiscal-year dividend records"""
+
+
+class USDividendItem:
+    """A single US dividend payment record."""
+
+    dividend: str
+    """Dividend per share"""
+    dividend_type: str
+    """Dividend type"""
+    ex_date: str
+    """Ex-dividend date"""
+    payment_date: str
+    """Payment date"""
+    record_date: str
+    """Record date"""
+
+
+class USRecentDividend:
+    """Trailing-12-month dividend summary."""
+
+    dividend_ttm: str
+    dividend_yield_ttm: str
+    payouts: str
+    currency: str
+
+
+class USDividendHistoryItem:
+    """One fiscal-year row in dividend_history or payout_ratios."""
+
+    fiscal_year: str
+    fiscal_year_range: str
+    total_shareholder_yield: str
+    dividend: str
+    dividend_yield: str
+    dividend_growth_rate: str
+    dividend_payout_ratio: str
+    dividend_to_cashflow_ratio: str
+    net_buyback: str
+    net_buyback_yield: str
+    net_buyback_growth_rate: str
+    net_buyback_payout_ratio: str
+    net_buyback_to_cashflow_ratio: str
+    currency: str
+
+
+class USDividendPayoutRecord:
+    """One actual dividend payment event."""
+
+    dividend: str
+    dividend_type: str
+    currency: str
+    ex_date: str
+    payment_date: str
+    record_date: str
+    title: str
+    start_time_unix: str
+
+
+class USCompanyDividends:
+    """US company historical dividends. Returned by FundamentalContext.us_company_dividends."""
+
+    recent_dividends: "USRecentDividend"
+    dividend_history: List["USDividendHistoryItem"]
+    payout_ratios: List["USDividendHistoryItem"]
+    dividend_payout_history: List["USDividendPayoutRecord"]
+
+
+class USETFFile:
+    """A single ETF document entry."""
+
+    file_name: str
+    file_path: str
+    update_date: str
+    code: str
+    format: str
+
+
+class USETFFilesResponse:
+    """US ETF document list. Returned by FundamentalContext.us_etf_files."""
+
+    files: List[USETFFile]
+    """Document entries"""
+
+# ── AI Agent ──────────────────────────────────────────────────────
+
+class Workspace:
+    """A Workspace the current account belongs to."""
+
+    id: str
+    """Workspace ID"""
+    name: str
+    """Workspace name"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+
+class WorkspacesResponse:
+    """Response for AgentContext.workspaces / AsyncAgentContext.workspaces."""
+
+    workspaces: list[Workspace]
+    """Workspaces the current account belongs to"""
+
+class Agent:
+    """An Agent in a Workspace."""
+
+    uid: str
+    """Agent UID, used as the ``agent_id`` argument of
+    AgentContext.conversation"""
+    name: str
+    """Agent name"""
+    description: str
+    """Agent description"""
+    mode: str
+    """Agent mode, e.g. ``"chat"``"""
+    icon: str
+    """Icon URL"""
+    is_published: bool
+    """Whether published; only published Agents can start conversations"""
+    published_at: int
+    """Publish time, Unix timestamp in seconds; 0 if unpublished"""
+    created_at: int
+    """Creation time, Unix timestamp in seconds"""
+    updated_at: int
+    """Last updated time, Unix timestamp in seconds"""
+
+class AgentsResponse:
+    """Response for AgentContext.agents / AsyncAgentContext.agents."""
+
+    agents: list[Agent]
+    """Agent list"""
+    total: int
+    """Total number of matching Agents"""
+
+class ConversationStatus:
+    """Final run status of a conversation."""
+
+    class Succeeded(ConversationStatus):
+        """The run completed successfully"""
+
+        ...
+
+    class Interrupted(ConversationStatus):
+        """The run is paused, waiting for AgentContext.continue_conversation"""
+
+        ...
+
+    class Failed(ConversationStatus):
+        """The run failed"""
+
+        ...
+
+    class Stopped(ConversationStatus):
+        """The run was stopped"""
+
+        ...
+
+class Reference:
+    """A source referenced by the answer."""
+
+    index: int
+    """Reference index"""
+    original_index: int
+    """Original index in the source list, before any reranking"""
+    ref_type: str
+    """Reference kind, e.g. ``"NewsArticle"``"""
+    id: str
+    """Reference id"""
+    title: str
+    """Reference title"""
+    url: str
+    """Reference URL"""
+    content: Any | None
+    """Full reference payload as sent by the server. Kept as raw JSON
+    because the field set varies by reference ``ref_type``"""
+
+class QuestionOption:
+    """One option of a Question."""
+
+    label: str
+    """Short UI label for the option"""
+    description: str
+    """Option text"""
+
+class Question:
+    """One question the Agent needs you to answer."""
+
+    question: str
+    """Question text"""
+    options: list[QuestionOption]
+    """Options; empty means free-form answer"""
+    multi_select: bool
+    """Whether multiple options may be selected"""
+
+class HumanInteraction:
+    """A single interaction requested while an Agent workflow is paused."""
+
+    tool_call_id: str
+    """Tool call that requested the interaction"""
+    interrupt_id: str
+    """Stable key expected by the answers map when continuing"""
+    interaction_type: str
+    """Interaction type such as `ask_human` or `trade_password`"""
+    tool_name: str
+    """Human-readable tool name"""
+    questions: list[Question]
+    """Questions and answer options presented to the user"""
+    tool_args: Any
+    """Original tool arguments, retained for host-specific UI rendering"""
+
+class Interrupt:
+    """Present when a conversation run is interrupted, waiting for
+    AgentContext.continue_conversation."""
+
+    node_id: str
+    """ID of the node that triggered the interrupt"""
+    tool_call_id: str
+    """Tool call ID of this inquiry; used as the answer key when continuing"""
+    questions: list[Question]
+    """Questions you need to answer"""
+    interactions: list[HumanInteraction]
+    """Full interaction descriptors used to render and answer the pause"""
+    message_id: int
+    """ID of the paused message"""
+    chat_id: int
+    """ID of the owning conversation"""
+
+class AgentError:
+    """Present when a conversation run failed."""
+
+    code: int
+    """Error code"""
+    message: str
+    """Error message"""
+
+class ConversationResponse:
+    """
+    Response for AgentContext.conversation / AgentContext.continue_conversation,
+    and the final result of the streamed counterparts.
+    """
+
+    chat_uid: str
+    """Conversation identifier, used for follow-up questions and
+    troubleshooting"""
+    message_id: str
+    """Message ID of this round"""
+    status: ConversationStatus
+    """Final run status"""
+    answer: str
+    """Final answer text; valid when status is ConversationStatus.Succeeded"""
+    references: list[Reference] | None
+    """Sources referenced by the answer"""
+    further_questions: list[str] | None
+    """Suggested follow-up questions ("you might also ask")"""
+    elapsed_time: float
+    """Run duration in seconds"""
+    interrupt: Interrupt | None
+    """Present only when status is ConversationStatus.Interrupted"""
+    error: AgentError | None
+    """Present only when the run failed"""
+
+class ChatStartedPayload:
+    """Payload of a ``chat_started`` stream event."""
+
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+    chat_id: int
+    """ID of the owning conversation"""
+    error: str
+    """Error detail; empty at start"""
+    error_message: str
+    """User-facing error message; empty at start"""
+
+class MessagePayload:
+    """
+    Payload of a ``message`` stream event — an incremental text chunk. This
+    is the highest-frequency event; concatenate ``text`` fragments in
+    arrival order.
+    """
+
+    text: str
+    """Incremental text fragment"""
+    message_type: str
+    """``"answer"`` — final answer text; ``"think"`` — reasoning process;
+    ``"process"`` — stage progress description"""
+    key: str
+    """Identifier of the stream segment this fragment belongs to. Fragments
+    with the same key form one continuous block — group by key when
+    rendering"""
+    started_at: int
+    """Time this segment started, Unix timestamp in seconds"""
+    stage: str
+    """Stage identifier; only present when message_type is ``"process"``"""
+    stage_title: str
+    """Stage title while running; only present when message_type is
+    ``"process"``"""
+    stage_finished_title: str
+    """Stage title after it finishes; only present when message_type is
+    ``"process"``"""
+    outputs: Any | None
+    """Extra payload attached to the fragment; usually absent"""
+
+class WorkflowStartedInputs:
+    """
+    ``inputs`` of a ``workflow_started`` stream event.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+    query: str
+    """The question that was asked"""
+
+class WorkflowStartedPayload:
+    """
+    Payload of a ``workflow_started`` stream event, observed right after
+    ``chat_started``.
+    """
+
+    hit_cache: bool
+    """Whether this run's answer was served from a cache"""
+    inputs: WorkflowStartedInputs
+    """Echoes the run's inputs"""
+    started_at: int
+    """Unix timestamp in seconds"""
+    workflow_id: int
+    """Internal workflow run ID"""
+
+class ChatFinishedPayload:
+    """
+    Payload of a ``chat_finished`` stream event, observed once all
+    ``message`` events for this round have been sent, shortly before
+    ``workflow_finished``.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    message_id: str
+    """Message ID of this round"""
+    error: str
+    """Empty string in every run observed so far"""
+    error_message: str
+    """Empty string in every run observed so far"""
+
+class ChatTitleUpdatedPayload:
+    """
+    Payload of a ``chat_title_updated`` stream event — the server
+    auto-generates a short title for the conversation as a UI convenience.
+    Can arrive before *or* after ``workflow_finished``; not tied to the run's
+    outcome.
+    """
+
+    chat_id: int
+    """ID of the owning conversation"""
+    chat_uid: str
+    """Conversation identifier"""
+    source: str
+    """Where the title came from, e.g. ``"ai_generated"``"""
+    title: str
+    """The new (possibly truncated) title"""
+    updated_at: int
+    """Unix timestamp in seconds"""
+
+class ThinkingStartedPayload:
+    """
+    Payload of a ``thinking_started`` stream event — the Agent has entered
+    the reasoning phase (analyzing the question, planning tool calls).
+    Between this and ``thinking_finished``, ``message`` events with
+    ``message_type == "think"`` and tool-call events may arrive.
+    """
+
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+
+class ThinkingFinishedPayload:
+    """
+    Payload of a ``thinking_finished`` stream event — the reasoning phase is
+    over; answer text (``message`` with ``message_type == "answer"``)
+    follows.
+    """
+
+    finished_at: int
+    """Finish time, Unix timestamp in seconds"""
+    elapsed_time: int
+    """Reasoning duration in seconds"""
+
+class NodeToolUseStartedPayload:
+    """
+    Payload of a ``node_tool_use_started`` stream event — an ordinary tool
+    call has started. Match it to its ``node_tool_use_finished`` counterpart
+    by ``tool_use_id``.
+    """
+
+    tool_use_id: str
+    """Unique ID of this call; matches the finished event"""
+    tool_name: str
+    """Localized display name of the tool"""
+    tool_func_name: str
+    """Locale-stable tool identifier; use this for logic keyed on the tool
+    kind"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    tips: str
+    """Progress text suitable for direct display, e.g. ``"Searching the
+    web..."``"""
+    tip_chips: list[str]
+    """Short tags accompanying tips; may be empty"""
+    iteration: int
+    """Round number. Calls in the same round (same iteration) run in
+    parallel"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+
+class NodeToolUseOutputs:
+    """``outputs`` of a NodeToolUseFinishedPayload — only carries fields
+    meant for display."""
+
+    references: list[Reference] | None
+    """Sources referenced by the tool result"""
+    reference_domains: list[str] | None
+    """Domains of the referenced sources"""
+    query: str | None
+    """The query the tool executed"""
+    text: str | None
+    """Raw response text of the tool"""
+    tool_args: Any | None
+    """Parsed request arguments"""
+    data: Any | None
+    """Structured result; present only for selected tools"""
+
+class NodeToolUseFinishedPayload:
+    """Payload of a ``node_tool_use_finished`` stream event — the tool call
+    has ended."""
+
+    tool_use_id: str
+    """Matches the tool_use_id of the started event"""
+    status: str
+    """``"succeeded"`` / ``"failed"``"""
+    error: str
+    """Error description on failure"""
+    elapsed_time: float
+    """Call duration in seconds"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    tool_name: str
+    """Localized display name"""
+    tool_func_name: str
+    """Locale-stable tool identifier"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    tool_type: str
+    """Tool category"""
+    tips: str
+    """Progress text"""
+    tip_chips: list[str]
+    """Short tags; may be empty"""
+    iteration: int
+    """Round number"""
+    is_thinking: bool
+    """True if the call happened during the thinking phase"""
+    outputs: NodeToolUseOutputs
+    """Filtered call results, for display"""
+
+class SubagentStartedPayload:
+    """
+    Payload of a ``subagent_started`` stream event. When the Agent spawns a
+    subagent to work on a sub-task, the subagent's lifecycle is reported
+    with this dedicated event family instead of ``node_tool_use_*``.
+    """
+
+    node_id: str
+    """ID of the node that spawned the subagent"""
+    tool_use_id: str
+    """Unique ID of this spawn; matches the finished event"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    goal: str
+    """Goal assigned to the subagent"""
+    prompt: str
+    """Full task prompt given to the subagent"""
+    subagent_id: str
+    """Subagent identifier; may be empty"""
+    tools: list[Any]
+    """Tools granted to the subagent; may be empty"""
+
+class SubagentProgressPayload:
+    """
+    Payload of a ``subagent_progress`` stream event, emitted every time the
+    subagent calls one of its own tools. Use it to render a live timeline
+    inside the subagent card.
+    """
+
+    node_id: str
+    """ID of the node that spawned the subagent"""
+    parent_tool_call_id: str
+    """tool_use_id of the owning SubagentStarted event"""
+    subagent_tool_name: str
+    """Name of the tool the subagent called"""
+    subagent_tool_args: str
+    """Arguments of that call, as a JSON string"""
+    subagent_status: str
+    """Status of that call: ``"running"`` / ``"succeeded"`` / ``"failed"``"""
+    subagent_duration_ms: int
+    """Duration of that call in milliseconds"""
+    subagent_iteration: int
+    """The subagent's internal round number"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+
+class SubagentOutputs:
+    """``outputs`` of a SubagentFinishedPayload."""
+
+    goal: str | None
+    """The goal that was assigned to the subagent"""
+    result: str | None
+    """The subagent's result"""
+    subagent_tools: list[Any] | None
+    """Timeline of tool calls the subagent made"""
+
+class SubagentFinishedPayload:
+    """Payload of a ``subagent_finished`` stream event."""
+
+    node_id: str
+    """ID of the node that spawned the subagent"""
+    tool_use_id: str
+    """Matches the tool_use_id of SubagentStarted"""
+    status: str
+    """``"succeeded"`` / ``"failed"``"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    elapsed_time: float
+    """Total subagent duration in seconds"""
+    error: str
+    """Error description on failure"""
+    outputs: SubagentOutputs
+    """Subagent result: goal, result, and the timeline of tool calls it
+    made"""
+
+class AgentToolStartedPayload:
+    """
+    Payload of an ``agent_tool_started`` stream event. When the Agent
+    delegates to another Agent as a tool, that inner run is reported with
+    the ``agent_tool_*`` family — the shape mirrors the subagent events.
+    """
+
+    node_id: str
+    """ID of the calling node"""
+    tool_use_id: str
+    """Unique ID of this call; matches the finished event"""
+    agent_tool_name: str
+    """Identifier of the Agent being called"""
+    title: str
+    """Display title; may be empty"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    tool_name: str
+    """Localized display name"""
+    tips: str
+    """Progress text; may be empty"""
+    tip_chips: list[str]
+    """Short tags; may be empty"""
+    is_thinking: bool
+    """True if called during the thinking phase"""
+
+class AgentToolProgressPayload:
+    """
+    Payload of an ``agent_tool_progress`` stream event, emitted for each
+    inner tool call the delegated Agent makes.
+    """
+
+    node_id: str
+    """ID of the calling node"""
+    parent_tool_call_id: str
+    """tool_use_id of the owning AgentToolStarted event"""
+    agent_tool_name: str
+    """Identifier of the Agent being called"""
+    inner_tool_name: str
+    """Name of the inner tool the delegated Agent called"""
+    inner_tool_args: str
+    """Arguments of that inner call, as a JSON string"""
+    status: str
+    """Status of the inner call: ``"running"`` / ``"succeeded"`` /
+    ``"failed"``"""
+    duration_ms: int
+    """Duration of the inner call in milliseconds"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    is_thinking: bool
+    """True if during the thinking phase"""
+
+class AgentToolFinishedPayload:
+    """Payload of an ``agent_tool_finished`` stream event."""
+
+    node_id: str
+    """ID of the calling node"""
+    tool_use_id: str
+    """Matches the tool_use_id of AgentToolStarted"""
+    agent_tool_name: str
+    """Identifier of the Agent being called"""
+    status: str
+    """``"succeeded"`` / ``"failed"``"""
+    started_at: int
+    """Start time, Unix timestamp in seconds"""
+    elapsed_time: float
+    """Total duration in seconds"""
+    error: str
+    """Error description on failure"""
+    tool_args: str
+    """Call arguments as a JSON string"""
+    outputs: Any | None
+    """Result of the delegated Agent"""
+    tool_type: str
+    """Tool category"""
+    tips: str
+    """Progress text; may be empty"""
+    tip_chips: list[str]
+    """Short tags; may be empty"""
+    is_thinking: bool
+    """True if during the thinking phase"""
+
+class QueryMaskedPayload:
+    """
+    Payload of a ``query_masked`` stream event — sensitive content in the
+    user query was masked before processing. Display masked_query instead
+    of the original query.
+    """
+
+    raw_query: str
+    """The original user query"""
+    masked_query: str
+    """The masked query"""
+
+class PlanChangedPayload:
+    """Payload of a ``plan_changed`` stream event — the Agent created or
+    updated its task plan."""
+
+    node_id: str
+    """ID of the planning node"""
+    started_at: int
+    """Time of the change, Unix timestamp in seconds"""
+    outputs: Any | None
+    """The current plan content"""
+    tool_name: str
+    """Identifies the planning tool"""
+
+class ContextCompressStartedPayload:
+    """
+    Payload of a ``context_compress_started`` stream event, marking the
+    start of a context-compression pass triggered by a long conversation.
+    Unlike other events, the timestamp here is an RFC 3339 string.
+    """
+
+    started_at: str
+    """Start time, RFC 3339"""
+    inputs: Any | None
+    """Compression input summary"""
+
+class ContextCompressFinishedPayload:
+    """
+    Payload of a ``context_compress_finished`` stream event. Unlike other
+    events, the timestamp here is an RFC 3339 string.
+    """
+
+    created_at: str
+    """Finish time, RFC 3339"""
+    inputs: Any | None
+    """Compression input summary"""
+    outputs: Any | None
+    """Compression result summary"""
+
+class ConversationStreamEvent:
+    """
+    One event observed while streaming
+    AgentContext.conversation_streamed / continue_conversation_streamed (or
+    the Async counterparts).
+
+    A run always begins with ``kind == "chat_started"`` and ends with
+    ``kind == "chat_finished"``. What happens in between depends on the
+    outcome:
+
+    - Succeeded: ``chat_started`` -> ``workflow_started`` ->
+      ``thinking_started`` -> ``message`` (message_type == "think") ... ->
+      ``node_tool_use_started`` / ``node_tool_use_finished`` ... ->
+      ``thinking_finished`` -> ``message`` (message_type == "answer") ... ->
+      ``workflow_finished`` (status == "succeeded") -> ``chat_finished``
+    - Interrupted (the Agent needs your input; resume via
+      ``continue_conversation_streamed``): ``chat_started`` ->
+      ``workflow_started`` -> ... -> ``human_interaction_required`` ->
+      ``chat_finished``. An interrupted run does **not** emit
+      ``workflow_finished``, and resuming it does **not** emit
+      ``workflow_started`` again.
+    - Failed: ``chat_started`` -> ``workflow_started`` -> ... ->
+      ``workflow_finished`` (status == "failed") -> ``chat_finished``
+
+    ``kind`` is the discriminant — one of ``"chat_started"``,
+    ``"workflow_started"``, ``"message"``, ``"ping"``,
+    ``"thinking_started"``, ``"thinking_finished"``,
+    ``"node_tool_use_started"``, ``"node_tool_use_finished"``,
+    ``"subagent_started"``, ``"subagent_progress"``, ``"subagent_finished"``,
+    ``"agent_tool_started"``, ``"agent_tool_progress"``,
+    ``"agent_tool_finished"``, ``"human_interaction_required"``,
+    ``"query_masked"``, ``"plan_changed"``, ``"context_compress_started"``,
+    ``"context_compress_finished"``, ``"chat_finished"``,
+    ``"workflow_finished"``, ``"chat_title_updated"``, ``"other"`` — and
+    exactly one of the payload fields below sharing that name is set,
+    matching ``kind`` — except ``"ping"``, a heartbeat with no payload, for
+    which every payload field is ``None``.
+
+    For a plain question-and-answer integration you only need to handle
+    four kinds — everything else is optional progress display:
+    ``"message"`` with ``message_type == "answer"`` (append ``text`` to the
+    answer being displayed), ``"human_interaction_required"`` (show the
+    questions and call ``continue_conversation`` /
+    ``continue_conversation_streamed`` with the answers),
+    ``"workflow_finished"`` (read the final outcome), and
+    ``"chat_finished"`` (the stream is over).
+    """
+
+    kind: str
+    """Discriminant: ``"chat_started"``, ``"workflow_started"``,
+    ``"message"``, ``"ping"``, ``"thinking_started"``,
+    ``"thinking_finished"``, ``"node_tool_use_started"``,
+    ``"node_tool_use_finished"``, ``"subagent_started"``,
+    ``"subagent_progress"``, ``"subagent_finished"``,
+    ``"agent_tool_started"``, ``"agent_tool_progress"``,
+    ``"agent_tool_finished"``, ``"human_interaction_required"``,
+    ``"query_masked"``, ``"plan_changed"``, ``"context_compress_started"``,
+    ``"context_compress_finished"``, ``"chat_finished"``,
+    ``"workflow_finished"``, ``"chat_title_updated"``, or ``"other"``"""
+    chat_started: ChatStartedPayload | None
+    """Set when kind == "chat_started" """
+    workflow_started: WorkflowStartedPayload | None
+    """Set when kind == "workflow_started". Observed right after
+    chat_started on every run seen so far. Not emitted when resuming an
+    interrupted run."""
+    message: MessagePayload | None
+    """Set when kind == "message": an incremental piece of the answer"""
+    thinking_started: ThinkingStartedPayload | None
+    """Set when kind == "thinking_started": the Agent has entered the
+    reasoning phase"""
+    thinking_finished: ThinkingFinishedPayload | None
+    """Set when kind == "thinking_finished": the reasoning phase is over"""
+    node_tool_use_started: NodeToolUseStartedPayload | None
+    """Set when kind == "node_tool_use_started": an ordinary tool call has
+    started"""
+    node_tool_use_finished: NodeToolUseFinishedPayload | None
+    """Set when kind == "node_tool_use_finished": an ordinary tool call has
+    ended"""
+    subagent_started: SubagentStartedPayload | None
+    """Set when kind == "subagent_started": the Agent has spawned a
+    subagent to work on a sub-task"""
+    subagent_progress: SubagentProgressPayload | None
+    """Set when kind == "subagent_progress": the subagent has called one of
+    its own tools"""
+    subagent_finished: SubagentFinishedPayload | None
+    """Set when kind == "subagent_finished": the subagent has finished its
+    sub-task"""
+    agent_tool_started: AgentToolStartedPayload | None
+    """Set when kind == "agent_tool_started": the Agent has delegated to
+    another Agent as a tool"""
+    agent_tool_progress: AgentToolProgressPayload | None
+    """Set when kind == "agent_tool_progress": the delegated Agent has
+    called one of its own tools"""
+    agent_tool_finished: AgentToolFinishedPayload | None
+    """Set when kind == "agent_tool_finished": the delegated Agent's run has
+    finished"""
+    human_interaction_required: ConversationResponse | None
+    """Set when kind == "human_interaction_required": the run is paused —
+    the Agent needs more information or confirmation from you. Carries the
+    same ConversationResponse shape as workflow_finished (status ==
+    ConversationStatus.Interrupted, with interrupt set) — an interrupted
+    run never emits workflow_finished at all, so this is the terminal event
+    carrying the run's outcome for that case instead. Resume via
+    continue_conversation / continue_conversation_streamed using
+    ConversationResponse.interrupt."""
+    query_masked: QueryMaskedPayload | None
+    """Set when kind == "query_masked": sensitive content in the user query
+    was masked before processing"""
+    plan_changed: PlanChangedPayload | None
+    """Set when kind == "plan_changed": the Agent created or updated its
+    task plan"""
+    context_compress_started: ContextCompressStartedPayload | None
+    """Set when kind == "context_compress_started": a context-compression
+    pass has started (long conversations trigger this)"""
+    context_compress_finished: ContextCompressFinishedPayload | None
+    """Set when kind == "context_compress_finished": the context-compression
+    pass has finished"""
+    chat_finished: ChatFinishedPayload | None
+    """Set when kind == "chat_finished" """
+    workflow_finished: ConversationResponse | None
+    """Set when kind == "workflow_finished" (the run finished — succeeded or
+    failed; never emitted for an interrupted run, see
+    human_interaction_required). Carries the run's outcome, but isn't
+    necessarily the last event of the stream — the server may still emit a
+    few more housekeeping events (e.g. kind == "chat_title_updated") before
+    actually closing the connection."""
+    chat_title_updated: ChatTitleUpdatedPayload | None
+    """Set when kind == "chat_title_updated" """
+    other_event: str | None
+    """Set when kind == "other": the SSE envelope's ``event`` field (the event
+    type name)"""
+    other: Any | None
+    """Set when kind == "other": raw JSON payload of an event type not
+    recognized by this SDK version"""
+
+class ConversationStreamIter:
+    """
+    Blocking iterator of ConversationStreamEvent, returned by
+    AgentContext.conversation_streamed / continue_conversation_streamed. Use
+    with a plain ``for`` loop.
+    """
+
+    def __iter__(self) -> "ConversationStreamIter": ...
+    def __next__(self) -> ConversationStreamEvent: ...
+
+class AgentContext:
+    """
+    AI Agent conversation context.
+
+    Examples:
+        ::
+
+            from longport.openapi import Config, AgentContext
+
+            config = Config.from_env()
+            ctx = AgentContext(config)
+
+            workspaces = ctx.workspaces()
+            agents = ctx.agents(workspaces.workspaces[0].id)
+            resp = ctx.conversation(
+                agents.agents[0].uid, "How has Tesla stock performed recently?"
+            )
+            print(resp)
+
+            for event in ctx.conversation_streamed(
+                agents.agents[0].uid, "How has Tesla stock performed recently?"
+            ):
+                print(event)
+    """
+
+    def __init__(self, config: "Config") -> None:
+        """Create an AgentContext."""
+        ...
+
+    def workspaces(self) -> WorkspacesResponse:
+        """List the Workspaces the current account belongs to."""
+        ...
+
+    def agents(
+        self,
+        workspace_id: str,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> AgentsResponse:
+        """
+        List the Agents in the specified Workspace.
+
+        Args:
+            workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def public_agents(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> AgentsResponse:
+        """
+        List all publicly available Agents on the platform (the Explore
+        catalog). Not scoped to a Workspace.
+
+        Args:
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def conversation(
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
+    ) -> ConversationResponse:
+        """
+        Start a conversation with the specified Agent, blocking until the run
+        succeeds, is interrupted, or fails.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+            parent_message_id: ``message_id`` from a previous response. Pass it
+                when asking a follow-up in an existing conversation to attach
+                the new message after the specified one, keeping the message
+                stream in order. Only valid together with ``chat_uid``, the
+                parent message must belong to that conversation, and it must not
+                be set for a new conversation
+        """
+        ...
+
+    def continue_conversation(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> ConversationResponse:
+        """
+        Resume an interrupted conversation, blocking until the run succeeds,
+        is interrupted again, or fails.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+    def conversation_streamed(
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
+    ) -> Iterator[ConversationStreamEvent]:
+        """
+        Start a conversation with the specified Agent, returning an iterator
+        of run-progress events. A ConversationStreamEvent with
+        ``kind == "workflow_finished"`` carries the run's outcome, but isn't
+        necessarily the last item — the server may still emit a few more
+        housekeeping events (e.g. ``kind == "chat_title_updated"``) before
+        actually closing the connection, so keep iterating to the end rather
+        than stopping as soon as you see it.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+            parent_message_id: ``message_id`` from a previous response; see
+                ``conversation`` for the exact semantics
+        """
+        ...
+
+    def continue_conversation_streamed(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Iterator[ConversationStreamEvent]:
+        """
+        Resume an interrupted conversation, returning an iterator of
+        run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+class AsyncConversationStreamIter:
+    """
+    Async iterator of ConversationStreamEvent, returned (once awaited) by
+    AsyncAgentContext.conversation_streamed / continue_conversation_streamed.
+    Use with ``async for``.
+    """
+
+    def __aiter__(self) -> "AsyncConversationStreamIter": ...
+    async def __anext__(self) -> ConversationStreamEvent: ...
+
+class AsyncAgentContext:
+    """
+    Async AI Agent conversation context for use with asyncio. Create via
+    AsyncAgentContext.create(config); all I/O methods return awaitables.
+
+    Examples:
+        ::
+
+            import asyncio
+            from longport.openapi import Config, AsyncAgentContext
+
+            async def main():
+                config = Config.from_env()
+                ctx = AsyncAgentContext.create(config)
+
+                workspaces = await ctx.workspaces()
+                agents = await ctx.agents(workspaces.workspaces[0].id)
+                resp = await ctx.conversation(
+                    agents.agents[0].uid, "How has Tesla stock performed recently?"
+                )
+                print(resp)
+
+                stream = await ctx.conversation_streamed(
+                    agents.agents[0].uid, "How has Tesla stock performed recently?"
+                )
+                async for event in stream:
+                    print(event)
+
+            asyncio.run(main())
+    """
+
+    @classmethod
+    def create(
+        cls: Type[AsyncAgentContext], config: Config
+    ) -> AsyncAgentContext:
+        """Create an async AI Agent context."""
+        ...
+
+    def workspaces(self) -> Awaitable[WorkspacesResponse]:
+        """List the Workspaces the current account belongs to. Returns
+        awaitable."""
+        ...
+
+    def agents(
+        self,
+        workspace_id: str,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> Awaitable[AgentsResponse]:
+        """
+        List the Agents in the specified Workspace. Returns awaitable.
+
+        Args:
+            workspace_id: Workspace ID
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def public_agents(
+        self,
+        page: int | None = None,
+        limit: int | None = None,
+        name: str | None = None,
+    ) -> Awaitable[AgentsResponse]:
+        """
+        List all publicly available Agents on the platform (the Explore
+        catalog). Not scoped to a Workspace. Returns awaitable.
+
+        Args:
+            page: Page number, starts at 1
+            limit: Page size
+            name: Fuzzy search by Agent name
+        """
+        ...
+
+    def conversation(
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
+    ) -> Awaitable[ConversationResponse]:
+        """
+        Start a conversation with the specified Agent, blocking until the run
+        succeeds, is interrupted, or fails. Returns awaitable.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+            parent_message_id: ``message_id`` from a previous response. Pass it
+                when asking a follow-up in an existing conversation to attach
+                the new message after the specified one, keeping the message
+                stream in order. Only valid together with ``chat_uid``, the
+                parent message must belong to that conversation, and it must not
+                be set for a new conversation
+        """
+        ...
+
+    def continue_conversation(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Awaitable[ConversationResponse]:
+        """
+        Resume an interrupted conversation, blocking until the run succeeds,
+        is interrupted again, or fails. Returns awaitable.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...
+
+    def conversation_streamed(
+        self,
+        agent_id: str,
+        query: str,
+        chat_uid: str | None = None,
+        parent_message_id: str | None = None,
+    ) -> Awaitable[AsyncConversationStreamIter]:
+        """
+        Start a conversation with the specified Agent. Returns an awaitable
+        that resolves to an AsyncConversationStreamIter; use ``async for`` on
+        it to consume run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            query: The question to ask
+            chat_uid: Continue an existing conversation instead of starting a
+                new one
+            parent_message_id: ``message_id`` from a previous response; see
+                ``conversation`` for the exact semantics
+        """
+        ...
+
+    def continue_conversation_streamed(
+        self,
+        agent_id: str,
+        chat_uid: str,
+        message_id: str,
+        answers_by_tool_call: dict[str, dict[str, str]],
+    ) -> Awaitable[AsyncConversationStreamIter]:
+        """
+        Resume an interrupted conversation. Returns an awaitable that resolves
+        to an AsyncConversationStreamIter; use ``async for`` on it to consume
+        run-progress events.
+
+        Args:
+            agent_id: Agent UID
+            chat_uid: Conversation identifier, from ConversationResponse.chat_uid
+            message_id: ID of the paused message, from
+                ConversationResponse.message_id
+            answers_by_tool_call: Answers keyed by ``tool_call_id`` (from
+                ConversationResponse.interrupt), each value a map of question
+                text to answer
+        """
+        ...

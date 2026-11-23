@@ -37,7 +37,7 @@ public class OAuthBuilder {
     /**
      * Create a new {@code OAuthBuilder} with the given client ID.
      *
-     * @param clientId OAuth 2.0 client ID from the Longport developer portal
+     * @param clientId OAuth 2.0 client ID from the LongPort developer portal
      */
     public OAuthBuilder(String clientId) {
         this.clientId = clientId;

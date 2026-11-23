@@ -1,4 +1,4 @@
-//! OAuth 2.0 authentication support for Longport OpenAPI
+//! OAuth 2.0 authentication support for LongPort OpenAPI
 //!
 //! This crate provides utilities for performing OAuth 2.0 authorization code
 //! flow to obtain access tokens for API authentication.

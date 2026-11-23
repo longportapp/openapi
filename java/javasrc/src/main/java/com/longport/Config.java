@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Configuration options for Longport SDK
+ * Configuration options for LongPort SDK
  */
 public class Config implements AutoCloseable {
     private long raw;
@@ -193,6 +193,25 @@ public class Config implements AutoCloseable {
      */
     public synchronized Config logPath(String path) {
         this.raw = SdkNative.configSetLogPath(raw(), path);
+        return this;
+    }
+
+    /**
+     * Enable paper trading mode.
+     *
+     * <p>When enabled, all API calls target the paper trading (simulation)
+     * environment.  The server validates the token: if it belongs to a real-money
+     * account the server returns an error.
+     *
+     * <p>By default this option is disabled and the server imposes no restrictions
+     * — requests from both paper trading and real-money accounts are accepted.
+     *
+     * <p>Paper trading users should call this method as a safety guard.
+     *
+     * @return this object
+     */
+    public synchronized Config enablePapertrading() {
+        this.raw = SdkNative.configSetEnablePapertrading(raw());
         return this;
     }
 

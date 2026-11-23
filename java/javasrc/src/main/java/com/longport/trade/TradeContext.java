@@ -180,6 +180,20 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get all executions
+     *
+     * @param opts Options for this request
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<AllExecutionsResponse> getAllExecutions(GetAllExecutionsOptions opts)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextAllExecutions(raw(), opts, callback);
+        });
+    }
+
+    /**
      * Get history orders
      * 
      * <pre>
@@ -352,8 +366,27 @@ public class TradeContext implements AutoCloseable {
      * @throws OpenApiException If an error occurs
      */
     public synchronized CompletableFuture<Void> cancelOrder(String orderId) throws OpenApiException {
+        return cancelOrder(orderId, false);
+    }
+
+    /**
+     * Cancel order
+     *
+     * @param orderId    Order ID
+     * @param isAttached When set together with orderId, indicates that orderId is
+     *                   an attached sub-order ID. The server will look up using
+     *                   the attached order ID instead of treating it as a regular
+     *                   order ID.
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<Void> cancelOrder(String orderId, boolean isAttached) throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
-            SdkNative.tradeContextCancelOrder(raw(), orderId, callback);
+            if (isAttached) {
+                SdkNative.tradeContextCancelOrderAttached(raw(), orderId, callback);
+            } else {
+                SdkNative.tradeContextCancelOrder(raw(), orderId, callback);
+            }
         });
     }
 
@@ -584,6 +617,20 @@ public class TradeContext implements AutoCloseable {
             throws OpenApiException {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextOrderDetail(raw(), orderId, callback);
+        });
+    }
+
+    /**
+     * Get order detail for an attached order
+     *
+     * @param orderId Attached order ID
+     * @return A Future representing the result
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<OrderDetail> getOrderDetailAttached(String orderId)
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextOrderDetailAttached(raw(), orderId, callback);
         });
     }
 

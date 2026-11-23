@@ -2,7 +2,7 @@
 edition.workspace = true
 name = "longport-proto"
 version.workspace = true
-description = "Longport Protocol"
+description = "LongPort Protocol"
 license = "MIT OR Apache-2.0"
 
 [dependencies]

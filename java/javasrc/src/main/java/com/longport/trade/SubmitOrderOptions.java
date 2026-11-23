@@ -24,6 +24,8 @@ public class SubmitOrderOptions {
     private Integer triggerCount;
     private BigDecimal monitorPrice;
     private String remark;
+    private String clientRequestId;
+    private SubmitAttachedParams attachedParams;
 
     /**
      * Constructs options for submitting an order.
@@ -166,5 +168,38 @@ public class SubmitOrderOptions {
     public SubmitOrderOptions setRemark(String remark) {
         this.remark = remark;
         return this;
+    }
+
+    /**
+     * Sets the idempotent request ID.
+     * If not specified, idempotency control is skipped.
+     * The server caches this ID for 10 minutes to prevent duplicate orders.
+     *
+     * @param clientRequestId unique request identifier (e.g., UUID)
+     * @return this instance for chaining
+     */
+    public SubmitOrderOptions setClientRequestId(String clientRequestId) {
+        this.clientRequestId = clientRequestId;
+        return this;
+    }
+
+    /**
+     * Sets the attached order parameters.
+     *
+     * @param attachedParams attached order parameters
+     * @return this instance for chaining
+     */
+    public SubmitOrderOptions setAttachedParams(SubmitAttachedParams attachedParams) {
+        this.attachedParams = attachedParams;
+        return this;
+    }
+
+    /**
+     * Returns the attached order parameters.
+     *
+     * @return attached order parameters
+     */
+    public SubmitAttachedParams getAttachedParams() {
+        return attachedParams;
     }
 }

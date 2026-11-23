@@ -1,6 +1,7 @@
 use std::error::Error;
 
-use reqwest::StatusCode;
+use longport_geo::DcRegion;
+use reqwest::{StatusCode, header::HeaderMap};
 
 use crate::qs::QsError;
 
@@ -34,6 +35,20 @@ pub enum HttpClientError {
     #[error("request timeout")]
     RequestTimeout,
 
+    /// The requested API is restricted to one data center and cannot be reached
+    /// from a session in a different region.
+    #[error(
+        "this API ({path}) is only available in the {required} data center and is not supported for your {current}-region account"
+    )]
+    DcRegionRestricted {
+        /// The restricted API path (or WebSocket command) that was requested.
+        path: String,
+        /// The data center this API is limited to.
+        required: DcRegion,
+        /// The session's current data-center region.
+        current: DcRegion,
+    },
+
     /// OpenAPI error
     #[error("openapi error: code={code}: {message}")]
     OpenApi {
@@ -61,6 +76,19 @@ pub enum HttpClientError {
     #[error("status error: {0}")]
     BadStatus(StatusCode),
 
+    /// An HTTP response that could not be parsed as an OpenAPI response.
+    #[error("unexpected HTTP response: status={status}, trace_id={trace_id}, body={body}")]
+    UnexpectedHttpResponse {
+        /// HTTP response status.
+        status: StatusCode,
+        /// Upstream trace ID, when present.
+        trace_id: String,
+        /// Original HTTP response headers.
+        headers: Box<HeaderMap>,
+        /// Original HTTP response body.
+        body: String,
+    },
+
     /// Http error
     #[error(transparent)]
     Http(#[from] HttpError),
@@ -77,6 +105,10 @@ pub enum HttpClientError {
     /// OAuth error
     #[error("oauth error: {0}")]
     OAuth(String),
+
+    /// Server-sent events stream error
+    #[error("sse stream error: {0}")]
+    Sse(String),
 }
 
 /// Represents an HTTP error

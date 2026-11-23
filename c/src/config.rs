@@ -14,7 +14,7 @@ use crate::{
     types::{CLanguage, CPushCandlestickMode, CString},
 };
 
-/// Configuration options for Longport SDK
+/// Configuration options for LongPort SDK
 pub struct CConfig(pub(crate) Config);
 
 /// Create a new `Config` using API Key authentication
@@ -169,6 +169,23 @@ pub unsafe extern "C" fn lb_config_set_push_candlestick_mode(
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn lb_config_disable_print_quote_packages(config: *mut CConfig) {
     (*config).0.set_dont_print_quote_packages();
+}
+
+/// Enable paper trading mode.
+///
+/// When enabled, all API calls target the paper trading (simulation)
+/// environment.  The server validates the token: if it belongs to a real-money
+/// account the server returns an error.
+///
+/// When disabled (the default) the server imposes no restrictions — both
+/// paper trading and real-money accounts are accepted.
+///
+/// Paper trading users should call this function as a safety guard.
+///
+/// @param config  Config object
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn lb_config_enable_papertrading(config: *mut CConfig) {
+    (*config).0.set_enable_papertrading();
 }
 
 /// Set the log file path

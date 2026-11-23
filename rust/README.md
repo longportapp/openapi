@@ -1,4 +1,4 @@
-# Longport OpenAPI SDK for Rust
+# LongPort OpenAPI SDK for Rust
 
 <div align="center">
   <a href="https://crates.io/crates/longport">
@@ -20,7 +20,7 @@
 </div>
 
 
-`longport` provides an easy-to-use interface for invoking [`Longport OpenAPI`](https://open.longportapp.com/en/).
+`longport` provides an easy-to-use interface for invoking [`LongPort OpenAPI`](https://open.longportapp.com/en/).
 
 
 ## Context Types
@@ -41,9 +41,9 @@
 
 ## Documentation
 
-- SDK docs: https://longportapp.github.io/openapi/rust/longport/index.html
+- SDK docs: https://longport.github.io/openapi/rust/longport/index.html
 - crates.io: https://crates.io/crates/longport
-- Longport OpenAPI: https://open.longportapp.com/en/
+- LongPort OpenAPI: https://open.longportapp.com/en/
 
 ## Examples
 
@@ -67,7 +67,7 @@ longport = "4.0.0"
 
 ### Authentication
 
-Longport OpenAPI supports two authentication methods:
+LongPort OpenAPI supports two authentication methods:
 
 #### 1. OAuth 2.0 (Recommended)
 
@@ -175,6 +175,40 @@ setx LONGPORT_ACCESS_TOKEN "Access Token get from user center"
 | LONGPORT_PUSH_CANDLESTICK_MODE | `realtime` or `confirmed` (Default: `realtime`)                                 |
 | LONGPORT_PRINT_QUOTE_PACKAGES  | Print quote packages when connected, `true` or `false` (Default: `true`)        |
 | LONGPORT_LOG_PATH              | Set the path of the log files (Default: `no logs`)                              |
+| LONGPORT_PAPERTRADING          | Enable paper trading mode, `true` or `false` (Default: `false`). See [Paper Trading](#paper-trading). |
+
+## Paper Trading
+
+If your account is a **paper trading** (simulation) account and you want to
+place orders, you must explicitly enable paper trading mode.  When enabled, all
+API calls target the paper trading environment and the server validates the
+token — if the token belongs to a real-money account the server returns an
+error.
+
+By default this option is **off**: the server imposes no restrictions and
+accepts requests from both paper trading and real-money accounts.
+
+**Via environment variable** (applies automatically to all constructor methods):
+
+```bash
+export LONGPORT_PAPERTRADING=true   # macOS / Linux
+```
+
+```powershell
+$env:LONGPORT_PAPERTRADING = "true"   # Windows PowerShell
+```
+
+**Programmatically:**
+
+```rust,no_run
+use std::sync::Arc;
+use longport::Config;
+
+let config = Arc::new(
+    Config::from_apikey("app-key", "app-secret", "access-token")
+        .enable_papertrading()
+);
+```
 
 ## Quote API _(Get basic information of securities)_
 

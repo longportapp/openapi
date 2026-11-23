@@ -586,6 +586,34 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longport/trade/AttachedOrderDetail",
+    longport::trade::AttachedOrderDetail,
+    [
+        order_id,
+        attached_type_display,
+        trigger_price,
+        quantity,
+        executed_qty,
+        status,
+        updated_at,
+        withdrawn,
+        gtd,
+        time_in_force,
+        counter_id,
+        trigger_status,
+        executed_amount,
+        tag,
+        submitted_at,
+        executed_price,
+        force_only_rth,
+        reviewed,
+        activate_order_type,
+        activate_rth,
+        submit_price
+    ]
+);
+
+impl_java_class!(
     "com/longport/trade/PushOrderChanged",
     longport::trade::PushOrderChanged,
     [
@@ -624,6 +652,16 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longport/trade/AllExecutionsResponse",
+    longport::trade::AllExecutionsResponse,
+    [
+        has_more,
+        #[java(objarray)]
+        trades
+    ]
+);
+
+impl_java_class!(
     "com/longport/trade/Order",
     longport::trade::Order,
     [
@@ -657,7 +695,9 @@ impl_java_class!(
         #[java(set_as_opt = crate::types::JavaInteger)]
         trigger_count,
         monitor_price,
-        remark
+        remark,
+        #[java(objarray)]
+        attached_orders
     ]
 );
 
@@ -934,7 +974,9 @@ impl_java_class!(
         platform_deducted_currency,
         #[java(objarray)]
         history,
-        charge_detail
+        charge_detail,
+        #[java(objarray)]
+        attached_orders
     ]
 );
 
@@ -1670,6 +1712,16 @@ impl_java_class!(
 // ── AlertContext types ────────────────────────────────────────────
 
 impl_java_class!(
+    "com/longport/alert/AlertValueMap",
+    longport::alert::AlertValueMap,
+    [
+        price,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        chg
+    ]
+);
+
+impl_java_class!(
     "com/longport/alert/AlertItem",
     longport::alert::AlertItem,
     [
@@ -2354,13 +2406,25 @@ impl_java_class!(
 impl_java_class!(
     "com/longport/fundamental/RatingIndicator",
     longport::fundamental::RatingIndicator,
-    [name, score, letter]
+    [
+        name,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
     "com/longport/fundamental/RatingLeafIndicator",
     longport::fundamental::RatingLeafIndicator,
-    [name, value, value_type, score, letter]
+    [
+        name,
+        value,
+        value_type,
+        #[java(set_as_opt = crate::types::JavaDouble)]
+        score,
+        letter
+    ]
 );
 
 impl_java_class!(
@@ -2390,13 +2454,18 @@ impl_java_class!(
         style_txt_name,
         scale_txt_name,
         report_period_txt,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         multi_score,
         multi_letter,
         multi_score_change,
         industry_name,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_rank,
+        #[java(set_as_opt = crate::types::JavaLong)]
         industry_total,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_mean_score,
+        #[java(set_as_opt = crate::types::JavaDouble)]
         industry_median_score,
         #[java(objarray)]
         ratings
@@ -2472,7 +2541,7 @@ impl_java_class!(
     longport::fundamental::IndustryRankItem,
     [
         name,
-        counter_id,
+        symbol,
         chg,
         leading_name,
         leading_ticker,
@@ -2544,7 +2613,7 @@ impl crate::types::IntoJValue for longport::fundamental::IndustryPeerNode {
     ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
         let longport::fundamental::IndustryPeerNode {
             name,
-            counter_id,
+            symbol,
             stock_num,
             chg,
             ytd_chg,
@@ -2554,7 +2623,7 @@ impl crate::types::IntoJValue for longport::fundamental::IndustryPeerNode {
         let cls = <Self as crate::types::ClassLoader>::class_ref();
         let obj = env.new_object(cls.borrow(), "()V", &[])?;
         crate::types::set_field(env, &obj, "name", name)?;
-        crate::types::set_field(env, &obj, "counterId", counter_id)?;
+        crate::types::set_field(env, &obj, "symbol", symbol)?;
         crate::types::set_field(env, &obj, "stockNum", stock_num)?;
         crate::types::set_field(env, &obj, "chg", chg)?;
         crate::types::set_field(env, &obj, "ytdChg", ytd_chg)?;
@@ -2627,6 +2696,7 @@ impl_java_class!(
     longport::portfolio::FlowItem,
     [
         executed_date,
+        #[java(nullable)]
         executed_timestamp,
         code,
         direction,
@@ -2795,9 +2865,29 @@ impl_java_class!(
 );
 
 impl_java_class!(
+    "com/longport/market/RankSubCategory",
+    longport::market::RankSubCategory,
+    [key, name, market]
+);
+
+impl_java_class!(
+    "com/longport/market/RankCategory",
+    longport::market::RankCategory,
+    [
+        key,
+        name,
+        #[java(objarray)]
+        sub_categories
+    ]
+);
+
+impl_java_class!(
     "com/longport/market/RankCategoriesResponse",
     longport::market::RankCategoriesResponse,
-    [data]
+    [
+        #[java(objarray)]
+        categories
+    ]
 );
 
 impl_java_class!(
@@ -2864,3 +2954,566 @@ impl_java_class!(
     longport::screener::ScreenerIndicatorsResponse,
     [data]
 );
+
+// ── AgentContext types ─────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longport/agent/Workspace",
+    longport::agent::Workspace,
+    [id, name, created_at, updated_at]
+);
+
+impl_java_class!(
+    "com/longport/agent/WorkspacesResponse",
+    longport::agent::WorkspacesResponse,
+    [
+        #[java(objarray)]
+        workspaces
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/Agent",
+    longport::agent::Agent,
+    [
+        uid,
+        name,
+        description,
+        mode,
+        icon,
+        is_published,
+        published_at,
+        created_at,
+        updated_at
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/AgentsResponse",
+    longport::agent::AgentsResponse,
+    [
+        #[java(objarray)]
+        agents,
+        total
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/Reference",
+    longport::agent::Reference,
+    [index, original_index, ref_type, id, title, url, content]
+);
+
+impl_java_class!(
+    "com/longport/agent/QuestionOption",
+    longport::agent::QuestionOption,
+    [label, description]
+);
+
+impl_java_class!(
+    "com/longport/agent/Question",
+    longport::agent::Question,
+    [
+        question,
+        #[java(objarray)]
+        options,
+        multi_select
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/HumanInteraction",
+    longport::agent::HumanInteraction,
+    [
+        tool_call_id,
+        interrupt_id,
+        interaction_type,
+        tool_name,
+        #[java(objarray)]
+        questions,
+        tool_args
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/Interrupt",
+    longport::agent::Interrupt,
+    [
+        node_id,
+        tool_call_id,
+        #[java(objarray)]
+        questions,
+        #[java(objarray)]
+        interactions,
+        message_id,
+        chat_id
+    ]
+);
+
+// The Java class is named `ConversationError` (not `AgentError`) since it
+// describes a failed conversation *run*, not a JNI/transport-level failure —
+// `OpenApiException` already owns that role for this SDK. `impl_java_class!`
+// only cares that the two names are given independently, so no wrapper type
+// is needed just to rename it.
+impl_java_class!(
+    "com/longport/agent/ConversationError",
+    longport::agent::AgentError,
+    [code, message]
+);
+
+impl_java_class!(
+    "com/longport/agent/ChatStartedEvent",
+    longport::agent::ChatStartedPayload,
+    [chat_uid, message_id, chat_id, error, error_message]
+);
+
+// JNI-side view of `longport::agent::WorkflowStartedInputs`, the `inputs`
+// sub-object of a `workflow_started` event — mapped to its own Java class
+// the same way `Interrupt`/`Question` nest inside `ConversationResponse`
+// above.
+impl_java_class!(
+    "com/longport/agent/WorkflowStartedInputs",
+    longport::agent::WorkflowStartedInputs,
+    [chat_id, chat_uid, message_id, query]
+);
+
+impl_java_class!(
+    "com/longport/agent/WorkflowStartedEvent",
+    longport::agent::WorkflowStartedPayload,
+    [hit_cache, inputs, started_at, workflow_id]
+);
+
+impl_java_class!(
+    "com/longport/agent/MessageEvent",
+    longport::agent::MessagePayload,
+    [
+        text,
+        message_type,
+        key,
+        started_at,
+        stage,
+        stage_title,
+        stage_finished_title,
+        outputs
+    ]
+);
+
+/// JNI-side marker for
+/// [`longport::agent::ConversationStreamEvent::Ping`], which — unlike
+/// every other variant — carries no payload at all. `impl_java_class!` works
+/// fine against a zero-field struct, so this is used instead of hand-writing
+/// a bespoke JNI object constructor for the one variant with nothing to
+/// carry. See the manual `IntoJValue` for `ConversationStreamEvent` below,
+/// the only place this type is used.
+pub(crate) struct PingEvent {}
+
+impl_java_class!("com/longport/agent/PingEvent", PingEvent, []);
+
+impl_java_class!(
+    "com/longport/agent/ThinkingStartedEvent",
+    longport::agent::ThinkingStartedPayload,
+    [started_at]
+);
+
+impl_java_class!(
+    "com/longport/agent/ThinkingFinishedEvent",
+    longport::agent::ThinkingFinishedPayload,
+    [finished_at, elapsed_time]
+);
+
+impl_java_class!(
+    "com/longport/agent/NodeToolUseStartedEvent",
+    longport::agent::NodeToolUseStartedPayload,
+    [
+        tool_use_id,
+        tool_name,
+        tool_func_name,
+        tool_args,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        iteration,
+        started_at
+    ]
+);
+
+/// JNI-side view of [`longport::agent::NodeToolUseOutputs`], with
+/// `references`/`reference_domains` normalized from `Option<Vec<_>>` down to a
+/// plain `Vec` (empty when absent) — same convention as
+/// [`ConversationResponse`]'s `references` field above.
+pub(crate) struct NodeToolUseOutputs {
+    pub(crate) references: Vec<longport::agent::Reference>,
+    pub(crate) reference_domains: Vec<String>,
+    pub(crate) query: Option<String>,
+    pub(crate) text: Option<String>,
+    pub(crate) tool_args: Option<serde_json::Value>,
+    pub(crate) data: Option<serde_json::Value>,
+}
+
+impl From<longport::agent::NodeToolUseOutputs> for NodeToolUseOutputs {
+    fn from(value: longport::agent::NodeToolUseOutputs) -> Self {
+        Self {
+            references: value.references.unwrap_or_default(),
+            reference_domains: value.reference_domains.unwrap_or_default(),
+            query: value.query,
+            text: value.text,
+            tool_args: value.tool_args,
+            data: value.data,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longport/agent/NodeToolUseOutputs",
+    NodeToolUseOutputs,
+    [
+        #[java(objarray)]
+        references,
+        #[java(objarray)]
+        reference_domains,
+        query,
+        text,
+        tool_args,
+        data
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/NodeToolUseFinishedEvent",
+    longport::agent::NodeToolUseFinishedPayload,
+    [
+        tool_use_id,
+        status,
+        error,
+        elapsed_time,
+        started_at,
+        tool_name,
+        tool_func_name,
+        tool_args,
+        tool_type,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        iteration,
+        is_thinking,
+        #[java(set_as = crate::types::NodeToolUseOutputs)]
+        outputs
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/SubagentStartedEvent",
+    longport::agent::SubagentStartedPayload,
+    [
+        node_id,
+        tool_use_id,
+        started_at,
+        goal,
+        prompt,
+        subagent_id,
+        #[java(objarray)]
+        tools
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/SubagentProgressEvent",
+    longport::agent::SubagentProgressPayload,
+    [
+        node_id,
+        parent_tool_call_id,
+        subagent_tool_name,
+        subagent_tool_args,
+        subagent_status,
+        subagent_duration_ms,
+        subagent_iteration,
+        started_at
+    ]
+);
+
+/// JNI-side view of [`longport::agent::SubagentOutputs`], with
+/// `subagent_tools` normalized from `Option<Vec<_>>` down to a plain `Vec`
+/// (empty when absent) — same convention as [`NodeToolUseOutputs`] above.
+pub(crate) struct SubagentOutputs {
+    pub(crate) goal: Option<String>,
+    pub(crate) result: Option<String>,
+    pub(crate) subagent_tools: Vec<serde_json::Value>,
+}
+
+impl From<longport::agent::SubagentOutputs> for SubagentOutputs {
+    fn from(value: longport::agent::SubagentOutputs) -> Self {
+        Self {
+            goal: value.goal,
+            result: value.result,
+            subagent_tools: value.subagent_tools.unwrap_or_default(),
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longport/agent/SubagentOutputs",
+    SubagentOutputs,
+    [
+        goal,
+        result,
+        #[java(objarray)]
+        subagent_tools
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/SubagentFinishedEvent",
+    longport::agent::SubagentFinishedPayload,
+    [
+        node_id,
+        tool_use_id,
+        status,
+        started_at,
+        elapsed_time,
+        error,
+        #[java(set_as = crate::types::SubagentOutputs)]
+        outputs
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/AgentToolStartedEvent",
+    longport::agent::AgentToolStartedPayload,
+    [
+        node_id,
+        tool_use_id,
+        agent_tool_name,
+        title,
+        started_at,
+        tool_args,
+        tool_name,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        is_thinking
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/AgentToolProgressEvent",
+    longport::agent::AgentToolProgressPayload,
+    [
+        node_id,
+        parent_tool_call_id,
+        agent_tool_name,
+        inner_tool_name,
+        inner_tool_args,
+        status,
+        duration_ms,
+        started_at,
+        is_thinking
+    ]
+);
+
+impl_java_class!(
+    "com/longport/agent/AgentToolFinishedEvent",
+    longport::agent::AgentToolFinishedPayload,
+    [
+        node_id,
+        tool_use_id,
+        agent_tool_name,
+        status,
+        started_at,
+        elapsed_time,
+        error,
+        tool_args,
+        outputs,
+        tool_type,
+        tips,
+        #[java(objarray)]
+        tip_chips,
+        is_thinking
+    ]
+);
+
+/// JNI-side wrapper so that
+/// [`longport::agent::ConversationStreamEvent::HumanInteractionRequired`]
+/// can go through the same `impl_java_class!` machinery as every other event
+/// payload, wrapping the same [`ConversationResponse`] that
+/// [`WorkflowFinishedEvent`] wraps — see the manual `IntoJValue` for
+/// `ConversationStreamEvent` below, which is the only place this type is
+/// used.
+pub(crate) struct HumanInteractionRequiredEvent {
+    pub(crate) response: ConversationResponse,
+}
+
+impl_java_class!(
+    "com/longport/agent/HumanInteractionRequiredEvent",
+    HumanInteractionRequiredEvent,
+    [response]
+);
+
+impl_java_class!(
+    "com/longport/agent/QueryMaskedEvent",
+    longport::agent::QueryMaskedPayload,
+    [raw_query, masked_query]
+);
+
+impl_java_class!(
+    "com/longport/agent/PlanChangedEvent",
+    longport::agent::PlanChangedPayload,
+    [node_id, started_at, outputs, tool_name]
+);
+
+impl_java_class!(
+    "com/longport/agent/ContextCompressStartedEvent",
+    longport::agent::ContextCompressStartedPayload,
+    [started_at, inputs]
+);
+
+impl_java_class!(
+    "com/longport/agent/ContextCompressFinishedEvent",
+    longport::agent::ContextCompressFinishedPayload,
+    [created_at, inputs, outputs]
+);
+
+impl_java_class!(
+    "com/longport/agent/ChatFinishedEvent",
+    longport::agent::ChatFinishedPayload,
+    [chat_id, chat_uid, message_id, error, error_message]
+);
+
+/// JNI-side view of [`longport::agent::ConversationResponse`], with
+/// `references`/`further_questions` normalized from `Option<Vec<_>>` down to
+/// a plain `Vec` (empty when absent) so they can use the same
+/// `#[java(objarray)]` convention as every other list field — mirrors how
+/// `StockPosition` above collapses `Option<Decimal>`/`Option<i64>` fields
+/// with `unwrap_or_default`.
+pub(crate) struct ConversationResponse {
+    pub(crate) chat_uid: String,
+    pub(crate) message_id: String,
+    pub(crate) status: longport::agent::ConversationStatus,
+    pub(crate) answer: String,
+    pub(crate) references: Vec<longport::agent::Reference>,
+    pub(crate) further_questions: Vec<String>,
+    pub(crate) elapsed_time: f64,
+    pub(crate) interrupt: Option<longport::agent::Interrupt>,
+    pub(crate) error: Option<longport::agent::AgentError>,
+}
+
+impl From<longport::agent::ConversationResponse> for ConversationResponse {
+    fn from(value: longport::agent::ConversationResponse) -> Self {
+        Self {
+            chat_uid: value.chat_uid,
+            message_id: value.message_id,
+            status: value.status,
+            answer: value.answer,
+            references: value.references.unwrap_or_default(),
+            further_questions: value.further_questions.unwrap_or_default(),
+            elapsed_time: value.elapsed_time,
+            interrupt: value.interrupt,
+            error: value.error,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longport/agent/ConversationResponse",
+    ConversationResponse,
+    [
+        chat_uid,
+        message_id,
+        status,
+        answer,
+        #[java(objarray)]
+        references,
+        #[java(objarray)]
+        further_questions,
+        elapsed_time,
+        interrupt,
+        error
+    ]
+);
+
+/// JNI-side wrapper so that
+/// [`longport::agent::ConversationStreamEvent::WorkflowFinished`] can go
+/// through the same `impl_java_class!` machinery as every other event
+/// payload — see the manual `IntoJValue` for `ConversationStreamEvent` below,
+/// which is the only place this type is used.
+pub(crate) struct WorkflowFinishedEvent {
+    pub(crate) response: ConversationResponse,
+}
+
+impl_java_class!(
+    "com/longport/agent/WorkflowFinishedEvent",
+    WorkflowFinishedEvent,
+    [response]
+);
+
+impl_java_class!(
+    "com/longport/agent/ChatTitleUpdatedEvent",
+    longport::agent::ChatTitleUpdatedPayload,
+    [chat_id, chat_uid, source, title, updated_at]
+);
+
+/// JNI-side wrapper for
+/// [`longport::agent::ConversationStreamEvent::Other`], carrying the SSE
+/// envelope's `event` type name alongside the raw event JSON as a string
+/// (same convention as `AlertItem.valueMap`).
+pub(crate) struct OtherEvent {
+    pub(crate) event: String,
+    pub(crate) json: serde_json::Value,
+}
+
+impl_java_class!("com/longport/agent/OtherEvent", OtherEvent, [event, json]);
+
+/// `ConversationStreamEvent` is an enum-with-payload, so unlike every type
+/// above it can't go through `impl_java_class!` (which only knows how to
+/// build a single Java class by reflecting named struct fields onto it).
+/// Instead each variant is modeled as its own Java subclass of the
+/// `ConversationStreamEvent` sealed-style hierarchy
+/// (`ChatStartedEvent`/`WorkflowStartedEvent`/`MessageEvent`/`PingEvent`/
+/// `ThinkingStartedEvent`/`ThinkingFinishedEvent`/`NodeToolUseStartedEvent`/
+/// `NodeToolUseFinishedEvent`/`SubagentStartedEvent`/`SubagentProgressEvent`/
+/// `SubagentFinishedEvent`/`AgentToolStartedEvent`/`AgentToolProgressEvent`/
+/// `AgentToolFinishedEvent`/`HumanInteractionRequiredEvent`/
+/// `QueryMaskedEvent`/`PlanChangedEvent`/`ContextCompressStartedEvent`/
+/// `ContextCompressFinishedEvent`/`ChatFinishedEvent`/`WorkflowFinishedEvent`/
+/// `ChatTitleUpdatedEvent`/`OtherEvent`), and this manual `IntoJValue` picks
+/// the right one — the resulting object reference is passed to
+/// `Flow.Subscriber.onNext(Object)` as-is (generics are erased on the Java
+/// side, so any subclass of the sealed base is a valid argument there).
+impl crate::types::IntoJValue for longport::agent::ConversationStreamEvent {
+    fn into_jvalue<'a>(
+        self,
+        env: &mut jni::JNIEnv<'a>,
+    ) -> jni::errors::Result<jni::objects::JValueOwned<'a>> {
+        use longport::agent::ConversationStreamEvent::*;
+        match self {
+            ChatStarted(payload) => payload.into_jvalue(env),
+            WorkflowStarted(payload) => payload.into_jvalue(env),
+            Message(payload) => payload.into_jvalue(env),
+            Ping => PingEvent {}.into_jvalue(env),
+            ThinkingStarted(payload) => payload.into_jvalue(env),
+            ThinkingFinished(payload) => payload.into_jvalue(env),
+            NodeToolUseStarted(payload) => payload.into_jvalue(env),
+            NodeToolUseFinished(payload) => payload.into_jvalue(env),
+            SubagentStarted(payload) => payload.into_jvalue(env),
+            SubagentProgress(payload) => payload.into_jvalue(env),
+            SubagentFinished(payload) => payload.into_jvalue(env),
+            AgentToolStarted(payload) => payload.into_jvalue(env),
+            AgentToolProgress(payload) => payload.into_jvalue(env),
+            AgentToolFinished(payload) => payload.into_jvalue(env),
+            HumanInteractionRequired(resp) => HumanInteractionRequiredEvent {
+                response: ConversationResponse::from(resp),
+            }
+            .into_jvalue(env),
+            QueryMasked(payload) => payload.into_jvalue(env),
+            PlanChanged(payload) => payload.into_jvalue(env),
+            ContextCompressStarted(payload) => payload.into_jvalue(env),
+            ContextCompressFinished(payload) => payload.into_jvalue(env),
+            ChatFinished(payload) => payload.into_jvalue(env),
+            WorkflowFinished(resp) => WorkflowFinishedEvent {
+                response: ConversationResponse::from(resp),
+            }
+            .into_jvalue(env),
+            ChatTitleUpdated(payload) => payload.into_jvalue(env),
+            Other { event, data } => OtherEvent { event, json: data }.into_jvalue(env),
+        }
+    }
+}

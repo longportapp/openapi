@@ -70,6 +70,8 @@ using longport::quote::WarrantType;
 using longport::quote::WatchlistGroup;
 using longport::quote::WatchlistSecurity;
 using longport::trade::AccountBalance;
+using longport::trade::AttachedOrderDetail;
+using longport::trade::AttachedOrderType;
 using longport::trade::BalanceType;
 using longport::trade::CashFlow;
 using longport::trade::CashFlowDirection;
@@ -77,6 +79,7 @@ using longport::trade::CashInfo;
 using longport::trade::ChargeCategoryCode;
 using longport::trade::CommissionFreeStatus;
 using longport::trade::DeductionStatus;
+using longport::trade::AllExecutionsResponse;
 using longport::trade::Execution;
 using longport::trade::FrozenTransactionFee;
 using longport::trade::FundPosition;
@@ -98,9 +101,11 @@ using longport::trade::OrderTag;
 using longport::trade::OrderType;
 using longport::trade::OutsideRTH;
 using longport::trade::PushOrderChanged;
+using longport::trade::ReplaceAttachedParams;
 using longport::trade::StockPosition;
 using longport::trade::StockPositionChannel;
 using longport::trade::StockPositionsResponse;
+using longport::trade::SubmitAttachedParams;
 using longport::trade::SubmitOrderResponse;
 using longport::trade::TimeInForceType;
 using longport::trade::TopicType;
@@ -967,6 +972,18 @@ convert(const lb_execution_t* info)
   };
 }
 
+inline AllExecutionsResponse
+convert(const lb_all_executions_response_t* resp)
+{
+  AllExecutionsResponse result;
+  result.has_more = resp->has_more;
+  std::transform(resp->trades,
+                 resp->trades + resp->num_trades,
+                 std::back_inserter(result.trades),
+                 [](auto row) { return convert(&row); });
+  return result;
+}
+
 inline OrderStatus
 convert(lb_order_status_t status)
 {
@@ -1173,19 +1190,6 @@ convert(lb_order_tag_t tag)
       return OrderTag::LongTerm;
     case OrderTagGrey:
       return OrderTag::Grey;
-    case OrderTagMarginCall:
-      return OrderTag::Grey;
-    case OrderTagOffline:
-      return OrderTag::Offline;
-    case OrderTagCreditor:
-      return OrderTag::Creditor;
-    case OrderTagDebtor:
-      return OrderTag::Debtor;
-    case OrderTagNonExercise:
-      return OrderTag::NonExercise;
-    case OrderTagAllocatedSub:
-      return OrderTag::AllocatedSub;
-    /// Trade Allocation
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1254,6 +1258,8 @@ convert(lb_outside_rth_t status)
       return OutsideRTH::AnyTime;
     case OutsideRTHOvernight:
       return OutsideRTH::Overnight;
+    case OutsideRTHOptionPreMarket:
+      return OutsideRTH::OptionPreMarket;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1271,14 +1277,185 @@ convert(OutsideRTH status)
       return OutsideRTHAnyTime;
     case OutsideRTH::Overnight:
       return OutsideRTHOvernight;
+    case OutsideRTH::OptionPreMarket:
+      return OutsideRTHOptionPreMarket;
     default:
       throw std::invalid_argument("unreachable");
   }
 }
 
+inline AttachedOrderType
+convert(CAttachedOrderType ty)
+{
+  switch (ty) {
+    case AttachedOrderTypeUnknown:
+      return AttachedOrderType::Unknown;
+    case AttachedOrderTypeProfitTaker:
+      return AttachedOrderType::ProfitTaker;
+    case AttachedOrderTypeStopLoss:
+      return AttachedOrderType::StopLoss;
+    case AttachedOrderTypeBracket:
+      return AttachedOrderType::Bracket;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline CAttachedOrderType
+convert(AttachedOrderType ty)
+{
+  switch (ty) {
+    case AttachedOrderType::Unknown:
+      return AttachedOrderTypeUnknown;
+    case AttachedOrderType::ProfitTaker:
+      return AttachedOrderTypeProfitTaker;
+    case AttachedOrderType::StopLoss:
+      return AttachedOrderTypeStopLoss;
+    case AttachedOrderType::Bracket:
+      return AttachedOrderTypeBracket;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline AttachedOrderDetail
+convert(const CAttachedOrderDetail* detail)
+{
+  return AttachedOrderDetail{
+    detail->order_id,
+    convert(detail->attached_type_display),
+    detail->trigger_price ? std::optional{ Decimal(detail->trigger_price) }
+                          : std::nullopt,
+    Decimal(detail->quantity),
+    Decimal(detail->executed_qty),
+    convert(detail->status),
+    detail->updated_at,
+    detail->withdrawn,
+    detail->gtd ? std::optional{ convert(detail->gtd) } : std::nullopt,
+    convert(detail->time_in_force),
+    detail->counter_id,
+    detail->trigger_status ? std::optional{ convert(*detail->trigger_status) } : std::nullopt,
+    Decimal(detail->executed_amount),
+    convert(detail->tag),
+    detail->submitted_at,
+    detail->executed_price ? std::optional{ Decimal(detail->executed_price) } : std::nullopt,
+    detail->force_only_rth ? std::optional{ convert(*detail->force_only_rth) }
+                           : std::nullopt,
+    detail->reviewed,
+    convert(detail->activate_order_type),
+    detail->activate_rth ? std::optional{ convert(*detail->activate_rth) }
+                         : std::nullopt,
+    detail->submit_price ? std::optional{ Decimal(detail->submit_price) }
+                         : std::nullopt,
+  };
+}
+
+struct CSubmitAttachedParamsStorage
+{
+  lb_time_in_force_type_t time_in_force;
+  lb_order_type_t activate_order_type;
+  lb_outside_rth_t activate_rth;
+  CSubmitAttachedParams params;
+};
+
+inline CSubmitAttachedParamsStorage
+convert_submit_attached(const SubmitAttachedParams& src)
+{
+  CSubmitAttachedParamsStorage s{};
+  s.params.attached_order_type = convert(src.attached_order_type);
+  s.params.profit_taker_price =
+    src.profit_taker_price
+      ? (const lb_decimal_t*)src.profit_taker_price.value()
+      : nullptr;
+  s.params.stop_loss_price =
+    src.stop_loss_price ? (const lb_decimal_t*)src.stop_loss_price.value()
+                        : nullptr;
+  if (src.time_in_force) {
+    s.time_in_force = convert(*src.time_in_force);
+    s.params.time_in_force = &s.time_in_force;
+  }
+  s.params.expire_time = src.expire_time ? &*src.expire_time : nullptr;
+  if (src.activate_order_type) {
+    s.activate_order_type = convert(*src.activate_order_type);
+    s.params.activate_order_type = &s.activate_order_type;
+  }
+  s.params.profit_taker_submit_price =
+    src.profit_taker_submit_price
+      ? (const lb_decimal_t*)src.profit_taker_submit_price.value()
+      : nullptr;
+  s.params.stop_loss_submit_price =
+    src.stop_loss_submit_price
+      ? (const lb_decimal_t*)src.stop_loss_submit_price.value()
+      : nullptr;
+  if (src.activate_rth) {
+    s.activate_rth = convert(*src.activate_rth);
+    s.params.activate_rth = &s.activate_rth;
+  }
+  return s;
+}
+
+struct CReplaceAttachedParamsStorage
+{
+  lb_time_in_force_type_t time_in_force;
+  lb_order_type_t activate_order_type;
+  lb_outside_rth_t activate_rth;
+  CReplaceAttachedParams params;
+};
+
+inline CReplaceAttachedParamsStorage
+convert_replace_attached(const ReplaceAttachedParams& src)
+{
+  CReplaceAttachedParamsStorage s{};
+  s.params.attached_order_type = convert(src.attached_order_type);
+  s.params.profit_taker_price =
+    src.profit_taker_price
+      ? (const lb_decimal_t*)src.profit_taker_price.value()
+      : nullptr;
+  s.params.stop_loss_price =
+    src.stop_loss_price ? (const lb_decimal_t*)src.stop_loss_price.value()
+                        : nullptr;
+  if (src.time_in_force) {
+    s.time_in_force = convert(*src.time_in_force);
+    s.params.time_in_force = &s.time_in_force;
+  }
+  s.params.expire_time = src.expire_time ? &*src.expire_time : nullptr;
+  if (src.activate_order_type) {
+    s.activate_order_type = convert(*src.activate_order_type);
+    s.params.activate_order_type = &s.activate_order_type;
+  }
+  s.params.profit_taker_submit_price =
+    src.profit_taker_submit_price
+      ? (const lb_decimal_t*)src.profit_taker_submit_price.value()
+      : nullptr;
+  s.params.stop_loss_submit_price =
+    src.stop_loss_submit_price
+      ? (const lb_decimal_t*)src.stop_loss_submit_price.value()
+      : nullptr;
+  if (src.activate_rth) {
+    s.activate_rth = convert(*src.activate_rth);
+    s.params.activate_rth = &s.activate_rth;
+  }
+  s.params.profit_taker_id =
+    src.profit_taker_id ? &*src.profit_taker_id : nullptr;
+  s.params.stop_loss_id = src.stop_loss_id ? &*src.stop_loss_id : nullptr;
+  s.params.cancel_all_attached =
+    src.cancel_all_attached ? &*src.cancel_all_attached : nullptr;
+  s.params.main_id = src.main_id ? &*src.main_id : nullptr;
+  s.params.quantity =
+    src.quantity ? (const lb_decimal_t*)src.quantity.value() : nullptr;
+  s.params.market_price =
+    src.market_price ? (const lb_decimal_t*)src.market_price.value() : nullptr;
+  return s;
+}
+
 inline Order
 convert(const lb_order_t* order)
 {
+  std::vector<AttachedOrderDetail> attached_orders;
+  std::transform(order->attached_orders,
+                 order->attached_orders + order->num_attached_orders,
+                 std::back_inserter(attached_orders),
+                 [](auto& item) { return convert(&item); });
   return Order{
     order->order_id,
     convert(order->status),
@@ -1320,7 +1497,8 @@ convert(const lb_order_t* order)
                          : std::nullopt,
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
-    order->remark
+    order->remark,
+    attached_orders,
   };
 }
 
@@ -1701,6 +1879,12 @@ convert(const lb_order_detail_t* order)
                  std::back_inserter(history),
                  [](auto item) { return convert(&item); });
 
+  std::vector<AttachedOrderDetail> attached_orders;
+  std::transform(order->attached_orders,
+                 order->attached_orders + order->num_attached_orders,
+                 std::back_inserter(attached_orders),
+                 [](auto& item) { return convert(&item); });
+
   return OrderDetail{
     order->order_id,
     convert(order->status),
@@ -1763,7 +1947,8 @@ convert(const lb_order_detail_t* order)
       ? std::optional{ std::string(order->platform_deducted_currency) }
       : std::nullopt,
     history,
-    convert(&order->charge_detail),
+    order->has_charge_detail ? std::optional{ convert(&order->charge_detail) } : std::nullopt,
+    attached_orders,
   };
 }
 
@@ -2326,16 +2511,9 @@ inline quote::OptionVolumeStats convert(const lb_option_volume_stats_t* s) {
   return { s->symbol, s->call_volume, s->put_volume };
 }
 inline quote::OptionVolumeDailyStat convert(const lb_option_volume_daily_stat_t* s) {
-  return { s->symbol,
-           convert(&s->date),
-           s->call_volume,
-           s->put_volume,
-           s->call_open_interest,
-           s->put_open_interest,
-           s->total_volume,
-           s->total_open_interest,
-           s->pc_vol,
-           s->pc_oi };
+  return { s->symbol,      convert(&s->date), s->call_volume,   s->put_volume,
+           s->call_open_interest, s->put_open_interest, s->total_volume, s->total_open_interest,
+           s->pc_vol,      s->pc_oi };
 }
 inline quote::OptionVolumeDaily convert(const lb_option_volume_daily_t* r) {
   std::vector<quote::OptionVolumeDailyStat> stats;
@@ -2498,6 +2676,19 @@ inline market::RankListResponse convert(const lb_rank_list_response_t* r) {
   std::vector<market::RankListItem> lists;
   for (size_t i = 0; i < r->num_lists; ++i) lists.push_back(convert(&r->lists[i]));
   return { r->bmp, std::move(lists) };
+}
+inline market::RankSubCategory convert(const lb_rank_sub_category_t* s) {
+  return { s->key ? s->key : "", s->name ? s->name : "", s->market ? s->market : "" };
+}
+inline market::RankCategory convert(const lb_rank_category_t* c) {
+  std::vector<market::RankSubCategory> subs;
+  for (size_t i = 0; i < c->num_sub_categories; ++i) subs.push_back(convert(&c->sub_categories[i]));
+  return { c->key ? c->key : "", c->name ? c->name : "", std::move(subs) };
+}
+inline market::RankCategoriesResponse convert(const lb_rank_categories_response_t* r) {
+  std::vector<market::RankCategory> cats;
+  for (size_t i = 0; i < r->num_categories; ++i) cats.push_back(convert(&r->categories[i]));
+  return { std::move(cats) };
 }
 
 // ── FundamentalContext conversions ────────────────────────────────
@@ -2734,7 +2925,7 @@ inline fundamental::InstitutionRatingViews convert(const lb_institution_rating_v
 
 // ── industry_rank conversions ─────────────────────────────────────
 inline fundamental::IndustryRankItem convert(const lb_industry_rank_item_t* item) {
-  return { item->name, item->counter_id, item->chg, item->leading_name, item->leading_ticker,
+  return { item->name, item->symbol, item->chg, item->leading_name, item->leading_ticker,
            item->leading_chg, item->value_name, item->value_data };
 }
 inline fundamental::IndustryRankGroup convert(const lb_industry_rank_group_t* g) {
@@ -2750,11 +2941,12 @@ inline fundamental::IndustryRankResponse convert(const lb_industry_rank_response
 
 // ── industry_peers conversions ────────────────────────────────────
 inline fundamental::IndustryPeerNode convert(const lb_industry_peer_node_t* node) {
-  return { node->name, node->counter_id, node->stock_num, node->chg, node->ytd_chg,
+  return { node->name, node->symbol, node->stock_num, node->chg, node->ytd_chg,
            node->next_json ? node->next_json : "" };
 }
 inline fundamental::IndustryPeersResponse convert(const lb_industry_peers_response_t* r) {
-  fundamental::IndustryPeersTop top{ r->top.name, r->top.market };
+  std::optional<fundamental::IndustryPeersTop> top;
+  if (r->top) top = fundamental::IndustryPeersTop{ r->top->name, r->top->market };
   std::optional<fundamental::IndustryPeerNode> chain;
   if (r->chain) chain = convert(r->chain);
   return { std::move(top), std::move(chain) };
@@ -2879,8 +3071,12 @@ inline portfolio::ProfitAnalysisDetail convert(const lb_profit_analysis_detail_t
 
 inline alert::AlertItem convert(const lb_alert_item_t* item) {
   std::vector<int32_t> state(item->state, item->state + item->num_state);
+  alert::AlertValueMap value_map{
+    item->value_map.price ? item->value_map.price : "",
+    item->value_map.chg ? std::optional<double>(*item->value_map.chg) : std::nullopt
+  };
   return { item->id, item->indicator_id, item->enabled, item->frequency, item->scope,
-           item->text, std::move(state), item->value_map };
+           item->text, std::move(state), std::move(value_map) };
 }
 inline alert::AlertSymbolGroup convert(const lb_alert_symbol_group_t* g) {
   std::vector<alert::AlertItem> inds;
@@ -2977,6 +3173,272 @@ inline sharelist::SharelistList convert(const lb_sharelist_list_t* r) {
 }
 inline sharelist::SharelistDetail convert(const lb_sharelist_detail_t* r) {
   return { convert(&r->sharelist), convert(&r->scopes) };
+}
+
+// ── AgentContext ──────────────────────────────────────────────────
+
+inline agent::Workspace convert(const lb_workspace_t* w) {
+  return { w->id, w->name, w->created_at, w->updated_at };
+}
+inline agent::WorkspacesResponse convert(const lb_workspaces_response_t* r) {
+  std::vector<agent::Workspace> workspaces;
+  for (size_t i = 0; i < r->num_workspaces; ++i) workspaces.push_back(convert(&r->workspaces[i]));
+  return { std::move(workspaces) };
+}
+inline agent::Agent convert(const lb_agent_t* a) {
+  return { a->uid, a->name, a->description, a->mode, a->icon, a->is_published,
+           a->published_at, a->created_at, a->updated_at };
+}
+inline agent::AgentsResponse convert(const lb_agents_response_t* r) {
+  std::vector<agent::Agent> agents;
+  for (size_t i = 0; i < r->num_agents; ++i) agents.push_back(convert(&r->agents[i]));
+  return { std::move(agents), r->total };
+}
+inline agent::ConversationStatus convert(lb_conversation_status_t status) {
+  switch (status) {
+    case ConversationStatusSucceeded:
+      return agent::ConversationStatus::Succeeded;
+    case ConversationStatusInterrupted:
+      return agent::ConversationStatus::Interrupted;
+    case ConversationStatusFailed:
+      return agent::ConversationStatus::Failed;
+    case ConversationStatusStopped:
+      return agent::ConversationStatus::Stopped;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+inline agent::Reference convert(const lb_reference_t* r) {
+  return { r->index, r->original_index, r->ref_type, r->id, r->title, r->url, r->content_json };
+}
+inline agent::QuestionOption convert(const lb_question_option_t* o) {
+  return { o->label, o->description };
+}
+inline agent::Question convert(const lb_question_t* q) {
+  std::vector<agent::QuestionOption> options;
+  for (size_t i = 0; i < q->num_options; ++i) options.push_back(convert(&q->options[i]));
+  return { q->question, std::move(options), q->multi_select };
+}
+inline agent::HumanInteraction convert(const lb_human_interaction_t* h) {
+  std::vector<agent::Question> questions;
+  for (size_t j = 0; j < h->num_questions; ++j) questions.push_back(convert(&h->questions[j]));
+  return { h->tool_call_id, h->interrupt_id, h->interaction_type, h->tool_name,
+           std::move(questions), h->tool_args_json };
+}
+inline agent::Interrupt convert(const lb_interrupt_t* i) {
+  std::vector<agent::Question> questions;
+  for (size_t j = 0; j < i->num_questions; ++j) questions.push_back(convert(&i->questions[j]));
+  std::vector<agent::HumanInteraction> interactions;
+  for (size_t j = 0; j < i->num_interactions; ++j) interactions.push_back(convert(&i->interactions[j]));
+  return { i->node_id, i->tool_call_id, std::move(questions), std::move(interactions),
+           i->message_id, i->chat_id };
+}
+inline agent::AgentError convert(const lb_agent_error_t* e) {
+  return { e->code, e->message };
+}
+inline agent::ConversationResponse convert(const lb_conversation_response_t* r) {
+  std::vector<agent::Reference> references;
+  for (size_t i = 0; i < r->num_references; ++i) references.push_back(convert(&r->references[i]));
+  std::vector<std::string> further_questions(r->further_questions,
+                                             r->further_questions + r->num_further_questions);
+  return {
+    r->chat_uid,
+    r->message_id,
+    convert(r->status),
+    r->answer,
+    std::move(references),
+    std::move(further_questions),
+    r->elapsed_time,
+    r->interrupt ? std::optional<agent::Interrupt>(convert(r->interrupt)) : std::nullopt,
+    r->error ? std::optional<agent::AgentError>(convert(r->error)) : std::nullopt,
+  };
+}
+inline agent::ChatStartedPayload convert(const lb_chat_started_payload_t* p) {
+  return { p->chat_uid, p->chat_id, p->message_id, p->error, p->error_message };
+}
+inline agent::MessagePayload convert(const lb_message_payload_t* p) {
+  return { p->text, p->message_type, p->key, p->started_at, p->stage, p->stage_title,
+           p->stage_finished_title, p->outputs_json };
+}
+inline agent::WorkflowStartedInputs convert(const lb_workflow_started_inputs_t* i) {
+  return { i->chat_id, i->chat_uid, i->message_id, i->query };
+}
+inline agent::WorkflowStartedPayload convert(const lb_workflow_started_payload_t* p) {
+  return { p->hit_cache, convert(p->inputs), p->started_at, p->workflow_id };
+}
+inline agent::ThinkingStartedPayload convert(const lb_thinking_started_payload_t* p) {
+  return { p->started_at };
+}
+inline agent::ThinkingFinishedPayload convert(const lb_thinking_finished_payload_t* p) {
+  return { p->finished_at, p->elapsed_time };
+}
+inline agent::NodeToolUseStartedPayload convert(const lb_node_tool_use_started_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->tool_use_id, p->tool_name, p->tool_func_name, p->tool_args, p->tips,
+           std::move(tip_chips), p->iteration, p->started_at };
+}
+inline agent::NodeToolUseOutputs convert(const lb_node_tool_use_outputs_t* o) {
+  std::vector<agent::Reference> references;
+  for (size_t i = 0; i < o->num_references; ++i) references.push_back(convert(&o->references[i]));
+  std::vector<std::string> reference_domains(o->reference_domains,
+                                              o->reference_domains + o->num_reference_domains);
+  return { std::move(references), std::move(reference_domains), o->query, o->text,
+           o->tool_args_json, o->data_json };
+}
+inline agent::NodeToolUseFinishedPayload convert(const lb_node_tool_use_finished_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->tool_use_id, p->status, p->error, p->elapsed_time, p->started_at, p->tool_name,
+           p->tool_func_name, p->tool_args, p->tool_type, p->tips, std::move(tip_chips),
+           p->iteration, p->is_thinking, convert(p->outputs) };
+}
+inline agent::SubagentStartedPayload convert(const lb_subagent_started_payload_t* p) {
+  return { p->node_id, p->tool_use_id, p->started_at, p->goal, p->prompt, p->subagent_id,
+           p->tools_json };
+}
+inline agent::SubagentProgressPayload convert(const lb_subagent_progress_payload_t* p) {
+  return { p->node_id, p->parent_tool_call_id, p->subagent_tool_name, p->subagent_tool_args,
+           p->subagent_status, p->subagent_duration_ms, p->subagent_iteration, p->started_at };
+}
+inline agent::SubagentOutputs convert(const lb_subagent_outputs_t* o) {
+  return { o->goal, o->result, o->subagent_tools_json };
+}
+inline agent::SubagentFinishedPayload convert(const lb_subagent_finished_payload_t* p) {
+  return { p->node_id, p->tool_use_id, p->status, p->started_at, p->elapsed_time, p->error,
+           convert(p->outputs) };
+}
+inline agent::AgentToolStartedPayload convert(const lb_agent_tool_started_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->node_id, p->tool_use_id, p->agent_tool_name, p->title, p->started_at, p->tool_args,
+           p->tool_name, p->tips, std::move(tip_chips), p->is_thinking };
+}
+inline agent::AgentToolProgressPayload convert(const lb_agent_tool_progress_payload_t* p) {
+  return { p->node_id, p->parent_tool_call_id, p->agent_tool_name, p->inner_tool_name,
+           p->inner_tool_args, p->status, p->duration_ms, p->started_at, p->is_thinking };
+}
+inline agent::AgentToolFinishedPayload convert(const lb_agent_tool_finished_payload_t* p) {
+  std::vector<std::string> tip_chips(p->tip_chips, p->tip_chips + p->num_tip_chips);
+  return { p->node_id, p->tool_use_id, p->agent_tool_name, p->status, p->started_at,
+           p->elapsed_time, p->error, p->tool_args, p->outputs_json, p->tool_type, p->tips,
+           std::move(tip_chips), p->is_thinking };
+}
+inline agent::QueryMaskedPayload convert(const lb_query_masked_payload_t* p) {
+  return { p->raw_query, p->masked_query };
+}
+inline agent::PlanChangedPayload convert(const lb_plan_changed_payload_t* p) {
+  return { p->node_id, p->started_at, p->outputs_json, p->tool_name };
+}
+inline agent::ContextCompressStartedPayload convert(const lb_context_compress_started_payload_t* p) {
+  return { p->started_at, p->inputs_json };
+}
+inline agent::ContextCompressFinishedPayload convert(
+  const lb_context_compress_finished_payload_t* p) {
+  return { p->created_at, p->inputs_json, p->outputs_json };
+}
+inline agent::ChatFinishedPayload convert(const lb_chat_finished_payload_t* p) {
+  return { p->chat_id, p->chat_uid, p->message_id, p->error, p->error_message };
+}
+inline agent::ChatTitleUpdatedPayload convert(const lb_chat_title_updated_payload_t* p) {
+  return { p->chat_id, p->chat_uid, p->source, p->title, p->updated_at };
+}
+inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event_t* e) {
+  agent::ConversationStreamEvent event{};
+  switch (e->kind) {
+    case ChatStarted:
+      event.kind = agent::ConversationStreamEventKind::ChatStarted;
+      event.chat_started = convert(e->chat_started);
+      break;
+    case WorkflowStarted:
+      event.kind = agent::ConversationStreamEventKind::WorkflowStarted;
+      event.workflow_started = convert(e->workflow_started);
+      break;
+    case Message:
+      event.kind = agent::ConversationStreamEventKind::Message;
+      event.message = convert(e->message);
+      break;
+    case Ping:
+      event.kind = agent::ConversationStreamEventKind::Ping;
+      break;
+    case ThinkingStarted:
+      event.kind = agent::ConversationStreamEventKind::ThinkingStarted;
+      event.thinking_started = convert(e->thinking_started);
+      break;
+    case ThinkingFinished:
+      event.kind = agent::ConversationStreamEventKind::ThinkingFinished;
+      event.thinking_finished = convert(e->thinking_finished);
+      break;
+    case NodeToolUseStarted:
+      event.kind = agent::ConversationStreamEventKind::NodeToolUseStarted;
+      event.node_tool_use_started = convert(e->node_tool_use_started);
+      break;
+    case NodeToolUseFinished:
+      event.kind = agent::ConversationStreamEventKind::NodeToolUseFinished;
+      event.node_tool_use_finished = convert(e->node_tool_use_finished);
+      break;
+    case SubagentStarted:
+      event.kind = agent::ConversationStreamEventKind::SubagentStarted;
+      event.subagent_started = convert(e->subagent_started);
+      break;
+    case SubagentProgress:
+      event.kind = agent::ConversationStreamEventKind::SubagentProgress;
+      event.subagent_progress = convert(e->subagent_progress);
+      break;
+    case SubagentFinished:
+      event.kind = agent::ConversationStreamEventKind::SubagentFinished;
+      event.subagent_finished = convert(e->subagent_finished);
+      break;
+    case AgentToolStarted:
+      event.kind = agent::ConversationStreamEventKind::AgentToolStarted;
+      event.agent_tool_started = convert(e->agent_tool_started);
+      break;
+    case AgentToolProgress:
+      event.kind = agent::ConversationStreamEventKind::AgentToolProgress;
+      event.agent_tool_progress = convert(e->agent_tool_progress);
+      break;
+    case AgentToolFinished:
+      event.kind = agent::ConversationStreamEventKind::AgentToolFinished;
+      event.agent_tool_finished = convert(e->agent_tool_finished);
+      break;
+    case HumanInteractionRequired:
+      event.kind = agent::ConversationStreamEventKind::HumanInteractionRequired;
+      event.human_interaction_required = convert(e->human_interaction_required);
+      break;
+    case QueryMasked:
+      event.kind = agent::ConversationStreamEventKind::QueryMasked;
+      event.query_masked = convert(e->query_masked);
+      break;
+    case PlanChanged:
+      event.kind = agent::ConversationStreamEventKind::PlanChanged;
+      event.plan_changed = convert(e->plan_changed);
+      break;
+    case ContextCompressStarted:
+      event.kind = agent::ConversationStreamEventKind::ContextCompressStarted;
+      event.context_compress_started = convert(e->context_compress_started);
+      break;
+    case ContextCompressFinished:
+      event.kind = agent::ConversationStreamEventKind::ContextCompressFinished;
+      event.context_compress_finished = convert(e->context_compress_finished);
+      break;
+    case ChatFinished:
+      event.kind = agent::ConversationStreamEventKind::ChatFinished;
+      event.chat_finished = convert(e->chat_finished);
+      break;
+    case WorkflowFinished:
+      event.kind = agent::ConversationStreamEventKind::WorkflowFinished;
+      event.workflow_finished = convert(e->workflow_finished);
+      break;
+    case ChatTitleUpdated:
+      event.kind = agent::ConversationStreamEventKind::ChatTitleUpdated;
+      event.chat_title_updated = convert(e->chat_title_updated);
+      break;
+    case Other:
+      event.kind = agent::ConversationStreamEventKind::Other;
+      event.other_event = std::string(e->other_event);
+      event.other_json = std::string(e->other_json);
+      break;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+  return event;
 }
 
 } // namespace convert

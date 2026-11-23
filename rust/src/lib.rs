@@ -14,15 +14,13 @@ pub mod runtime;
 pub use runtime::runtime_handle;
 mod serde_utils;
 mod types;
-mod utils;
-
-pub use utils::counter;
 
 #[cfg(feature = "blocking")]
 #[cfg_attr(docsrs, doc(cfg(feature = "blocking")))]
 pub mod blocking;
 
 pub use longport_oauth as oauth;
+pub mod agent;
 pub mod alert;
 pub mod asset;
 pub mod calendar;
@@ -36,6 +34,7 @@ pub mod screener;
 pub mod sharelist;
 pub mod trade;
 
+pub use agent::AgentContext;
 pub use alert::AlertContext;
 pub use asset::AssetContext;
 pub use calendar::CalendarContext;
@@ -44,13 +43,23 @@ pub use content::ContentContext;
 pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
 pub use fundamental::FundamentalContext;
+// ── US-market type re-exports ─────────────────────────────────────────────────
+pub use fundamental::types::{
+    USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
+    USETFFilesResponse, USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
+};
 pub use longport_httpcli as httpclient;
+pub use longport_httpcli::{DC_REGION_HEADER, DcRegion};
 pub use longport_wscli as wsclient;
 pub use market::MarketContext;
 pub use portfolio::PortfolioContext;
-pub use quote::QuoteContext;
+pub use quote::{QuoteContext, USCryptoOverview};
 pub use rust_decimal::Decimal;
 pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
-pub use trade::TradeContext;
+pub use trade::{
+    GetUSHistoryOrders, GetUSRealizedPLOptions, QueryUSOrdersOptions, QueryUSOrdersResponse,
+    TradeContext, USAssetOverview, USCashEntry, USCryptoEntry, USOrderDetailResponse,
+    USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+};
 pub use types::Market;

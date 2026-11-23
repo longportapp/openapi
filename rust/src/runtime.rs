@@ -11,7 +11,7 @@ pub(crate) static RUNTIME: LazyLock<Runtime> = LazyLock::new(|| {
         .expect("create tokio runtime")
 });
 
-/// Returns a handle to the global Longport tokio runtime.
+/// Returns a handle to the global LongPort tokio runtime.
 ///
 /// Used internally by language bindings to schedule async tasks.
 #[doc(hidden)]

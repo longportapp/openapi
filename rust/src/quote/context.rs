@@ -1,10 +1,9 @@
 use std::{
-    collections::HashMap,
     sync::{Arc, RwLock},
     time::Duration,
 };
 
-use longport_httpcli::{HttpClient, Json, Method};
+use longport_httpcli::{DcRegion, HttpClient, Json, Method};
 use longport_proto::quote;
 use longport_wscli::WsClientError;
 use serde::{Deserialize, Serialize};
@@ -242,7 +241,7 @@ impl QuoteContext {
 
     /// Subscribe
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/subscribe/subscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/subscribe/subscribe>
     ///
     /// # Examples
     ///
@@ -292,7 +291,7 @@ impl QuoteContext {
 
     /// Unsubscribe
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/subscribe/unsubscribe>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/subscribe/unsubscribe>
     ///
     /// # Examples
     ///
@@ -443,7 +442,7 @@ impl QuoteContext {
 
     /// Get basic information of securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/static>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/static>
     ///
     /// # Examples
     ///
@@ -487,7 +486,7 @@ impl QuoteContext {
 
     /// Get quote of securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/quote>
     ///
     /// # Examples
     ///
@@ -528,7 +527,7 @@ impl QuoteContext {
 
     /// Get quote of option securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/option-quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/option-quote>
     ///
     /// # Examples
     ///
@@ -567,7 +566,7 @@ impl QuoteContext {
 
     /// Get quote of warrant securities
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/warrant-quote>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/warrant-quote>
     ///
     /// # Examples
     ///
@@ -606,7 +605,7 @@ impl QuoteContext {
 
     /// Get security depth
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/depth>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/depth>
     ///
     /// # Examples
     ///
@@ -652,7 +651,7 @@ impl QuoteContext {
 
     /// Get security brokers
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/brokers>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/brokers>
     ///
     /// # Examples
     ///
@@ -674,6 +673,17 @@ impl QuoteContext {
     /// # });
     /// ```
     pub async fn brokers(&self, symbol: impl Into<String>) -> Result<SecurityBrokers> {
+        // Broker queue is served only by the AP data center; short-circuit a
+        // non-AP session with the same unified error the HTTP path returns.
+        let current = self.0.http_cli.dc_region().await;
+        if !current.allows(longport_httpcli::DcRegion::Ap) {
+            return Err(longport_httpcli::HttpClientError::DcRegionRestricted {
+                path: "quote/brokers (WebSocket)".to_string(),
+                required: longport_httpcli::DcRegion::Ap,
+                current,
+            }
+            .into());
+        }
         let resp: quote::SecurityBrokersResponse = self
             .request(
                 cmd_code::GET_SECURITY_BROKERS,
@@ -690,7 +700,7 @@ impl QuoteContext {
 
     /// Get participants
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/broker-ids>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/broker-ids>
     ///
     /// # Examples
     ///
@@ -732,7 +742,7 @@ impl QuoteContext {
 
     /// Get security trades
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/trade>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade>
     ///
     /// # Examples
     ///
@@ -773,7 +783,7 @@ impl QuoteContext {
 
     /// Get security intraday lines
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/intraday>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/intraday>
     ///
     /// # Examples
     ///
@@ -822,7 +832,7 @@ impl QuoteContext {
 
     /// Get security candlesticks
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/candlestick>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/candlestick>
     ///
     /// # Examples
     ///
@@ -995,7 +1005,7 @@ impl QuoteContext {
 
     /// Get option chain expiry date list
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/optionchain-date>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/optionchain-date>
     ///
     /// # Examples
     ///
@@ -1041,7 +1051,7 @@ impl QuoteContext {
 
     /// Get option chain info by date
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/optionchain-date-strike>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/optionchain-date-strike>
     ///
     /// # Examples
     ///
@@ -1095,7 +1105,7 @@ impl QuoteContext {
 
     /// Get warrant issuers
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/issuer>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/issuer>
     ///
     /// # Examples
     ///
@@ -1179,7 +1189,7 @@ impl QuoteContext {
 
     /// Get trading session of the day
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/trade-session>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade-session>
     ///
     /// # Examples
     ///
@@ -1222,7 +1232,7 @@ impl QuoteContext {
     /// The interval must be less than one month, and only the most recent year
     /// is supported.
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/trade-day>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/trade-day>
     ///
     /// # Examples
     ///
@@ -1284,7 +1294,7 @@ impl QuoteContext {
 
     /// Get capital flow intraday
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/capital-flow-intraday>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/capital-flow-intraday>
     ///
     /// # Examples
     ///
@@ -1320,7 +1330,7 @@ impl QuoteContext {
 
     /// Get capital distribution
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/capital-distribution>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/capital-distribution>
     ///
     /// # Examples
     ///
@@ -1388,7 +1398,7 @@ impl QuoteContext {
 
     /// Get watchlist
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_groups>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_groups>
     ///
     /// # Examples
     ///
@@ -1428,7 +1438,7 @@ impl QuoteContext {
 
     /// Create watchlist group
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_create_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_create_group>
     ///
     /// # Examples
     ///
@@ -1486,7 +1496,7 @@ impl QuoteContext {
 
     /// Delete watchlist group
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_delete_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_delete_group>
     ///
     /// # Examples
     ///
@@ -1525,8 +1535,8 @@ impl QuoteContext {
 
     /// Update watchlist group
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_update_group>
-    /// Reference: <https://open.longport.com/en/docs/quote/individual/watchlist_update_group_securities>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_update_group>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/individual/watchlist_update_group_securities>
     ///
     /// # Examples
     ///
@@ -1643,7 +1653,7 @@ impl QuoteContext {
 
     /// Get current market temperature
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/market_temperature>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/market_temperature>
     ///
     /// # Examples
     ///
@@ -1684,7 +1694,7 @@ impl QuoteContext {
 
     /// Get historical market temperature
     ///
-    /// Reference: <https://open.longport.com/en/docs/quote/pull/history_market_temperature>
+    /// Reference: <https://open.longportapp.com/en/docs/quote/pull/history_market_temperature>
     ///
     /// # Examples
     ///
@@ -1992,8 +2002,6 @@ impl QuoteContext {
     ) -> Result<ShortPositionsResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
-
         let sym = symbol.into();
         let is_hk = sym.to_uppercase().ends_with(".HK");
         let path = if is_hk {
@@ -2008,17 +2016,17 @@ impl QuoteContext {
 
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             last_timestamp: String,
             count: u32,
         }
-        // Response: {"counter_id":"ST/US/AAPL","data":[{...}]}
+        // Response: {"symbol":"AAPL.US","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&sym),
+                symbol: sym.clone(),
                 last_timestamp: ts.to_string(),
                 count,
             })
@@ -2061,10 +2069,9 @@ impl QuoteContext {
     ///
     /// Path: `GET /v1/quote/option-volume-stats`
     pub async fn option_volume(&self, symbol: impl Into<String>) -> Result<OptionVolumeStats> {
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(serde::Serialize)]
         struct Query {
-            underlying_counter_id: String,
+            symbol: String,
         }
         #[derive(serde::Deserialize)]
         struct RawOptionVolumeStats {
@@ -2077,7 +2084,7 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats")
             .query_params(Query {
-                underlying_counter_id: symbol_to_counter_id(&symbol),
+                symbol: symbol.clone(),
             })
             .response::<Json<RawOptionVolumeStats>>()
             .send()
@@ -2100,17 +2107,16 @@ impl QuoteContext {
         timestamp: i64,
         count: u32,
     ) -> Result<OptionVolumeDaily> {
-        use crate::utils::counter::{counter_id_to_symbol, symbol_to_counter_id};
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             timestamp: i64,
             line_num: u32,
             direction: i32,
         }
         #[derive(serde::Deserialize)]
         struct RawDailyStat {
-            underlying_counter_id: String,
+            symbol: String,
             timestamp: String,
             total_call_volume: String,
             total_put_volume: String,
@@ -2133,7 +2139,7 @@ impl QuoteContext {
             .http_cli
             .request(Method::GET, "/v1/quote/option-volume-stats/daily")
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&symbol),
+                symbol: symbol.clone(),
                 timestamp,
                 line_num: count,
                 direction: 1,
@@ -2149,7 +2155,7 @@ impl QuoteContext {
             .map(|item| {
                 let ts: i64 = item.timestamp.parse().unwrap_or(0);
                 OptionVolumeDailyStat {
-                    symbol: counter_id_to_symbol(&item.underlying_counter_id),
+                    symbol: item.symbol,
                     date: time::OffsetDateTime::from_unix_timestamp(ts)
                         .unwrap_or(time::OffsetDateTime::UNIX_EPOCH)
                         .date(),
@@ -2180,10 +2186,9 @@ impl QuoteContext {
     ) -> Result<ShortTradesResponse> {
         use std::time::{SystemTime, UNIX_EPOCH};
 
-        use crate::utils::counter::symbol_to_counter_id;
         #[derive(serde::Serialize)]
         struct Query {
-            counter_id: String,
+            symbol: String,
             last_timestamp: String,
             page_size: String,
         }
@@ -2197,13 +2202,13 @@ impl QuoteContext {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
-        // Response: {"counter_id":"ST/HK/700","data":[{...}]}
+        // Response: {"symbol":"00700.HK","data":[{...}]} — only `data` is used.
         let outer: serde_json::Value = self
             .0
             .http_cli
             .request(Method::GET, path)
             .query_params(Query {
-                counter_id: symbol_to_counter_id(&sym),
+                symbol: sym.clone(),
                 last_timestamp: ts.to_string(),
                 page_size: count.to_string(),
             })
@@ -2259,79 +2264,38 @@ impl QuoteContext {
         Ok(())
     }
 
-    // ── symbol_to_counter_ids ─────────────────────────────────────
+    // ── US-market APIs ────────────────────────────────────────────────────────
 
-    /// Batch convert symbols to counter IDs via the remote API.
+    /// Get cryptocurrency market overview.
     ///
-    /// Returns a map of `symbol → counter_id` (e.g. `DRAM.US` →
-    /// `ETF/US/DRAM`). Symbols the backend does not recognize are omitted
-    /// from the result.
+    /// `symbol` must be in `PAIR.EXCHANGE` format.
+    /// US DC uses the **BKKT** exchange: e.g. `"BTCUSD.BKKT"` →
+    /// `"VA/BKKT/BTCUSD"`. Pass the exchange suffix explicitly.
     ///
-    /// Path: `POST /v1/quote/symbol-to-counter-ids`
-    pub async fn symbol_to_counter_ids(
+    /// Path: `GET /v1/us/gemini/crypto-overview`
+    ///
+    /// US token required.
+    pub async fn us_crypto_overview(
         &self,
-        symbols: Vec<String>,
-    ) -> Result<HashMap<String, String>> {
-        #[derive(Debug, Serialize)]
-        struct Request {
-            ticker_regions: Vec<String>,
+        symbol: impl Into<String>,
+    ) -> Result<crate::quote::USCryptoOverview> {
+        #[derive(Serialize)]
+        struct Query {
+            symbol: String,
         }
-        #[derive(Debug, Deserialize)]
-        struct Response {
-            #[serde(default)]
-            list: HashMap<String, String>,
-        }
-
-        let resp = self
+        Ok(self
             .0
             .http_cli
-            .request(Method::POST, "/v1/quote/symbol-to-counter-ids")
-            .body(Json(Request {
-                ticker_regions: symbols,
-            }))
-            .response::<Json<Response>>()
+            .request(Method::GET, "/v1/us/gemini/crypto-overview")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                symbol: symbol.into(),
+            })
+            .response::<Json<crate::quote::USCryptoOverview>>()
             .send()
             .with_subscriber(self.0.log_subscriber.clone())
-            .await?;
-        Ok(resp.0.list)
-    }
-
-    /// Resolve counter IDs for symbols, local-first with remote fallback.
-    ///
-    /// Symbols found in the embedded ETF / index / warrant directory (or in
-    /// the local cache of previous remote resolutions) are resolved without
-    /// network access. The remaining symbols are resolved in one batch via
-    /// [`symbol_to_counter_ids`](Self::symbol_to_counter_ids) and the results
-    /// are persisted to the local cache for subsequent lookups. Symbols the
-    /// backend does not recognize fall back to the default `ST/` conversion.
-    pub async fn resolve_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<HashMap<String, String>> {
-        use crate::utils::counter;
-
-        let mut result = HashMap::with_capacity(symbols.len());
-        let mut unknown = Vec::new();
-        for symbol in symbols {
-            match counter::lookup_counter_id(&symbol) {
-                Some(counter_id) => {
-                    result.insert(symbol, counter_id);
-                }
-                None => unknown.push(symbol),
-            }
-        }
-        if !unknown.is_empty() {
-            let resolved = self.symbol_to_counter_ids(unknown.clone()).await?;
-            counter::cache_counter_ids(resolved.values().map(String::as_str));
-            for symbol in unknown {
-                let counter_id = resolved
-                    .get(&symbol)
-                    .cloned()
-                    .unwrap_or_else(|| counter::symbol_to_counter_id(&symbol));
-                result.insert(symbol, counter_id);
-            }
-        }
-        Ok(result)
+            .await?
+            .0)
     }
 }
 

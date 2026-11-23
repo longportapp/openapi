@@ -14,8 +14,8 @@ use crate::{
         RequestCreateWatchlistGroup, RequestUpdateWatchlistGroup, Security, SecurityBrokers,
         SecurityCalcIndex, SecurityDepth, SecurityListCategory, SecurityQuote, SecurityStaticInfo,
         ShortPositionsResponse, ShortTradesResponse, SortOrderType, StrikePriceInfo, SubFlags,
-        Subscription, Trade, TradeSessions, WarrantInfo, WarrantQuote, WarrantSortBy,
-        WarrantStatus, WarrantType, WatchlistGroup,
+        Subscription, Trade, TradeSessions, USCryptoOverview, WarrantInfo, WarrantQuote,
+        WarrantSortBy, WarrantStatus, WarrantType, WatchlistGroup,
     },
 };
 
@@ -1212,22 +1212,14 @@ impl QuoteContextSync {
             .call(move |ctx| async move { ctx.short_trades(symbol, count).await })
     }
 
-    /// Batch convert symbols to counter IDs via the remote API
-    pub fn symbol_to_counter_ids(
-        &self,
-        symbols: Vec<String>,
-    ) -> Result<std::collections::HashMap<String, String>> {
-        self.rt
-            .call(move |ctx| async move { ctx.symbol_to_counter_ids(symbols).await })
-    }
+    // ── US-market blocking wrappers ───────────────────────────────────────────
 
-    /// Resolve counter IDs for symbols, local-first with remote fallback and
-    /// local caching
-    pub fn resolve_counter_ids(
+    /// Get cryptocurrency market overview (blocking)
+    pub fn us_crypto_overview(
         &self,
-        symbols: Vec<String>,
-    ) -> Result<std::collections::HashMap<String, String>> {
+        symbol: impl Into<String> + Send + 'static,
+    ) -> Result<USCryptoOverview> {
         self.rt
-            .call(move |ctx| async move { ctx.resolve_counter_ids(symbols).await })
+            .call(move |ctx| async move { ctx.us_crypto_overview(symbol).await })
     }
 }

@@ -44,7 +44,7 @@ private:
   uint16_t callback_port_;
 
 public:
-  /// @param client_id     OAuth 2.0 client ID from the Longport developer portal
+  /// @param client_id     OAuth 2.0 client ID from the LongPort developer portal
   /// @param callback_port Local callback server port; pass 0 to use the
   ///                      default (60355)
   OAuthBuilder(const std::string& client_id, uint16_t callback_port = 0);

@@ -1,4 +1,4 @@
-site_name: Longport OpenAPI SDK
+site_name: LongPort OpenAPI SDK
 docs_dir: docs
 
 theme:

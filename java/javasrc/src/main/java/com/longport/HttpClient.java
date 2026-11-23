@@ -5,9 +5,9 @@ import java.util.concurrent.CompletableFuture;
 import com.google.gson.Gson;
 
 /**
- * Longport OpenAPI HTTP client.
+ * LongPort OpenAPI HTTP client.
  * <p>
- * Provides authenticated HTTP access to the Longport REST API. Instances are
+ * Provides authenticated HTTP access to the LongPort REST API. Instances are
  * created via the static factory methods {@link #fromApikey} or
  * {@link #fromApikeyEnv}. The client must be closed after use (it implements
  * {@link AutoCloseable}).

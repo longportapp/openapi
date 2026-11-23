@@ -2,7 +2,7 @@
 edition.workspace = true
 name = "longport-python"
 version.workspace = true
-description = "Longport OpenAPI SDK for Python"
+description = "LongPort OpenAPI SDK for Python"
 homepage = "https://open.longportapp.com/en/"
 readme = "README.md"
 repository = "https://github.com/longportapp/openapi"
@@ -19,6 +19,7 @@ longport = { workspace = true, features = ["blocking"] }
 longport-python-macros = { path = "crates/macros" }
 pyo3-async-runtimes = { workspace = true }
 
+futures-util.workspace = true
 parking_lot.workspace = true
 pyo3 = { workspace = true, features = [
     "extension-module",

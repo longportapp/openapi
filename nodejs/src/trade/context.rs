@@ -193,6 +193,20 @@ impl TradeContext {
             .collect()
     }
 
+    // TODO: temporarily disabled — restore when API is available
+    // Get all executions
+    // #[napi]
+    // pub async fn all_executions(
+    // &self,
+    // opts: Option<GetAllExecutionsOptions>,
+    // ) -> Result<AllExecutionsResponse> {
+    // self.ctx
+    // .all_executions(opts.map(Into::into))
+    // .await
+    // .map_err(ErrorNewType)?
+    // .try_into()
+    // }
+
     /// Get history orders
     ///
     /// #### Example
@@ -351,11 +365,12 @@ impl TradeContext {
     /// await ctx.cancelOrder("709043056541253632");
     /// ```
     #[napi]
-    pub async fn cancel_order(&self, order_id: String) -> Result<()> {
-        self.ctx
-            .cancel_order(order_id)
-            .await
-            .map_err(ErrorNewType)?;
+    pub async fn cancel_order(&self, order_id: String, is_attached: Option<bool>) -> Result<()> {
+        let mut opts = longport::trade::CancelOrderOptions::new(order_id);
+        if is_attached.unwrap_or(false) {
+            opts = opts.is_attached();
+        }
+        self.ctx.cancel_order(opts).await.map_err(ErrorNewType)?;
         Ok(())
     }
 
@@ -497,6 +512,101 @@ impl TradeContext {
     pub async fn order_detail(&self, order_id: String) -> Result<OrderDetail> {
         self.ctx
             .order_detail(order_id)
+            .await
+            .map_err(ErrorNewType)?
+            .try_into()
+    }
+
+    // ── US-market methods ─────────────────────────────────────────────────
+
+    /// Query US order list. Returns JSON string. US token required.
+    /// symbol: user-facing symbol e.g. "AAPL.US"; action: 0=all/1=buy/2=sell.
+    #[napi]
+    pub fn us_query_orders<'env>(
+        &self,
+        env: &'env Env,
+        symbol: Option<String>,
+        action: i32,
+        start_at: i64,
+        end_at: i64,
+        query_type: i32,
+        page: i32,
+        limit: i32,
+    ) -> Result<PromiseRaw<'env, String>> {
+        let ctx = self.ctx.clone();
+        let opts = longport::trade::GetUSHistoryOrders {
+            symbol,
+            side: match action {
+                1 => longport::trade::OrderSide::Buy,
+                2 => longport::trade::OrderSide::Sell,
+                _ => longport::trade::OrderSide::Unknown,
+            },
+            start_at,
+            end_at,
+            query_type,
+            page,
+            limit,
+        };
+        env.spawn_future(async move {
+            let resp = ctx.us_query_orders(opts).await.map_err(ErrorNewType)?;
+            serde_json::to_string(&resp).map_err(|e| napi::Error::from_reason(e.to_string()))
+        })
+    }
+
+    /// Get US order detail. US token required.
+    #[napi]
+    pub fn us_order_detail<'env>(
+        &self,
+        env: &'env Env,
+        order_id: String,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USOrderDetailResponse>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_order_detail(order_id)
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    /// Get US account asset overview. US token required.
+    #[napi]
+    pub fn us_asset_overview<'env>(
+        &self,
+        env: &'env Env,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USAssetOverview>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(
+            async move { Ok(ctx.us_asset_overview().await.map_err(ErrorNewType)?.into()) },
+        )
+    }
+
+    /// Get US realized P&L. US token required.
+    #[napi]
+    pub fn us_realized_pl<'env>(
+        &self,
+        env: &'env Env,
+        currency: String,
+        category: Option<String>,
+    ) -> Result<PromiseRaw<'env, crate::trade::types::USRealizedPL>> {
+        let ctx = self.ctx.clone();
+        env.spawn_future(async move {
+            Ok(ctx
+                .us_realized_pl(longport::trade::GetUSRealizedPLOptions {
+                    currency,
+                    category: category.unwrap_or_default(),
+                })
+                .await
+                .map_err(ErrorNewType)?
+                .into())
+        })
+    }
+
+    #[napi]
+    pub async fn order_detail_attached(&self, order_id: String) -> Result<OrderDetail> {
+        self.ctx
+            .order_detail(longport::trade::GetOrderDetailOptions::new(order_id).is_attached())
             .await
             .map_err(ErrorNewType)?
             .try_into()

@@ -2,7 +2,7 @@
 edition.workspace = true
 name = "longport-oauth"
 version.workspace = true
-description = "Longport OpenAPI OAuth 2.0 client for Rust"
+description = "LongPort OpenAPI OAuth 2.0 client for Rust"
 license = "MIT OR Apache-2.0"
 
 [features]

@@ -387,18 +387,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longport/trade/OrderTag",
     longport::trade::OrderTag,
-    [
-        Unknown,
-        Normal,
-        LongTerm,
-        Grey,
-        MarginCall,
-        Offline,
-        Creditor,
-        Debtor,
-        NonExercise,
-        AllocatedSub,
-    ]
+    [Unknown, Normal, LongTerm, Grey,]
 );
 
 impl_java_enum!(
@@ -422,7 +411,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longport/trade/OutsideRTH",
     longport::trade::OutsideRTH,
-    [Unknown, RTHOnly, AnyTime, Overnight]
+    [Unknown, RTHOnly, AnyTime, Overnight, OptionPreMarket]
 );
 
 impl_java_enum!(
@@ -453,6 +442,21 @@ impl_java_enum!(
     "com/longport/trade/ChargeCategoryCode",
     longport::trade::ChargeCategoryCode,
     [Unknown, Broker, Third]
+);
+
+impl_java_enum!(
+    "com/longport/trade/AttachedOrderType",
+    longport::trade::AttachedOrderType,
+    [
+        #[java(remote = Unknown)]
+        UNKNOWN,
+        #[java(remote = ProfitTaker)]
+        PROFIT_TAKER,
+        #[java(remote = StopLoss)]
+        STOP_LOSS,
+        #[java(remote = Bracket)]
+        BRACKET,
+    ]
 );
 
 impl_java_enum!(
@@ -525,4 +529,9 @@ impl_java_enum!(
         Underperform,
         NoOpinion
     ]
+);
+impl_java_enum!(
+    "com/longport/agent/ConversationStatus",
+    longport::agent::ConversationStatus,
+    [Succeeded, Interrupted, Failed, Stopped]
 );
