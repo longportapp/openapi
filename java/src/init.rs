@@ -287,7 +287,8 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::dca::DcaSupportInfo,
         longport::dca::DcaSupportList,
         longport::dca::DcaCalcDateResult,
-        // AlertContext - list returns JSON via AlertList IntoJValue (serde_json)
+        // AlertContext - list returns JSON via AlertList IntoJValue
+        // (serde_json)
         longport::dca::DcaPlan,
         longport::dca::DcaList,
         longport::dca::DcaStats,
@@ -359,7 +360,8 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::dca::DcaSupportInfo,
         longport::dca::DcaSupportList,
         longport::dca::DcaCalcDateResult,
-        // AlertContext - list returns JSON via AlertList IntoJValue (serde_json)
+        // AlertContext - list returns JSON via AlertList IntoJValue
+        // (serde_json)
         longport::dca::DcaPlan,
         longport::dca::DcaList,
         longport::dca::DcaStats,

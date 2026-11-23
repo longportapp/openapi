@@ -48,7 +48,7 @@ pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
 pub use fund::FundContext;
 pub use fundamental::FundamentalContext;
-// ── US-market type re-exports ─────────────────────────────────────────────────
+// ── US-market type re-exports ──
 pub use fundamental::types::{
     USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
     USETFFilesResponse, USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
