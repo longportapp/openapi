@@ -5655,7 +5655,8 @@ typedef struct lb_execution_t {
    */
   const struct lb_decimal_t *price;
   /**
-   * Order side
+   * Order side. `Unknown` when the response omits it (LongPort US
+   * `/v1/trade/execution/history`)
    */
   enum lb_order_side_t side;
 } lb_execution_t;
@@ -15582,6 +15583,8 @@ void lb_portfolio_context_release(const struct lb_portfolio_context_t *ctx);
 
 /**
  * Get exchange rates. Returns CExchangeRates.
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_portfolio_context_exchange_rate(const struct lb_portfolio_context_t *ctx,
                                         lb_async_callback_t callback,
@@ -16313,6 +16316,8 @@ void lb_trade_context_unsubscribe(const struct lb_trade_context_t *ctx,
 /**
  * Get history executions
  *
+ * `side` may be `Unknown` on LongPort US accounts.
+ *
  * @param[in] opts Options for get history executions request (can be null)
  */
 void lb_trade_context_history_executions(const struct lb_trade_context_t *ctx,
@@ -16400,6 +16405,8 @@ void lb_trade_context_cancel_order_attached(const struct lb_trade_context_t *ctx
 
 /**
  * Get account balance
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,
                                       const char *currency,
@@ -16408,6 +16415,8 @@ void lb_trade_context_account_balance(const struct lb_trade_context_t *ctx,
 
 /**
  * Get cash flow
+ *
+ * AP accounts only: US data-center accounts get a region error.
  *
  * @param[in] opts Options for get cash flow request
  */
@@ -16419,6 +16428,9 @@ void lb_trade_context_cash_flow(const struct lb_trade_context_t *ctx,
 /**
  * Get fund positions
  *
+ * AP accounts only: US data-center accounts have no fund holdings and get a
+ * region error. No US equivalent.
+ *
  * @param[in] opts Options for get fund positions request
  */
 void lb_trade_context_fund_positions(const struct lb_trade_context_t *ctx,
@@ -16429,6 +16441,8 @@ void lb_trade_context_fund_positions(const struct lb_trade_context_t *ctx,
 /**
  * Get stock positions
  *
+ * AP accounts only: US data-center accounts get a region error.
+ *
  * @param[in] opts Options for get stock positions request
  */
 void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
@@ -16438,6 +16452,9 @@ void lb_trade_context_stock_positions(const struct lb_trade_context_t *ctx,
 
 /**
  * Get margin ratio
+ *
+ * AP accounts only: US data-center accounts get a region error. No US
+ * equivalent.
  */
 void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
                                    const char *symbol,
@@ -16446,6 +16463,8 @@ void lb_trade_context_margin_ratio(const struct lb_trade_context_t *ctx,
 
 /**
  * Get order detail
+ *
+ * AP accounts only: US data-center accounts get a region error.
  */
 void lb_trade_context_order_detail(const struct lb_trade_context_t *ctx,
                                    const char *order_id,

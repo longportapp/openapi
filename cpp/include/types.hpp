@@ -1435,7 +1435,8 @@ struct Execution
   int64_t trade_done_at;
   Decimal quantity;
   Decimal price;
-  /// Order side
+  /// Order side. `Unknown` when the response omits it (LongPort US
+  /// `/v1/trade/execution/history`)
   OrderSide side;
 };
 
