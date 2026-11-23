@@ -4,7 +4,7 @@ use napi::Result;
 use crate::{
     error::ErrorNewType,
     oauth::OAuth,
-    types::{Language, PushCandlestickMode},
+    types::{Language, PushCandlestickMode, QuoteTransport},
     utils::from_datetime,
 };
 
@@ -26,6 +26,12 @@ pub struct ExtraConfigParams {
     pub enable_overnight: Option<bool>,
     /// Push candlesticks mode (default: PushCandlestickMode.Realtime)
     pub push_candlestick_mode: Option<PushCandlestickMode>,
+    /// Transport for quote pull (request/response) APIs (default:
+    /// QuoteTransport.WebSocket)
+    ///
+    /// Subscriptions and push events always use the WebSocket connection; this
+    /// only selects how request/response quote APIs reach the server.
+    pub quote_transport: Option<QuoteTransport>,
     /// Enable printing the opened quote packages when connected to the server
     /// (default: true).  Set to `false` to suppress the output.
     pub enable_print_quote_packages: Option<bool>,
@@ -64,6 +70,9 @@ fn apply_extra(mut config: longport::Config, extra: Option<ExtraConfigParams>) -
         if let Some(mode) = extra.push_candlestick_mode {
             config.set_push_candlestick_mode(mode.into());
         }
+        if let Some(quote_transport) = extra.quote_transport {
+            config.set_quote_transport(quote_transport.into());
+        }
         if let Some(false) = extra.enable_print_quote_packages {
             config.set_dont_print_quote_packages();
         }
@@ -89,7 +98,8 @@ impl Config {
     /// (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`,
     /// `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
     /// `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
-    /// `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`).  Fields
+    /// `LONGPORT_QUOTE_TRANSPORT`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+    /// `LONGPORT_LOG_PATH`).  Fields
     /// set in `extra` override the corresponding environment variables.
     ///
     /// @param appKey       Application key
@@ -137,6 +147,8 @@ impl Config {
     ///   `false` (Default: `false`)
     /// - `LONGPORT_PUSH_CANDLESTICK_MODE` - `realtime` or `confirmed` (Default:
     ///   `realtime`)
+    /// - `LONGPORT_QUOTE_TRANSPORT` - Transport for quote pull APIs, `ws` or
+    ///   `http` (Default: `ws`)
     /// - `LONGPORT_PRINT_QUOTE_PACKAGES` - Print quote packages when connected,
     ///   `true` or `false` (Default: `true`)
     /// - `LONGPORT_LOG_PATH` - Log file directory (Default: no logs)
@@ -156,7 +168,8 @@ impl Config {
     /// (`LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`,
     /// `LONGPORT_QUOTE_WS_URL`, `LONGPORT_TRADE_WS_URL`,
     /// `LONGPORT_ENABLE_OVERNIGHT`, `LONGPORT_PUSH_CANDLESTICK_MODE`,
-    /// `LONGPORT_PRINT_QUOTE_PACKAGES`, `LONGPORT_LOG_PATH`).  Fields
+    /// `LONGPORT_QUOTE_TRANSPORT`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+    /// `LONGPORT_LOG_PATH`).  Fields
     /// set in `extra` override the corresponding environment variables.
     ///
     /// @param oauth  OAuth handle obtained from `OAuth.build(...)`

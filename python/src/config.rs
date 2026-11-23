@@ -4,7 +4,7 @@ use crate::{
     error::ErrorNewType,
     oauth::OAuth,
     time::PyOffsetDateTimeWrapper,
-    types::{Language, PushCandlestickMode},
+    types::{Language, PushCandlestickMode, QuoteTransport},
 };
 
 #[pyclass(name = "Config")]
@@ -18,7 +18,8 @@ impl Config {
     /// (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
     /// ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
     /// ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
-    /// ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+    /// ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``,
+    /// ``LONGPORT_QUOTE_TRANSPORT``).
     /// Any explicit parameter passed to this method overrides the
     /// corresponding environment variable.
     ///
@@ -39,6 +40,9 @@ impl Config {
     /// mode     enable_print_quote_packages: Print opened quote packages on
     /// connect         (default: ``True``)
     ///     log_path: Path for log files (default: no logs)
+    ///     quote_transport: Transport used by the quote pull APIs (reads
+    ///         ``LONGPORT_QUOTE_TRANSPORT`` from env if omitted; default:
+    ///         ``QuoteTransport.WebSocket``)
     #[staticmethod]
     #[pyo3(signature = (
         app_key,
@@ -53,6 +57,7 @@ impl Config {
         enable_print_quote_packages = true,
         log_path = None,
         enable_papertrading = false,
+        quote_transport = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn from_apikey(
@@ -68,6 +73,7 @@ impl Config {
         enable_print_quote_packages: bool,
         log_path: Option<String>,
         enable_papertrading: bool,
+        quote_transport: Option<QuoteTransport>,
     ) -> Self {
         let mut config = longport::Config::from_apikey(app_key, app_secret, access_token);
 
@@ -96,6 +102,9 @@ impl Config {
         if enable_papertrading {
             config.set_enable_papertrading();
         }
+        if let Some(quote_transport) = quote_transport {
+            config.set_quote_transport(quote_transport.into());
+        }
 
         Self(config)
     }
@@ -122,6 +131,8 @@ impl Config {
     ///     - ``LONGPORT_PRINT_QUOTE_PACKAGES`` - ``true`` or ``false``
     ///       (Default: ``true``)
     ///     - ``LONGPORT_LOG_PATH`` - Log file directory (Default: no logs)
+    ///     - ``LONGPORT_QUOTE_TRANSPORT`` - ``ws`` or ``http`` (Default:
+    ///       ``ws``)
     #[classmethod]
     fn from_apikey_env(_cls: Bound<PyType>) -> PyResult<Self> {
         Ok(Self(
@@ -138,7 +149,8 @@ impl Config {
     /// (``LONGPORT_HTTP_URL``, ``LONGPORT_LANGUAGE``,
     /// ``LONGPORT_QUOTE_WS_URL``, ``LONGPORT_TRADE_WS_URL``,
     /// ``LONGPORT_ENABLE_OVERNIGHT``, ``LONGPORT_PUSH_CANDLESTICK_MODE``,
-    /// ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``).
+    /// ``LONGPORT_PRINT_QUOTE_PACKAGES``, ``LONGPORT_LOG_PATH``,
+    /// ``LONGPORT_QUOTE_TRANSPORT``).
     /// Any explicit parameter passed to this method overrides the
     /// corresponding environment variable.
     ///
@@ -158,6 +170,7 @@ impl Config {
     ///     enable_print_quote_packages: Print opened quote packages on connect
     ///         (optional)
     ///     log_path: Path for log files (optional)
+    ///     quote_transport: Transport used by the quote pull APIs (optional)
     ///
     /// Returns:
     ///     Config object
@@ -173,6 +186,7 @@ impl Config {
         enable_print_quote_packages = None,
         log_path = None,
         enable_papertrading = None,
+        quote_transport = None,
     ))]
     #[allow(clippy::too_many_arguments)]
     fn from_oauth(
@@ -187,6 +201,7 @@ impl Config {
         enable_print_quote_packages: Option<bool>,
         log_path: Option<String>,
         enable_papertrading: Option<bool>,
+        quote_transport: Option<QuoteTransport>,
     ) -> Self {
         let mut config = longport::Config::from_oauth(oauth.0.clone());
 
@@ -216,6 +231,9 @@ impl Config {
         }
         if let Some(true) = enable_papertrading {
             config.set_enable_papertrading();
+        }
+        if let Some(quote_transport) = quote_transport {
+            config.set_quote_transport(quote_transport.into());
         }
 
         Self(config)

@@ -86,6 +86,7 @@ pub extern "system" fn Java_com_longport_SdkNative_init<'a>(
         longport::SimpleErrorKind,
         longport::Language,
         longport::PushCandlestickMode,
+        longport::QuoteTransport,
         longport::Market,
         longport::quote::TradeStatus,
         longport::quote::TradeSession,

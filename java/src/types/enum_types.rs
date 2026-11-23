@@ -30,6 +30,12 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longport/QuoteTransport",
+    longport::QuoteTransport,
+    [WebSocket, Http]
+);
+
+impl_java_enum!(
     "com/longport/Market",
     longport::Market,
     [Unknown, US, HK, CN, SG, Crypto]
