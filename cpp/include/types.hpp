@@ -1650,6 +1650,8 @@ struct AttachedOrderDetail
   OrderType activate_order_type;
   std::optional<OutsideRTH> activate_rth;
   std::optional<Decimal> submit_price;
+  /// Bid/ask depth level of the limit order submitted price
+  std::optional<int32_t> limit_depth_level;
 };
 
 /// Submit attached order params
@@ -1664,6 +1666,12 @@ struct SubmitAttachedParams
   std::optional<Decimal> profit_taker_submit_price;
   std::optional<Decimal> stop_loss_submit_price;
   std::optional<OutsideRTH> activate_rth;
+  /// Bid/ask depth level for the take-profit limit order submitted price,
+  /// valid when `activate_order_type` is `LIT`
+  std::optional<int32_t> profit_taker_depth_level;
+  /// Bid/ask depth level for the stop-loss limit order submitted price, valid
+  /// when `activate_order_type` is `LIT`
+  std::optional<int32_t> stop_loss_depth_level;
 };
 
 /// Replace attached order params
@@ -1684,6 +1692,12 @@ struct ReplaceAttachedParams
   std::optional<int64_t> main_id;
   std::optional<Decimal> quantity;
   std::optional<Decimal> market_price;
+  /// Bid/ask depth level for the take-profit limit order submitted price,
+  /// valid when `activate_order_type` is `LIT`
+  std::optional<int32_t> profit_taker_depth_level;
+  /// Bid/ask depth level for the stop-loss limit order submitted price, valid
+  /// when `activate_order_type` is `LIT`
+  std::optional<int32_t> stop_loss_depth_level;
 };
 
 /// Multi-leg strategy

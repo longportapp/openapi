@@ -4562,6 +4562,16 @@ typedef struct CReplaceAttachedParams {
    * Market price (can be null)
    */
   const struct lb_decimal_t *market_price;
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *profit_taker_depth_level;
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *stop_loss_depth_level;
 } CReplaceAttachedParams;
 
 /**
@@ -4669,6 +4679,16 @@ typedef struct CSubmitAttachedParams {
    * RTH setting for activated order (can be null)
    */
   const enum lb_outside_rth_t *activate_rth;
+  /**
+   * Bid/ask depth level for the take-profit limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *profit_taker_depth_level;
+  /**
+   * Bid/ask depth level for the stop-loss limit order submitted price,
+   * valid when `activate_order_type` is `LIT` (can be null)
+   */
+  const int32_t *stop_loss_depth_level;
 } CSubmitAttachedParams;
 
 /**
@@ -5746,6 +5766,10 @@ typedef struct CAttachedOrderDetail {
    * Submit price (maybe null)
    */
   const struct lb_decimal_t *submit_price;
+  /**
+   * Bid/ask depth level of the limit order submitted price (maybe null)
+   */
+  const int32_t *limit_depth_level;
 } CAttachedOrderDetail;
 
 /**

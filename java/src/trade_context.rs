@@ -425,6 +425,15 @@ fn read_submit_attached_params(
     if let Some(v) = activate_rth {
         params = params.activate_rth(v);
     }
+    let profit_taker_depth_level: Option<JavaInteger> =
+        get_field(env, obj, "profitTakerDepthLevel")?;
+    if let Some(v) = profit_taker_depth_level {
+        params = params.profit_taker_depth_level(v.into());
+    }
+    let stop_loss_depth_level: Option<JavaInteger> = get_field(env, obj, "stopLossDepthLevel")?;
+    if let Some(v) = stop_loss_depth_level {
+        params = params.stop_loss_depth_level(v.into());
+    }
     Ok(params)
 }
 
@@ -493,6 +502,15 @@ fn read_replace_attached_params(
     let market_price: Option<Decimal> = get_field(env, obj, "marketPrice")?;
     if let Some(v) = market_price {
         params = params.market_price(v);
+    }
+    let profit_taker_depth_level: Option<JavaInteger> =
+        get_field(env, obj, "profitTakerDepthLevel")?;
+    if let Some(v) = profit_taker_depth_level {
+        params = params.profit_taker_depth_level(v.into());
+    }
+    let stop_loss_depth_level: Option<JavaInteger> = get_field(env, obj, "stopLossDepthLevel")?;
+    if let Some(v) = stop_loss_depth_level {
+        params = params.stop_loss_depth_level(v.into());
     }
     Ok(params)
 }
