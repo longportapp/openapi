@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['warrantsortby_2782',['WarrantSortBy',['../namespacelongport_1_1quote.html#aaf9b79be6c85e5972d5a043fc2abf001',1,'longport::quote']]],
-  ['warrantstatus_2783',['WarrantStatus',['../namespacelongport_1_1quote.html#aa3d52eeb7d82a2a44a3b3b88f5fb776d',1,'longport::quote']]],
-  ['warranttype_2784',['WarrantType',['../namespacelongport_1_1quote.html#acc6eac080c16a5f14aa8612f111c50d4',1,'longport::quote']]]
+  ['securitiesupdatemode_4042',['SecuritiesUpdateMode',['../namespacelongport_1_1quote.html#a50a6cc3db5fdf7bc0fb5dcf07d3b1a1a',1,'longport::quote']]],
+  ['securityboard_4043',['SecurityBoard',['../namespacelongport_1_1quote.html#a84897730f6f4409836383f61865e073a',1,'longport::quote']]],
+  ['securitylistcategory_4044',['SecurityListCategory',['../namespacelongport_1_1quote.html#aa93af3fc6c64ad59a3314237846cdca6',1,'longport::quote']]],
+  ['sortordertype_4045',['SortOrderType',['../namespacelongport_1_1quote.html#ae5b0516484ac8b93bb8d3c3c26ee746b',1,'longport::quote']]]
 ];

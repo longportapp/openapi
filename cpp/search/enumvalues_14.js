@@ -1,10 +1,13 @@
 var searchData=
 [
-  ['waittocancel_3012',['WaitToCancel',['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872eaeb9ea6f9cc675c610ecc5e9073500cb0',1,'longport::trade']]],
-  ['waittonew_3013',['WaitToNew',['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872eac6fbc935f6c6061d11c28a4997c75ba1',1,'longport::trade']]],
-  ['waittoreplace_3014',['WaitToReplace',['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872ea59779acbe7e693505d8db550c7524bd1',1,'longport::trade']]],
-  ['warrantdelta_3015',['WarrantDelta',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea5bf66b3fed4ba1ae21fdcb48b1121384',1,'longport::quote']]],
-  ['warrantpreparelist_3016',['WarrantPrepareList',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949af7c250f64a12a710b6d1d4c69c48f602',1,'longport::quote']]],
-  ['week_3017',['Week',['../namespacelongport_1_1market.html#a145b66646d81579604bb6e3bbbe2ce38ad2ce009594dcc60befa6a4e6cbeb71fc',1,'longport::market::Week()'],['../namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ad2ce009594dcc60befa6a4e6cbeb71fc',1,'longport::quote::Week()']]],
-  ['weekly_3018',['Weekly',['../namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5cab84e1c5a158a59252803658eb956e308',1,'longport::quote::Weekly()'],['../namespacelongport_1_1dca.html#afec59098a92c5d8e9daeddafdd87f7e2a6c25e6a6da95b3d583c6ec4c3f82ed4d',1,'longport::dca::Weekly()']]]
+  ['waittocancel_4336',['WaitToCancel',['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872eaeb9ea6f9cc675c610ecc5e9073500cb0',1,'longport::trade']]],
+  ['waittonew_4337',['WaitToNew',['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872eac6fbc935f6c6061d11c28a4997c75ba1',1,'longport::trade']]],
+  ['waittoreplace_4338',['WaitToReplace',['../namespacelongport_1_1trade.html#afcaefb5ea049d0d57d50576e58c1872ea59779acbe7e693505d8db550c7524bd1',1,'longport::trade']]],
+  ['warrantdelta_4339',['WarrantDelta',['../namespacelongport_1_1quote.html#a1057d28d1b3ec4b2f7847b2f53a4fbbea5bf66b3fed4ba1ae21fdcb48b1121384',1,'longport::quote']]],
+  ['warrantpreparelist_4340',['WarrantPrepareList',['../namespacelongport_1_1quote.html#a6ead1faa00772e4d59f678c774007949af7c250f64a12a710b6d1d4c69c48f602',1,'longport::quote']]],
+  ['websocket_4341',['WebSocket',['../namespacelongport.html#a7d73d3988569ba2b490869db6b7e5660a45edc1b96407d9d213dd1135962a32a0',1,'longport']]],
+  ['week_4342',['Week',['../namespacelongport_1_1market.html#a145b66646d81579604bb6e3bbbe2ce38ad2ce009594dcc60befa6a4e6cbeb71fc',1,'longport::market::Week()'],['../namespacelongport_1_1quote.html#a60167d694ea9a5fec686d08fa21dae17ad2ce009594dcc60befa6a4e6cbeb71fc',1,'longport::quote::Week()']]],
+  ['weekly_4343',['Weekly',['../namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5cab84e1c5a158a59252803658eb956e308',1,'longport::quote::Weekly()'],['../namespacelongport_1_1quote.html#a3c44f69c0146a4f836f4f75fe8c90d5ca6c25e6a6da95b3d583c6ec4c3f82ed4d',1,'longport::quote::Weekly()'],['../namespacelongport_1_1dca.html#afec59098a92c5d8e9daeddafdd87f7e2a6c25e6a6da95b3d583c6ec4c3f82ed4d',1,'longport::dca::Weekly()']]],
+  ['workflowfinished_4344',['WorkflowFinished',['../namespacelongport_1_1agent.html#ad5bf6d186695cf6eb45540f5140e50dda00a5bab150f47712d442ad66553efe2b',1,'longport::agent']]],
+  ['workflowstarted_4345',['WorkflowStarted',['../namespacelongport_1_1agent.html#ad5bf6d186695cf6eb45540f5140e50ddae84cf8a3a17804d548df98df74a97f73',1,'longport::agent']]]
 ];

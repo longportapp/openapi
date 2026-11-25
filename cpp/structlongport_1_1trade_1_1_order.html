@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C++ SDK: longport::trade::Order Struct Reference</title>
+<title>LongPort OpenAPI C++ SDK: longport::trade::Order Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C++ SDK
+   <div id="projectname">LongPort OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -167,10 +167,33 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a3c9f4abba60d77bf9dbb74991d0295a3"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_order.html#a3c9f4abba60d77bf9dbb74991d0295a3">remark</a></td></tr>
 <tr class="memdesc:a3c9f4abba60d77bf9dbb74991d0295a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remark.  <a href="structlongport_1_1trade_1_1_order.html#a3c9f4abba60d77bf9dbb74991d0295a3">More...</a><br /></td></tr>
 <tr class="separator:a3c9f4abba60d77bf9dbb74991d0295a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b2112af7cefd8fa63ece89b3fa1fffd"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_order.html#a7b2112af7cefd8fa63ece89b3fa1fffd">delayed_until</a></td></tr>
+<tr class="separator:a7b2112af7cefd8fa63ece89b3fa1fffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b3bbbaac9b2957c9cdd09c25e269b30"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structlongport_1_1trade_1_1_attached_order_detail.html">AttachedOrderDetail</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_order.html#a0b3bbbaac9b2957c9cdd09c25e269b30">attached_orders</a></td></tr>
+<tr class="memdesc:a0b3bbbaac9b2957c9cdd09c25e269b30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attached orders.  <a href="structlongport_1_1trade_1_1_order.html#a0b3bbbaac9b2957c9cdd09c25e269b30">More...</a><br /></td></tr>
+<tr class="separator:a0b3bbbaac9b2957c9cdd09c25e269b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad18bee7d1febf31b470606224bba43aa"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structlongport_1_1trade_1_1_multi_leg_info.html">MultiLegInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_order.html#ad18bee7d1febf31b470606224bba43aa">multi_leg</a></td></tr>
+<tr class="separator:ad18bee7d1febf31b470606224bba43aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="structlongport_1_1trade_1_1_order.html" title="Order.">Order</a>. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a0b3bbbaac9b2957c9cdd09c25e269b30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b3bbbaac9b2957c9cdd09c25e269b30">&#9670;&nbsp;</a></span>attached_orders</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="structlongport_1_1trade_1_1_attached_order_detail.html">AttachedOrderDetail</a>&gt; longport::trade::Order::attached_orders</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Attached orders. </p>
+
+</div>
+</div>
 <a id="a4a65b34fe10b9dfb774fe76a8418cc5c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4a65b34fe10b9dfb774fe76a8418cc5c">&#9670;&nbsp;</a></span>currency</h2>
 
@@ -184,6 +207,21 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Currency. </p>
+
+</div>
+</div>
+<a id="a7b2112af7cefd8fa63ece89b3fa1fffd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b2112af7cefd8fa63ece89b3fa1fffd">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int64_t&gt; longport::trade::Order::delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Time-condition submit time (Unix timestamp in seconds, not set when the order is not a time-condition order) </p>
 
 </div>
 </div>
@@ -312,6 +350,21 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Rejected Message or remark. </p>
+
+</div>
+</div>
+<a id="ad18bee7d1febf31b470606224bba43aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad18bee7d1febf31b470606224bba43aa">&#9670;&nbsp;</a></span>multi_leg</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;<a class="el" href="structlongport_1_1trade_1_1_multi_leg_info.html">MultiLegInfo</a>&gt; longport::trade::Order::multi_leg</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Multi-leg strategy information (only present for multi-leg option combination orders) </p>
 
 </div>
 </div>

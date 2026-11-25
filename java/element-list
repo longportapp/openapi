@@ -1,10 +1,13 @@
 com.longport
+com.longport.agent
 com.longport.alert
 com.longport.asset
 com.longport.calendar
 com.longport.content
 com.longport.dca
+com.longport.fund
 com.longport.fundamental
+com.longport.grid
 com.longport.market
 com.longport.portfolio
 com.longport.quote

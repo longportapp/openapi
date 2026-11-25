@@ -1,6 +1,21 @@
 var searchData=
 [
-  ['language_5fen_3389',['Language_EN',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1fae9c695c416f014fbd506e8bc75412f59',1,'longport.h']]],
-  ['language_5fzh_5fcn_3390',['Language_ZH_CN',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1faa474147a7830e4ac380329decce70e8a',1,'longport.h']]],
-  ['language_5fzh_5fhk_3391',['Language_ZH_HK',['../longport_8h.html#ad746ba63a793b4e10cc564f6ae7aad1fa5d29f72c612e972f4575de179a4a6858',1,'longport.h']]]
+  ['industryrankindicatorleadinggainer_4910',['IndustryRankIndicatorLeadingGainer',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54a1ae66956d51f0ee683b8652cf93b4da6',1,'longport.h']]],
+  ['industryrankindicatormarketcap_4911',['IndustryRankIndicatorMarketCap',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54a8bd63a675d7b48d947bbed1b710eaee7',1,'longport.h']]],
+  ['industryrankindicatornetprofit_4912',['IndustryRankIndicatorNetProfit',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54abde95f54c62143917e5ca2150277f422',1,'longport.h']]],
+  ['industryrankindicatornetprofitgrowth_4913',['IndustryRankIndicatorNetProfitGrowth',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54a986fc5ef07ae8e7e861e2edc58c38436',1,'longport.h']]],
+  ['industryrankindicatorpopularity_4914',['IndustryRankIndicatorPopularity',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54a79eea59f39f0088d2fceb4ee1bd5d76c',1,'longport.h']]],
+  ['industryrankindicatorrevenue_4915',['IndustryRankIndicatorRevenue',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54a2497485bcfede2d4694093b835a7f239',1,'longport.h']]],
+  ['industryrankindicatorrevenuegrowth_4916',['IndustryRankIndicatorRevenueGrowth',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54ada59e4e532ba37718c2c5b1958fd2682',1,'longport.h']]],
+  ['industryrankindicatortodaytrend_4917',['IndustryRankIndicatorTodayTrend',['../longport_8h.html#a09c7328d6a19df979a51bd4278bb9b54ad25d63df5e7cc8b4792674ddb7e72952',1,'longport.h']]],
+  ['industryranksorttypemulti_4918',['IndustryRankSortTypeMulti',['../longport_8h.html#a7f344364d2e8f8f12867962f7b9fc5c7a7cc10cdbf80af63309b8da8eb08381dc',1,'longport.h']]],
+  ['industryranksorttypesingle_4919',['IndustryRankSortTypeSingle',['../longport_8h.html#a7f344364d2e8f8f12867962f7b9fc5c7aac6518210e0f0e1de44eaba9c3b6e061',1,'longport.h']]],
+  ['institutionrecommendbuy_4920',['InstitutionRecommendBuy',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a0958f034c7efc3e9e7f0916b603a4333',1,'longport.h']]],
+  ['institutionrecommendhold_4921',['InstitutionRecommendHold',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58ad49c1598278ea960824401976ae293b5',1,'longport.h']]],
+  ['institutionrecommendnoopinion_4922',['InstitutionRecommendNoOpinion',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a5f04436b1332555c5e549174ab81219a',1,'longport.h']]],
+  ['institutionrecommendsell_4923',['InstitutionRecommendSell',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a4a60253c5ba55bf2b65cd1ec465355c5',1,'longport.h']]],
+  ['institutionrecommendstrongbuy_4924',['InstitutionRecommendStrongBuy',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a7bcf1df6d5e41deda4945eadd61b28ef',1,'longport.h']]],
+  ['institutionrecommendstrongsell_4925',['InstitutionRecommendStrongSell',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58abc246f4704807a00230690f7cf90eaa4',1,'longport.h']]],
+  ['institutionrecommendunderperform_4926',['InstitutionRecommendUnderperform',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a123a44d9cd98fb28941a5917945a7d17',1,'longport.h']]],
+  ['institutionrecommendunknown_4927',['InstitutionRecommendUnknown',['../longport_8h.html#a2df8b4a7096c847cd6279a118ef28d58a249594d71ce117026223ce3e4661765f',1,'longport.h']]]
 ];

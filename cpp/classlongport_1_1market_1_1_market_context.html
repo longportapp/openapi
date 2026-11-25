@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C++ SDK: longport::market::MarketContext Class Reference</title>
+<title>LongPort OpenAPI C++ SDK: longport::market::MarketContext Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C++ SDK
+   <div id="projectname">LongPort OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -123,9 +123,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3a7a59fd70e8d47505a9922ddcbb3eed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1market_1_1_market_context.html#a3a7a59fd70e8d47505a9922ddcbb3eed">top_movers</a> (const std::vector&lt; std::string &gt; &amp;markets, uint32_t sort, const std::string *date, uint32_t limit, <a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongport_1_1market_1_1_top_movers_response.html">TopMoversResponse</a> &gt; callback) const</td></tr>
 <tr class="memdesc:a3a7a59fd70e8d47505a9922ddcbb3eed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get top movers (stocks with unusual price movements) across one or more markets.  <a href="classlongport_1_1market_1_1_market_context.html#a3a7a59fd70e8d47505a9922ddcbb3eed">More...</a><br /></td></tr>
 <tr class="separator:a3a7a59fd70e8d47505a9922ddcbb3eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25919a57edf97940b59cdb2d370a6fab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1market_1_1_market_context.html#a25919a57edf97940b59cdb2d370a6fab">rank_categories</a> (<a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1market_1_1_market_context.html">MarketContext</a>, std::string &gt; callback) const</td></tr>
-<tr class="memdesc:a25919a57edf97940b59cdb2d370a6fab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all available rank category keys and labels (raw JSON string)  <a href="classlongport_1_1market_1_1_market_context.html#a25919a57edf97940b59cdb2d370a6fab">More...</a><br /></td></tr>
-<tr class="separator:a25919a57edf97940b59cdb2d370a6fab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a409772430226935a677e5f168250f7d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1market_1_1_market_context.html#a409772430226935a677e5f168250f7d3">rank_categories</a> (<a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongport_1_1market_1_1_rank_categories_response.html">RankCategoriesResponse</a> &gt; callback) const</td></tr>
+<tr class="memdesc:a409772430226935a677e5f168250f7d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all available rank category keys and labels.  <a href="classlongport_1_1market_1_1_market_context.html#a409772430226935a677e5f168250f7d3">More...</a><br /></td></tr>
+<tr class="separator:a409772430226935a677e5f168250f7d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a18d4500067aa52160fb85c4c2348ea58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1market_1_1_market_context.html#a18d4500067aa52160fb85c4c2348ea58">rank_list</a> (const std::string &amp;key, bool need_article, <a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongport_1_1market_1_1_rank_list_response.html">RankListResponse</a> &gt; callback) const</td></tr>
 <tr class="memdesc:a18d4500067aa52160fb85c4c2348ea58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a ranked list of securities for the given category key.  <a href="classlongport_1_1market_1_1_market_context.html#a18d4500067aa52160fb85c4c2348ea58">More...</a><br /></td></tr>
 <tr class="separator:a18d4500067aa52160fb85c4c2348ea58"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -525,8 +525,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a25919a57edf97940b59cdb2d370a6fab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a25919a57edf97940b59cdb2d370a6fab">&#9670;&nbsp;</a></span>rank_categories()</h2>
+<a id="a409772430226935a677e5f168250f7d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a409772430226935a677e5f168250f7d3">&#9670;&nbsp;</a></span>rank_categories()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -534,14 +534,14 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void longport::market::MarketContext::rank_categories </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1market_1_1_market_context.html">MarketContext</a>, std::string &gt;&#160;</td>
+          <td class="paramtype"><a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1market_1_1_market_context.html">MarketContext</a>, <a class="el" href="structlongport_1_1market_1_1_rank_categories_response.html">RankCategoriesResponse</a> &gt;&#160;</td>
           <td class="paramname"><em>callback</em></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Get all available rank category keys and labels (raw JSON string) </p>
+<p>Get all available rank category keys and labels. </p>
 
 </div>
 </div>

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C SDK: lb_replace_order_options_t Struct Reference</title>
+<title>LongPort OpenAPI C SDK: lb_replace_order_options_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C SDK
+   <div id="projectname">LongPort OpenAPI C SDK
    </div>
   </td>
  </tr>
@@ -94,10 +94,61 @@ Data Fields</h2></td></tr>
 <tr class="separator:a92ab50a8dface7bbd9e7ba54e112b444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__replace__order__options__t.html#a9a51a4c0d5faa2f4386a52affa7e12d7">remark</a></td></tr>
 <tr class="separator:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6231ffbed1ec7d3804ff85158d8d5abf"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="struct_c_replace_attached_params.html">CReplaceAttachedParams</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__replace__order__options__t.html#a6231ffbed1ec7d3804ff85158d8d5abf">attached_params</a></td></tr>
+<tr class="separator:a6231ffbed1ec7d3804ff85158d8d5abf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f76ca65dfe4fd40ae37ca5968ac028b"><td class="memItemLeft" align="right" valign="top">const int64_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__replace__order__options__t.html#a2f76ca65dfe4fd40ae37ca5968ac028b">delayed_until</a></td></tr>
+<tr class="separator:a2f76ca65dfe4fd40ae37ca5968ac028b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae890b9b88dcd6c41af5009fb63c3b687"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__replace__order__options__t.html#ae890b9b88dcd6c41af5009fb63c3b687">clear_delayed_until</a></td></tr>
+<tr class="separator:ae890b9b88dcd6c41af5009fb63c3b687"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for replace order request </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a6231ffbed1ec7d3804ff85158d8d5abf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6231ffbed1ec7d3804ff85158d8d5abf">&#9670;&nbsp;</a></span>attached_params</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="struct_c_replace_attached_params.html">CReplaceAttachedParams</a>* attached_params</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Attached order parameters (can be null) </p>
+
+</div>
+</div>
+<a id="ae890b9b88dcd6c41af5009fb63c3b687"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae890b9b88dcd6c41af5009fb63c3b687">&#9670;&nbsp;</a></span>clear_delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool clear_delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Clear the time condition, turning the order into a regular order (takes precedence over <code>delayed_until</code>) </p>
+
+</div>
+</div>
+<a id="a2f76ca65dfe4fd40ae37ca5968ac028b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f76ca65dfe4fd40ae37ca5968ac028b">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int64_t* delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>New time-condition submit time, Unix timestamp in seconds; must be later than now and no more than 90 days ahead (can be null to keep the current time condition) </p>
+
+</div>
+</div>
 <a id="aebc43ea7a44b77153d8da0bd15246c5e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aebc43ea7a44b77153d8da0bd15246c5e">&#9670;&nbsp;</a></span>limit_depth_level</h2>
 

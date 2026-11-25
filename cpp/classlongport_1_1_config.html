@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C++ SDK: longport::Config Class Reference</title>
+<title>LongPort OpenAPI C++ SDK: longport::Config Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C++ SDK
+   <div id="projectname">LongPort OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -105,9 +105,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aedf2a1e98a243555fad87fd0e17e7c90"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongport_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_config.html#aedf2a1e98a243555fad87fd0e17e7c90">enable_overnight</a> ()</td></tr>
 <tr class="memdesc:aedf2a1e98a243555fad87fd0e17e7c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable overnight quote.  <a href="classlongport_1_1_config.html#aedf2a1e98a243555fad87fd0e17e7c90">More...</a><br /></td></tr>
 <tr class="separator:aedf2a1e98a243555fad87fd0e17e7c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24baa8db1e9fe40058bf35d3c63bdd9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongport_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_config.html#a24baa8db1e9fe40058bf35d3c63bdd9d">enable_papertrading</a> ()</td></tr>
+<tr class="separator:a24baa8db1e9fe40058bf35d3c63bdd9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6dc31e5b83fcc01d972ecd58bf4cc075"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongport_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_config.html#a6dc31e5b83fcc01d972ecd58bf4cc075">set_push_candlestick_mode</a> (<a class="el" href="namespacelongport.html#a621d07b7224fb0157acd5be0f100a4ba">PushCandlestickMode</a> mode)</td></tr>
 <tr class="memdesc:a6dc31e5b83fcc01d972ecd58bf4cc075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the push candlestick mode.  <a href="classlongport_1_1_config.html#a6dc31e5b83fcc01d972ecd58bf4cc075">More...</a><br /></td></tr>
 <tr class="separator:a6dc31e5b83fcc01d972ecd58bf4cc075"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2183045030238395fca7ac4f73da769a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongport_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_config.html#a2183045030238395fca7ac4f73da769a">set_quote_transport</a> (<a class="el" href="namespacelongport.html#a7d73d3988569ba2b490869db6b7e5660">QuoteTransport</a> transport)</td></tr>
+<tr class="separator:a2183045030238395fca7ac4f73da769a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a912f2987dd3733cd7fa709a6d7f35b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongport_1_1_config.html">Config</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_config.html#a5a912f2987dd3733cd7fa709a6d7f35b">disable_print_quote_packages</a> ()</td></tr>
 <tr class="memdesc:a5a912f2987dd3733cd7fa709a6d7f35b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable printing of quote packages on connection.  <a href="classlongport_1_1_config.html#a5a912f2987dd3733cd7fa709a6d7f35b">More...</a><br /></td></tr>
 <tr class="separator:a5a912f2987dd3733cd7fa709a6d7f35b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,6 +266,27 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a24baa8db1e9fe40058bf35d3c63bdd9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24baa8db1e9fe40058bf35d3c63bdd9d">&#9670;&nbsp;</a></span>enable_papertrading()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classlongport_1_1_config.html">Config</a>&amp; longport::Config::enable_papertrading </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enable paper trading mode.</p>
+<p>When enabled, all API calls target the paper trading (simulation) environment. The server validates the token: if it belongs to a real-money account the server returns an error.</p>
+<p>By default this option is disabled and the server imposes no restrictions — both paper trading and real-money accounts are accepted.</p>
+<p>Paper trading users should call this method as a safety guard. </p>
+
+</div>
+</div>
 <a id="abe47573315127387a76a849574f78c6d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abe47573315127387a76a849574f78c6d">&#9670;&nbsp;</a></span>from_apikey()</h2>
 
@@ -302,7 +327,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Create a new <code><a class="el" href="classlongport_1_1_config.html">Config</a></code> for API Key authentication</p>
-<p>Optional environment variables are read automatically: <code>LONGPORT_HTTP_URL</code>, <code>LONGPORT_LANGUAGE</code>, <code>LONGPORT_QUOTE_WS_URL</code>, <code>LONGPORT_TRADE_WS_URL</code>, <code>LONGPORT_ENABLE_OVERNIGHT</code>, <code>LONGPORT_PUSH_CANDLESTICK_MODE</code>, <code>LONGPORT_PRINT_QUOTE_PACKAGES</code>, <code>LONGPORT_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
+<p>Optional environment variables are read automatically: <code>LONGPORT_HTTP_URL</code>, <code>LONGPORT_LANGUAGE</code>, <code>LONGPORT_QUOTE_WS_URL</code>, <code>LONGPORT_TRADE_WS_URL</code>, <code>LONGPORT_ENABLE_OVERNIGHT</code>, <code>LONGPORT_PUSH_CANDLESTICK_MODE</code>, <code>LONGPORT_QUOTE_TRANSPORT</code>, <code>LONGPORT_PRINT_QUOTE_PACKAGES</code>, <code>LONGPORT_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">app_key</td><td>App key </td></tr>
@@ -338,7 +363,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Create a new <code><a class="el" href="classlongport_1_1_config.html">Config</a></code> from environment variables (API Key mode)</p>
-<p>Variables: <code>LONGPORT_APP_KEY</code>, <code>LONGPORT_APP_SECRET</code>, <code>LONGPORT_ACCESS_TOKEN</code>, <code>LONGPORT_HTTP_URL</code>, <code>LONGPORT_QUOTE_WS_URL</code>, <code>LONGPORT_TRADE_WS_URL</code>, <code>LONGPORT_LANGUAGE</code>, <code>LONGPORT_ENABLE_OVERNIGHT</code>, <code>LONGPORT_PUSH_CANDLESTICK_MODE</code>, <code>LONGPORT_PRINT_QUOTE_PACKAGES</code>, <code>LONGPORT_LOG_PATH</code> </p>
+<p>Variables: <code>LONGPORT_APP_KEY</code>, <code>LONGPORT_APP_SECRET</code>, <code>LONGPORT_ACCESS_TOKEN</code>, <code>LONGPORT_HTTP_URL</code>, <code>LONGPORT_QUOTE_WS_URL</code>, <code>LONGPORT_TRADE_WS_URL</code>, <code>LONGPORT_LANGUAGE</code>, <code>LONGPORT_ENABLE_OVERNIGHT</code>, <code>LONGPORT_PUSH_CANDLESTICK_MODE</code>, <code>LONGPORT_QUOTE_TRANSPORT</code>, <code>LONGPORT_PRINT_QUOTE_PACKAGES</code>, <code>LONGPORT_LOG_PATH</code> </p>
 
 </div>
 </div>
@@ -366,7 +391,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Create a new <code><a class="el" href="classlongport_1_1_config.html">Config</a></code> for <a class="el" href="classlongport_1_1_o_auth.html">OAuth</a> 2.0 authentication</p>
-<p>Optional environment variables are read automatically: <code>LONGPORT_HTTP_URL</code>, <code>LONGPORT_LANGUAGE</code>, <code>LONGPORT_QUOTE_WS_URL</code>, <code>LONGPORT_TRADE_WS_URL</code>, <code>LONGPORT_ENABLE_OVERNIGHT</code>, <code>LONGPORT_PUSH_CANDLESTICK_MODE</code>, <code>LONGPORT_PRINT_QUOTE_PACKAGES</code>, <code>LONGPORT_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
+<p>Optional environment variables are read automatically: <code>LONGPORT_HTTP_URL</code>, <code>LONGPORT_LANGUAGE</code>, <code>LONGPORT_QUOTE_WS_URL</code>, <code>LONGPORT_TRADE_WS_URL</code>, <code>LONGPORT_ENABLE_OVERNIGHT</code>, <code>LONGPORT_PUSH_CANDLESTICK_MODE</code>, <code>LONGPORT_QUOTE_TRANSPORT</code>, <code>LONGPORT_PRINT_QUOTE_PACKAGES</code>, <code>LONGPORT_LOG_PATH</code>. Use the chainable <code>set_*</code> methods to override any of these values.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">oauth</td><td><a class="el" href="classlongport_1_1_o_auth.html">OAuth</a> 2.0 client obtained from <code><a class="el" href="classlongport_1_1_o_auth_builder.html#aed25153074c8b8daa237e23fb12ef74a">OAuthBuilder::build</a></code> </td></tr>
@@ -507,6 +532,26 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Set the push candlestick mode. </p>
+
+</div>
+</div>
+<a id="a2183045030238395fca7ac4f73da769a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2183045030238395fca7ac4f73da769a">&#9670;&nbsp;</a></span>set_quote_transport()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classlongport_1_1_config.html">Config</a>&amp; longport::Config::set_quote_transport </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacelongport.html#a7d73d3988569ba2b490869db6b7e5660">QuoteTransport</a>&#160;</td>
+          <td class="paramname"><em>transport</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Set the transport used by the quote pull APIs</p>
+<p>Default: <code><a class="el" href="namespacelongport.html#a7d73d3988569ba2b490869db6b7e5660a45edc1b96407d9d213dd1135962a32a0" title="Send pull requests over the quote WebSocket connection (default)">QuoteTransport::WebSocket</a></code> (or <code>LONGPORT_QUOTE_TRANSPORT</code> = <code>ws</code> / <code>http</code>) </p>
 
 </div>
 </div>

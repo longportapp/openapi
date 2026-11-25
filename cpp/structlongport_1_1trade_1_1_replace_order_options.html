@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C++ SDK: longport::trade::ReplaceOrderOptions Struct Reference</title>
+<title>LongPort OpenAPI C++ SDK: longport::trade::ReplaceOrderOptions Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C++ SDK
+   <div id="projectname">LongPort OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -113,10 +113,63 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a2dac17efd686c8b5c62824d55cf542a4"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_replace_order_options.html#a2dac17efd686c8b5c62824d55cf542a4">remark</a></td></tr>
 <tr class="memdesc:a2dac17efd686c8b5c62824d55cf542a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remark.  <a href="structlongport_1_1trade_1_1_replace_order_options.html#a2dac17efd686c8b5c62824d55cf542a4">More...</a><br /></td></tr>
 <tr class="separator:a2dac17efd686c8b5c62824d55cf542a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c098aeda1e0faedf28c78e652f73f45"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structlongport_1_1trade_1_1_replace_attached_params.html">ReplaceAttachedParams</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_replace_order_options.html#a1c098aeda1e0faedf28c78e652f73f45">attached_params</a></td></tr>
+<tr class="memdesc:a1c098aeda1e0faedf28c78e652f73f45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attached order params.  <a href="structlongport_1_1trade_1_1_replace_order_options.html#a1c098aeda1e0faedf28c78e652f73f45">More...</a><br /></td></tr>
+<tr class="separator:a1c098aeda1e0faedf28c78e652f73f45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34c4e549966dd694bdd055e390597d3b"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_replace_order_options.html#a34c4e549966dd694bdd055e390597d3b">delayed_until</a></td></tr>
+<tr class="separator:a34c4e549966dd694bdd055e390597d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11a3843351d4e4c9ee94b4bc5d30ac3b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlongport_1_1trade_1_1_replace_order_options.html#a11a3843351d4e4c9ee94b4bc5d30ac3b">clear_delayed_until</a> = false</td></tr>
+<tr class="separator:a11a3843351d4e4c9ee94b4bc5d30ac3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Options for replace order request. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a1c098aeda1e0faedf28c78e652f73f45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c098aeda1e0faedf28c78e652f73f45">&#9670;&nbsp;</a></span>attached_params</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;<a class="el" href="structlongport_1_1trade_1_1_replace_attached_params.html">ReplaceAttachedParams</a>&gt; longport::trade::ReplaceOrderOptions::attached_params</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Attached order params. </p>
+
+</div>
+</div>
+<a id="a11a3843351d4e4c9ee94b4bc5d30ac3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11a3843351d4e4c9ee94b4bc5d30ac3b">&#9670;&nbsp;</a></span>clear_delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool longport::trade::ReplaceOrderOptions::clear_delayed_until = false</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Clear the time condition, turning the order into a regular order (takes precedence over <code>delayed_until</code>) </p>
+
+</div>
+</div>
+<a id="a34c4e549966dd694bdd055e390597d3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34c4e549966dd694bdd055e390597d3b">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;int64_t&gt; longport::trade::ReplaceOrderOptions::delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>New time-condition submit time (Unix timestamp in seconds), later than now and no more than 90 days ahead; not set keeps the current time condition </p>
+
+</div>
+</div>
 <a id="a5424f88d8c80cf219b83afe889d37665"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5424f88d8c80cf219b83afe889d37665">&#9670;&nbsp;</a></span>limit_depth_level</h2>
 

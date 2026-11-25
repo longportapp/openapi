@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C++ SDK: longport::Status Class Reference</title>
+<title>LongPort OpenAPI C++ SDK: longport::Status Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C++ SDK
+   <div id="projectname">LongPort OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -101,7 +101,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a0a0c4640563a1329104d1eeeb7c3863f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error kind if an error occurs.  <a href="classlongport_1_1_status.html#a0a0c4640563a1329104d1eeeb7c3863f">More...</a><br /></td></tr>
 <tr class="separator:a0a0c4640563a1329104d1eeeb7c3863f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa70198a9d5243667cc16648616d34296"><td class="memItemLeft" align="right" valign="top">std::optional&lt; int64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#aa70198a9d5243667cc16648616d34296">code</a> () const</td></tr>
-<tr class="memdesc:aa70198a9d5243667cc16648616d34296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error code if an error occurs.  <a href="classlongport_1_1_status.html#aa70198a9d5243667cc16648616d34296">More...</a><br /></td></tr>
 <tr class="separator:aa70198a9d5243667cc16648616d34296"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a48cb80cf0de774caa8724c398a9271"><td class="memItemLeft" align="right" valign="top">std::optional&lt; const char * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1_status.html#a0a48cb80cf0de774caa8724c398a9271">message</a> () const</td></tr>
 <tr class="memdesc:a0a48cb80cf0de774caa8724c398a9271"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the error message if an error occurs.  <a href="classlongport_1_1_status.html#a0a48cb80cf0de774caa8724c398a9271">More...</a><br /></td></tr>
@@ -219,8 +218,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Returns the error code if an error occurs. </p>
+<p>Returns the error code if an error occurs: the HTTP status, the OpenAPI error code, or for <code><a class="el" href="namespacelongport.html#af5bcd3a8c3c5f5e8487253e271398b48a54699d9a7e6df4edbca4053281b2458e">ErrorKind::OAuth</a></code> a stable code identifying the failure (see <code>lb_error_code</code> in longport.h for the table) </p>
 
 </div>
 </div>

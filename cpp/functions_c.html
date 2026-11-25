@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C++ SDK: Class Members</title>
+<title>LongPort OpenAPI C++ SDK: Class Members</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C++ SDK
+   <div id="projectname">LongPort OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -81,15 +81,19 @@ $(function() {
 , <a class="el" href="structlongport_1_1quote_1_1_warrant_info.html#ae0c7df9433c77c3c718d9bf758affa74">longport::quote::WarrantInfo</a>
 , <a class="el" href="structlongport_1_1quote_1_1_warrant_quote.html#a69959530736d09dea23b7bdebdd6cfdb">longport::quote::WarrantQuote</a>
 </li>
-<li>call_symbol
-: <a class="el" href="structlongport_1_1quote_1_1_strike_price_info.html#a79092217609f12b1ffbb8033dba2be17">longport::quote::StrikePriceInfo</a>
-</li>
 <li>call_volume
 : <a class="el" href="structlongport_1_1quote_1_1_option_volume_daily_stat.html#a470a5bc0df4b171507080c0740a189fb">longport::quote::OptionVolumeDailyStat</a>
 , <a class="el" href="structlongport_1_1quote_1_1_option_volume_stats.html#a829fedd99e2772ea120d57e1c52306bc">longport::quote::OptionVolumeStats</a>
 </li>
+<li>cancel()
+: <a class="el" href="classlongport_1_1grid_1_1_grid_context.html#a417b38983836e242b2d42da69c882c46">longport::grid::GridContext</a>
+</li>
+<li>cancel_all_attached
+: <a class="el" href="structlongport_1_1trade_1_1_replace_attached_params.html#ae6c4706c1841d3a9405eb9150dbbd63e">longport::trade::ReplaceAttachedParams</a>
+</li>
 <li>cancel_order()
-: <a class="el" href="classlongport_1_1trade_1_1_trade_context.html#a0f52b221e7d2fdf201037aafed48e8d4">longport::trade::TradeContext</a>
+: <a class="el" href="classlongport_1_1fund_1_1_fund_context.html#a2eeec14eb8daf5c878696e8eeafd6f2e">longport::fund::FundContext</a>
+, <a class="el" href="classlongport_1_1trade_1_1_trade_context.html#a595888296659a8109114da6dade1f548">longport::trade::TradeContext</a>
 </li>
 <li>candlestick
 : <a class="el" href="structlongport_1_1quote_1_1_push_candlestick.html#aec5b741e53e25d631d122f20fa75d1ed">longport::quote::PushCandlestick</a>
@@ -117,9 +121,17 @@ $(function() {
 <li>cash_max_qty
 : <a class="el" href="structlongport_1_1trade_1_1_estimate_max_purchase_quantity_response.html#a5f88e23de51662164f6ca9fdaa8dc6ba">longport::trade::EstimateMaxPurchaseQuantityResponse</a>
 </li>
+<li>categories
+: <a class="el" href="structlongport_1_1market_1_1_rank_categories_response.html#aa611a9dbec777fca4910ea2d91a4e2c8">longport::market::RankCategoriesResponse</a>
+</li>
 <li>category
-: <a class="el" href="structlongport_1_1fundamental_1_1_company_overview.html#a574a6c1efaf8fc8bc0a80db0239e9630">longport::fundamental::CompanyOverview</a>
+: <a class="el" href="structlongport_1_1fund_1_1_fund_transaction.html#aff9d191ad86606e0b17e3eb9913f66a0">longport::fund::FundTransaction</a>
+, <a class="el" href="structlongport_1_1fund_1_1_get_fund_transactions_options.html#a0ab671c3a552c48bb50c91da9045033e">longport::fund::GetFundTransactionsOptions</a>
+, <a class="el" href="structlongport_1_1fundamental_1_1_company_overview.html#a574a6c1efaf8fc8bc0a80db0239e9630">longport::fundamental::CompanyOverview</a>
 , <a class="el" href="structlongport_1_1quote_1_1_warrant_quote.html#ac63a40352398781b2f55dddb96372fb0">longport::quote::WarrantQuote</a>
+</li>
+<li>category_average_performances
+: <a class="el" href="structlongport_1_1fund_1_1_fund_trend.html#afd52ea76beb69de64476588929bdfb74">longport::fund::FundTrend</a>
 </li>
 <li>ccy_symbol
 : <a class="el" href="structlongport_1_1fundamental_1_1_institution_rating_detail.html#ac31b51e2df7c51551b1ce35daf2cbae5">longport::fundamental::InstitutionRatingDetail</a>
@@ -135,10 +147,21 @@ $(function() {
 : <a class="el" href="structlongport_1_1fundamental_1_1_company_overview.html#afe0e242751efcab145bfb5f81f9b22de">longport::fundamental::CompanyOverview</a>
 </li>
 <li>change
-: <a class="el" href="structlongport_1_1fundamental_1_1_institution_rating_summary.html#af377aa6b88cb74d6da7099fec96c50bf">longport::fundamental::InstitutionRatingSummary</a>
+: <a class="el" href="structlongport_1_1fund_1_1_fund_nav_value.html#a54e15fa3ef8ee6421f9b34545bb36223">longport::fund::FundNavValue</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position_nav.html#a881a7ef7da7cd4e24c9dfc499dbc72c0">longport::fund::FundPositionNav</a>
+, <a class="el" href="structlongport_1_1fundamental_1_1_institution_rating_summary.html#af377aa6b88cb74d6da7099fec96c50bf">longport::fundamental::InstitutionRatingSummary</a>
 , <a class="el" href="structlongport_1_1market_1_1_rank_list_item.html#a9d0ec64cd93ede8d88d615c2830729dc">longport::market::RankListItem</a>
 , <a class="el" href="structlongport_1_1market_1_1_top_movers_stock.html#adcc938262bddba70e0f9926ba71e8c52">longport::market::TopMoversStock</a>
 , <a class="el" href="structlongport_1_1sharelist_1_1_sharelist_stock.html#a7d96a13800de20cb07470ad09f1230c9">longport::sharelist::SharelistStock</a>
+</li>
+<li>change_percent
+: <a class="el" href="structlongport_1_1fund_1_1_fund_annual_return.html#aa0036d184196024b25a675e78db4aa61">longport::fund::FundAnnualReturn</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_nav_value.html#a1b8d81e8c0f3d0b1aec92d1f8d490e38">longport::fund::FundNavValue</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position_nav.html#a2a25654d2d036687160d794e5cb25c65">longport::fund::FundPositionNav</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_quarterly_return.html#a4e21fa05c3e80fb45dbe38b4cc25ab81">longport::fund::FundQuarterlyReturn</a>
+</li>
+<li>change_percent_format
+: <a class="el" href="structlongport_1_1fund_1_1_fund_nav_value.html#a1f6156db50e879e6cf57ffefe6cdbc58">longport::fund::FundNavValue</a>
 </li>
 <li>change_rate
 : <a class="el" href="structlongport_1_1quote_1_1_security_calc_index.html#a01cd28e07e12876e8f720ad8de67a73f">longport::quote::SecurityCalcIndex</a>
@@ -154,21 +177,52 @@ $(function() {
 <li>changes
 : <a class="el" href="structlongport_1_1market_1_1_anomaly_response.html#a1a0a4e366fceb915cb7a16b4d6379d7a">longport::market::AnomalyResponse</a>
 </li>
+<li>channel
+: <a class="el" href="structlongport_1_1fund_1_1_fund_detail.html#a15e99a31099ad44d22884a6c3422c73e">longport::fund::FundDetail</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order_info.html#a83d4053869984838849a8faf8bdbc4b5">longport::fund::FundOrderInfo</a>
+</li>
+<li>channel_info
+: <a class="el" href="structlongport_1_1grid_1_1_grid_symbol_info.html#a9896e345a7d52f6d24d392a19fd079e7">longport::grid::GridSymbolInfo</a>
+</li>
 <li>channels
 : <a class="el" href="structlongport_1_1trade_1_1_fund_positions_response.html#a6a41580a147d256a95941c9a76093bd1">longport::trade::FundPositionsResponse</a>
 , <a class="el" href="structlongport_1_1trade_1_1_stock_positions_response.html#a86a32f14ac2666de1413c1f9a55e40a9">longport::trade::StockPositionsResponse</a>
 </li>
 <li>charge_detail
-: <a class="el" href="structlongport_1_1trade_1_1_order_detail.html#a5d45213342c5baa042240c3152bb1f3f">longport::trade::OrderDetail</a>
+: <a class="el" href="structlongport_1_1trade_1_1_order_detail.html#a1b802a99193fe6ed519ba2fbc5a230c2">longport::trade::OrderDetail</a>
 </li>
 <li>chart_uid
 : <a class="el" href="structlongport_1_1calendar_1_1_calendar_event_info.html#a46a734dc03ed85e32a0a3823b27779f3">longport::calendar::CalendarEventInfo</a>
+</li>
+<li>chat_finished
+: <a class="el" href="structlongport_1_1agent_1_1_conversation_stream_event.html#a79119ff41a87e79d0b9d720055137be0">longport::agent::ConversationStreamEvent</a>
+</li>
+<li>chat_id
+: <a class="el" href="structlongport_1_1agent_1_1_chat_finished_payload.html#a027cae649fb4d575988ff2ba297dc1b3">longport::agent::ChatFinishedPayload</a>
+, <a class="el" href="structlongport_1_1agent_1_1_chat_started_payload.html#ab8b7c3bcb23f282862edf3e02d45d69f">longport::agent::ChatStartedPayload</a>
+, <a class="el" href="structlongport_1_1agent_1_1_chat_title_updated_payload.html#ac10947a980543820d38c86fd838d9755">longport::agent::ChatTitleUpdatedPayload</a>
+, <a class="el" href="structlongport_1_1agent_1_1_interrupt.html#a5ccd5cef308545aaa7cc0c2794a49304">longport::agent::Interrupt</a>
+, <a class="el" href="structlongport_1_1agent_1_1_workflow_started_inputs.html#aca43b996d02fc89e9bc92ee728cd2a59">longport::agent::WorkflowStartedInputs</a>
+</li>
+<li>chat_started
+: <a class="el" href="structlongport_1_1agent_1_1_conversation_stream_event.html#a1eb034b8c8bfd2971591b136e1537015">longport::agent::ConversationStreamEvent</a>
+</li>
+<li>chat_title_updated
+: <a class="el" href="structlongport_1_1agent_1_1_conversation_stream_event.html#a602ee9fc694991bce2d70433820d5430">longport::agent::ConversationStreamEvent</a>
+</li>
+<li>chat_uid
+: <a class="el" href="structlongport_1_1agent_1_1_chat_finished_payload.html#a5c703b3d62480b1d585715fa514f270a">longport::agent::ChatFinishedPayload</a>
+, <a class="el" href="structlongport_1_1agent_1_1_chat_started_payload.html#a4fa52887aa707d65a1d6a3114ad945a3">longport::agent::ChatStartedPayload</a>
+, <a class="el" href="structlongport_1_1agent_1_1_chat_title_updated_payload.html#a22949e5506c597b8019708c864681ce5">longport::agent::ChatTitleUpdatedPayload</a>
+, <a class="el" href="structlongport_1_1agent_1_1_conversation_response.html#a491281e84c689397b37b13a65271e71a">longport::agent::ConversationResponse</a>
+, <a class="el" href="structlongport_1_1agent_1_1_workflow_started_inputs.html#a9ccdfa8cbd85f121f943e1fd28c60ef1">longport::agent::WorkflowStartedInputs</a>
 </li>
 <li>check_support()
 : <a class="el" href="classlongport_1_1dca_1_1_d_c_a_context.html#aa3ee9c7c769e94943e06f2eefe930fde">longport::dca::DCAContext</a>
 </li>
 <li>chg
 : <a class="el" href="structlongport_1_1alert_1_1_alert_symbol_group.html#a6872dbbcb7d032ee4745a28af6ee73a9">longport::alert::AlertSymbolGroup</a>
+, <a class="el" href="structlongport_1_1alert_1_1_alert_value_map.html#a37daae616dc3c404c967d50eecca8846">longport::alert::AlertValueMap</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_industry_peer_node.html#aa51e28a7e6cb77c336fa9769dd7d9451">longport::fundamental::IndustryPeerNode</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_industry_rank_item.html#ae4210174d92813b37a6bfadd59a8ca6c">longport::fundamental::IndustryRankItem</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_shareholder_stock.html#ab0783926fee719c46892168cfe42fa31">longport::fundamental::ShareholderStock</a>
@@ -194,19 +248,37 @@ $(function() {
 : <a class="el" href="structlongport_1_1market_1_1_constituent_stock.html#a1b47dd0c6a79adae4872566240ffcbd5">longport::market::ConstituentStock</a>
 , <a class="el" href="structlongport_1_1quote_1_1_security_static_info.html#a987603674247edfd848b1df6c7327250">longport::quote::SecurityStaticInfo</a>
 </li>
+<li>clear()
+: <a class="el" href="classlongport_1_1_o_auth.html#a54aa6906e023655d000b473ac2fe6063">longport::OAuth</a>
+</li>
+<li>clear_delayed_until
+: <a class="el" href="structlongport_1_1trade_1_1_replace_order_options.html#a11a3843351d4e4c9ee94b4bc5d30ac3b">longport::trade::ReplaceOrderOptions</a>
+</li>
 <li>clearance_times
 : <a class="el" href="structlongport_1_1portfolio_1_1_profit_analysis_item.html#ac1c3d1e48ed43f48a8b9a8d830d6d595">longport::portfolio::ProfitAnalysisItem</a>
+</li>
+<li>client_request_id
+: <a class="el" href="structlongport_1_1trade_1_1_submit_multi_leg_order_options.html#abf4d29b0b7d742ef9d2c274d88e616a2">longport::trade::SubmitMultiLegOrderOptions</a>
+, <a class="el" href="structlongport_1_1trade_1_1_submit_order_options.html#a9d4b1a799709e70773d6581cd16053fc">longport::trade::SubmitOrderOptions</a>
 </li>
 <li>close
 : <a class="el" href="structlongport_1_1quote_1_1_candlestick.html#adb69c81721faa6574367f6f0546f09bd">longport::quote::Candlestick</a>
 , <a class="el" href="structlongport_1_1quote_1_1_short_positions_item.html#abfc1e95b1a682462f0ffb83b5f213371">longport::quote::ShortPositionsItem</a>
 , <a class="el" href="structlongport_1_1quote_1_1_short_trades_item.html#a544060015bfc030a0a467f464995c8fc">longport::quote::ShortTradesItem</a>
 </li>
+<li>close_period
+: <a class="el" href="structlongport_1_1fund_1_1_fund_detail.html#a0830eb96d1f4a3b9532d9d9d3d0cfe97">longport::fund::FundDetail</a>
+</li>
 <li>cmp_desc
 : <a class="el" href="structlongport_1_1fundamental_1_1_snapshot_forecast_metric.html#ac4567652c212029c6c50b20af8c4b42f">longport::fundamental::SnapshotForecastMetric</a>
 </li>
 <li>code
-: <a class="el" href="structlongport_1_1alert_1_1_alert_symbol_group.html#a1abb5af6121ef9bc433eee769939629e">longport::alert::AlertSymbolGroup</a>
+: <a class="el" href="structlongport_1_1agent_1_1_agent_error.html#a7b6473451c12e80c68d64bea98483862">longport::agent::AgentError</a>
+, <a class="el" href="structlongport_1_1alert_1_1_alert_symbol_group.html#a1abb5af6121ef9bc433eee769939629e">longport::alert::AlertSymbolGroup</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_asset_allocation_item.html#ab6e42f9d14492ac945bc0b9ea767a86a">longport::fund::FundAssetAllocationItem</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_brief.html#ae28347e9727ca7ae460ed5bf2d618e18">longport::fund::FundBrief</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_detail.html#a6ac972ea85035f2c37b761206c1fe382">longport::fund::FundDetail</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_stock_holding.html#a4cc67bfb4ffab32e4f527d8e3da9cf88">longport::fund::FundStockHolding</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_asset_allocation_item.html#a436606a446d978519cc5cb3c156095f9">longport::fundamental::AssetAllocationItem</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_fund_holder.html#a4ae01ce63d131d5a0363c10fcc6a2fe4">longport::fundamental::FundHolder</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_shareholder_stock.html#ada11bc5de3cf16fbb7298311a97be2e4">longport::fundamental::ShareholderStock</a>
@@ -216,6 +288,7 @@ $(function() {
 , <a class="el" href="structlongport_1_1portfolio_1_1_profit_analysis_by_market_item.html#a1453f7687c2c2b91242d6937e7d0dc28">longport::portfolio::ProfitAnalysisByMarketItem</a>
 , <a class="el" href="structlongport_1_1sharelist_1_1_sharelist_stock.html#a77ed9b592abdc77402c332c9b1dd0787">longport::sharelist::SharelistStock</a>
 , <a class="el" href="classlongport_1_1_status.html#aa70198a9d5243667cc16648616d34296">longport::Status</a>
+, <a class="el" href="structlongport_1_1trade_1_1_multi_leg_info.html#a65faf457522a7094de5b5e116f91bf65">longport::trade::MultiLegInfo</a>
 , <a class="el" href="structlongport_1_1trade_1_1_order_charge_fee.html#a595c246ca1e1742577b0de845b5a024a">longport::trade::OrderChargeFee</a>
 , <a class="el" href="structlongport_1_1trade_1_1_order_charge_item.html#a73f63d20fbeebc37464d3f9db3b1e6ef">longport::trade::OrderChargeItem</a>
 </li>
@@ -233,8 +306,9 @@ $(function() {
 <li>comp_value
 : <a class="el" href="structlongport_1_1fundamental_1_1_consensus_detail.html#a71d6cf8d6f555a4530c5a7e86ad464e2">longport::fundamental::ConsensusDetail</a>
 </li>
-<li>company()
-: <a class="el" href="classlongport_1_1fundamental_1_1_fundamental_context.html#a1b5a349df1a136f292a1c0e50ba402fb">longport::fundamental::FundamentalContext</a>
+<li>company
+: <a class="el" href="structlongport_1_1fund_1_1_fund_filters.html#a5e3fefed2da73186a01915908e89a254">longport::fund::FundFilters</a>
+, <a class="el" href="classlongport_1_1fundamental_1_1_fundamental_context.html#a1b5a349df1a136f292a1c0e50ba402fb">longport::fundamental::FundamentalContext</a>
 </li>
 <li>company_id
 : <a class="el" href="structlongport_1_1fundamental_1_1_invest_security.html#ad355e268aa8b03a87de6a57bc8769e98">longport::fundamental::InvestSecurity</a>
@@ -250,7 +324,7 @@ $(function() {
 : <a class="el" href="structlongport_1_1fundamental_1_1_invest_security.html#a652eb1f2768cf3214e549c540596073a">longport::fundamental::InvestSecurity</a>
 </li>
 <li>Config()
-: <a class="el" href="classlongport_1_1_config.html#ae19c732c885f94fff6c3f12c1da097fe">longport::Config</a>
+: <a class="el" href="classlongport_1_1_config.html#a3729ceeb7a5c5567ae655dfadbd2ecac">longport::Config</a>
 </li>
 <li>consensus()
 : <a class="el" href="classlongport_1_1fundamental_1_1_fundamental_context.html#ad63971980f01103e3b4ab5dc93138303">longport::fundamental::FundamentalContext</a>
@@ -263,6 +337,10 @@ $(function() {
 </li>
 <li>content
 : <a class="el" href="structlongport_1_1calendar_1_1_calendar_event_info.html#a81e6e82c4f1e670bd5999ac5c7a960ef">longport::calendar::CalendarEventInfo</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order_keyword.html#a6d5796b9e8266fdbc7fe954c958a5d35">longport::fund::FundOrderKeyword</a>
+</li>
+<li>content_json
+: <a class="el" href="structlongport_1_1agent_1_1_reference.html#added7ea9731cd2c457aae54ecee6492f">longport::agent::Reference</a>
 </li>
 <li>ContentContext()
 : <a class="el" href="classlongport_1_1content_1_1_content_context.html#a34b6a59b31be57e7f1563bdfa21ce041">longport::content::ContentContext</a>
@@ -270,6 +348,21 @@ $(function() {
 <li>context()
 : <a class="el" href="structlongport_1_1_async_result.html#a1a0d75feb6fc841137be8f7e7ad24d86">longport::AsyncResult&lt; Ctx, T &gt;</a>
 , <a class="el" href="structlongport_1_1_push_event.html#afebe40c1dbd23ae50761befa50acba1d">longport::PushEvent&lt; Ctx, T &gt;</a>
+</li>
+<li>context_compress_finished
+: <a class="el" href="structlongport_1_1agent_1_1_conversation_stream_event.html#a4e122556aa742134c53405466f2a6d7c">longport::agent::ConversationStreamEvent</a>
+</li>
+<li>context_compress_started
+: <a class="el" href="structlongport_1_1agent_1_1_conversation_stream_event.html#a594b646a68d5c7cd526d3533c511c7cb">longport::agent::ConversationStreamEvent</a>
+</li>
+<li>continue_conversation()
+: <a class="el" href="classlongport_1_1agent_1_1_agent_context.html#aef0838ff147f9276e3357ffc1f0f43d0">longport::agent::AgentContext</a>
+</li>
+<li>continue_conversation_streamed()
+: <a class="el" href="classlongport_1_1agent_1_1_agent_context.html#a8a7eb8c440ad21039e576a8f984c7739">longport::agent::AgentContext</a>
+</li>
+<li>contract_direction
+: <a class="el" href="structlongport_1_1trade_1_1_multi_leg_order_leg.html#ace6575ec482d82375b50280a63b07ccc">longport::trade::MultiLegOrderLeg</a>
 </li>
 <li>contract_multiplier
 : <a class="el" href="structlongport_1_1quote_1_1_option_quote.html#a7fbbb6fee0498d9fdfb33a3cd7ac9685">longport::quote::OptionQuote</a>
@@ -279,6 +372,16 @@ $(function() {
 </li>
 <li>contract_type
 : <a class="el" href="structlongport_1_1quote_1_1_option_quote.html#a07f5a7be33e07d6527910b0019a106e3">longport::quote::OptionQuote</a>
+</li>
+<li>contrast_performances
+: <a class="el" href="structlongport_1_1fund_1_1_fund_performance_comparison.html#a3b3bae46c6ccd4908733744fda25556f">longport::fund::FundPerformanceComparison</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_trend.html#acdbc62ecf529eda08fdff8884fc646a1">longport::fund::FundTrend</a>
+</li>
+<li>conversation()
+: <a class="el" href="classlongport_1_1agent_1_1_agent_context.html#a98243f79d06372bde1b9a4ddeddeddf3">longport::agent::AgentContext</a>
+</li>
+<li>conversation_streamed()
+: <a class="el" href="classlongport_1_1agent_1_1_agent_context.html#a2dfeb44e68db925bde060bf0f92b815b">longport::agent::AgentContext</a>
 </li>
 <li>conversion_ratio
 : <a class="el" href="structlongport_1_1quote_1_1_security_calc_index.html#a788b053cf658a55a759b8046b1710346">longport::quote::SecurityCalcIndex</a>
@@ -294,6 +397,10 @@ $(function() {
 <li>cost
 : <a class="el" href="structlongport_1_1quote_1_1_short_positions_item.html#ac4490abb3cf052b8346450069a2e78a2">longport::quote::ShortPositionsItem</a>
 </li>
+<li>cost_level
+: <a class="el" href="structlongport_1_1fund_1_1_fund_analysis.html#aa65af984d894e0cff45268080f83aec5">longport::fund::FundAnalysis</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_analysis_detail.html#a22829ddc4690b7e0d3a7fa7f3e5832e3">longport::fund::FundAnalysisDetail</a>
+</li>
 <li>cost_net_asset_value
 : <a class="el" href="structlongport_1_1trade_1_1_fund_position.html#a462f4e019ae166eb6216a9096fdc7c9d">longport::trade::FundPosition</a>
 </li>
@@ -304,22 +411,49 @@ $(function() {
 : <a class="el" href="structlongport_1_1calendar_1_1_calendar_date_group.html#a70e56832a519daa72c6b831b51c1cfd9">longport::calendar::CalendarDateGroup</a>
 </li>
 <li>counter_id
-: <a class="el" href="structlongport_1_1fundamental_1_1_industry_peer_node.html#a2a4b58dea5023caf27ab143b41c7ddae">longport::fundamental::IndustryPeerNode</a>
-, <a class="el" href="structlongport_1_1fundamental_1_1_industry_rank_item.html#ab584ab857fcf35cdd0f82ddf3b3443fc">longport::fundamental::IndustryRankItem</a>
+: <a class="el" href="structlongport_1_1fund_1_1_fund_asset_allocation_item.html#ab2ccd46ccf45cab651a663208f57867c">longport::fund::FundAssetAllocationItem</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_brief.html#a1070761c5be8d8724756787e366fda90">longport::fund::FundBrief</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_dividend.html#ab306cd5a060535bf2b51e131b30c482c">longport::fund::FundDividend</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_nav_value.html#ac9d07aff3363b29f37ae296aac5fc4ae">longport::fund::FundNavValue</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order.html#abf02b98d05d0ca3207c7b1f30099c8dc">longport::fund::FundOrder</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order_info.html#a8ceb76e3f62a3c0ddd726ab729b1d423">longport::fund::FundOrderInfo</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order_submit_response.html#a576d934a8a91de6429cb8c3399c5da34">longport::fund::FundOrderSubmitResponse</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_performance.html#a8d6d42db0a0393675321d74de19a95b6">longport::fund::FundPerformance</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position.html#ae8ba79088f17e19709ca1565dd99a516">longport::fund::FundPosition</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position_nav.html#a9f30982d46f7f81bee426b11175e8f2f">longport::fund::FundPositionNav</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position_performance.html#a972d41340a84186650d1b1ebd0d89f87">longport::fund::FundPositionPerformance</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_stock_holding.html#ae82d7102452d8276185465e353d62d69">longport::fund::FundStockHolding</a>
+, <a class="el" href="structlongport_1_1fund_1_1_hot_fund.html#a1dde2b922bd2a3f64f7098ffdaf78404">longport::fund::HotFund</a>
+, <a class="el" href="structlongport_1_1fund_1_1_submit_fund_order_options.html#aa7aabcbbfcef401f23771960d31fa8c0">longport::fund::SubmitFundOrderOptions</a>
+, <a class="el" href="structlongport_1_1fund_1_1_validate_fund_order_options.html#ab3d2f2bc222c856684b6d3ad3c12bcc5">longport::fund::ValidateFundOrderOptions</a>
+, <a class="el" href="structlongport_1_1trade_1_1_attached_order_detail.html#ac8a84b20743b680001b8c7a11c929a30">longport::trade::AttachedOrderDetail</a>
+, <a class="el" href="structlongport_1_1trade_1_1_fund_position.html#aaed32050b399a613db76a927b8f2924b">longport::trade::FundPosition</a>
+</li>
+<li>counter_ids
+: <a class="el" href="structlongport_1_1fund_1_1_get_fund_orders_options.html#ac18072d9b477abfd18821154aafd8a7c">longport::fund::GetFundOrdersOptions</a>
 </li>
 <li>counter_name
 : <a class="el" href="structlongport_1_1calendar_1_1_calendar_event_info.html#a1d209420c589556ac15359491533714d">longport::calendar::CalendarEventInfo</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_nav_value.html#a8c5c26364d987056cf254ff1ef1717bc">longport::fund::FundNavValue</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position_nav.html#a45a32306c509d63df9c9a194f660095a">longport::fund::FundPositionNav</a>
+</li>
+<li>country_name
+: <a class="el" href="structlongport_1_1fund_1_1_fund_holding.html#a341100a764d89af26630b008f0d624cf">longport::fund::FundHolding</a>
 </li>
 <li>cover
 : <a class="el" href="structlongport_1_1sharelist_1_1_sharelist_info.html#a45758a4308aac2135d8004d7b0b30ac4">longport::sharelist::SharelistInfo</a>
 </li>
 <li>create()
-: <a class="el" href="classlongport_1_1alert_1_1_alert_context.html#a8552ce9c2ed82ace3d9372cceb2a55dc">longport::alert::AlertContext</a>
+: <a class="el" href="classlongport_1_1agent_1_1_agent_context.html#af75fedcac564f66368a142718f6858ac">longport::agent::AgentContext</a>
+, <a class="el" href="classlongport_1_1alert_1_1_alert_context.html#a8552ce9c2ed82ace3d9372cceb2a55dc">longport::alert::AlertContext</a>
 , <a class="el" href="classlongport_1_1asset_1_1_asset_context.html#a00de263fd2ea536346d934e9b4a79b35">longport::asset::AssetContext</a>
 , <a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html#a1576f0ea552aff25c84abb9483aaf34c">longport::calendar::CalendarContext</a>
 , <a class="el" href="classlongport_1_1content_1_1_content_context.html#a4af4c4cf2e89322ed22f55ebdf7935f3">longport::content::ContentContext</a>
 , <a class="el" href="classlongport_1_1dca_1_1_d_c_a_context.html#a2bfb15203d8e0e9a9cc3378940d29e91">longport::dca::DCAContext</a>
+, <a class="el" href="classlongport_1_1fund_1_1_fund_context.html#aeaacfa3dd6d063ef58b720a2c0ca2a71">longport::fund::FundContext</a>
 , <a class="el" href="classlongport_1_1fundamental_1_1_fundamental_context.html#a2ef9b6e94979c1c3e4ba3347c115ca2e">longport::fundamental::FundamentalContext</a>
+, <a class="el" href="classlongport_1_1grid_1_1_grid_context.html#a20c4838e0e80c27c7dacc6270603ee08">longport::grid::GridContext</a>
+, <a class="el" href="structlongport_1_1grid_1_1_grid_trade_rule.html#a6abd38df848fc1b90a17ab9c664bde41">longport::grid::GridTradeRule</a>
 , <a class="el" href="classlongport_1_1market_1_1_market_context.html#adca595a7660dd8e569299a40a2d5e171">longport::market::MarketContext</a>
 , <a class="el" href="classlongport_1_1portfolio_1_1_portfolio_context.html#afb0ce8b005ad03f29d58117e9279f6bb">longport::portfolio::PortfolioContext</a>
 , <a class="el" href="classlongport_1_1quote_1_1_quote_context.html#ab94b7d55b04f1b27f428d8c460c13a3b">longport::quote::QuoteContext</a>
@@ -340,9 +474,19 @@ $(function() {
 : <a class="el" href="classlongport_1_1quote_1_1_quote_context.html#a501da93e713045007e47b72dce2b2010">longport::quote::QuoteContext</a>
 </li>
 <li>created_at
-: <a class="el" href="structlongport_1_1content_1_1_owned_topic.html#a53927251412744fac3c40f0212b0ea54">longport::content::OwnedTopic</a>
+: <a class="el" href="structlongport_1_1agent_1_1_agent.html#a448f30c8405f59131065e52e27569249">longport::agent::Agent</a>
+, <a class="el" href="structlongport_1_1agent_1_1_context_compress_finished_payload.html#a6ad311f1dfefbc27730f05eb9dd69c56">longport::agent::ContextCompressFinishedPayload</a>
+, <a class="el" href="structlongport_1_1agent_1_1_workspace.html#a0c41b26a55efc174ebb766e1f0cf7522">longport::agent::Workspace</a>
+, <a class="el" href="structlongport_1_1content_1_1_owned_topic.html#a53927251412744fac3c40f0212b0ea54">longport::content::OwnedTopic</a>
 , <a class="el" href="structlongport_1_1dca_1_1_dca_history_record.html#af5a210fe42c4a9dd3aed07b19067729e">longport::dca::DcaHistoryRecord</a>
 , <a class="el" href="structlongport_1_1dca_1_1_dca_plan.html#a63c2315553de4e7561fe1f025f42db87">longport::dca::DcaPlan</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order.html#a41e22a005f0b1270ed97db31b3093563">longport::fund::FundOrder</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order_info.html#ab671ffee5a72fbde2b0c8b0f8d7458df">longport::fund::FundOrderInfo</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order_submit_response.html#a0293137226446b22f9ee5e14f6a46787">longport::fund::FundOrderSubmitResponse</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_transaction.html#afeb125081f9776fbdd5d5b76662d25aa">longport::fund::FundTransaction</a>
+, <a class="el" href="structlongport_1_1grid_1_1_grid_order.html#a4c9a85f8fe02ab166443733b581b3353">longport::grid::GridOrder</a>
+, <a class="el" href="structlongport_1_1grid_1_1_grid_order_detail.html#ad3fb781e7d3f15c02191107187b9bfb5">longport::grid::GridOrderDetail</a>
+, <a class="el" href="structlongport_1_1grid_1_1_grid_order_history.html#ab679f60221a5167ab18a0f6a2deb9720">longport::grid::GridOrderHistory</a>
 , <a class="el" href="structlongport_1_1sharelist_1_1_sharelist_info.html#a861bf41250c97c8c2a92a0b855004bde">longport::sharelist::SharelistInfo</a>
 </li>
 <li>creator
@@ -372,8 +516,29 @@ $(function() {
 <li>cumulative_transaction_amount
 : <a class="el" href="structlongport_1_1portfolio_1_1_profit_summary_breakdown.html#af780edb3d641e85c93f6a02b0ab24876">longport::portfolio::ProfitSummaryBreakdown</a>
 </li>
+<li>currencies
+: <a class="el" href="structlongport_1_1fund_1_1_get_fund_transactions_options.html#acad6f8c3202aa34f0175a0320d9d6e9a">longport::fund::GetFundTransactionsOptions</a>
+</li>
 <li>currency
 : <a class="el" href="structlongport_1_1calendar_1_1_calendar_event_info.html#a45b7252f026f218fc207bf24354c1c15">longport::calendar::CalendarEventInfo</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_brief.html#a11480656b3089a5c275651836c88a7b5">longport::fund::FundBrief</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_detail.html#ac92c8cb0f02d84cb3449725cb43a0cfe">longport::fund::FundDetail</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_dividend.html#ad3e30734afb8ba6534fc91562284c839">longport::fund::FundDividend</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_dividends.html#abcd74278693ed1239406cb825ba1e400">longport::fund::FundDividends</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_filters.html#a4c00af88fcc5470509007a95a4ce8f87">longport::fund::FundFilters</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_nav_value.html#a1e6a47ec5a11b8226f54a44108c3622c">longport::fund::FundNavValue</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order.html#a4b4ec3616fca3a6ab591317ae3b56c24">longport::fund::FundOrder</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_order_info.html#a5b99258a68fbbb127bc8db77f61a4e3d">longport::fund::FundOrderInfo</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position.html#a937577c2a5dcaf6936743deb1540f8ea">longport::fund::FundPosition</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position_detail_values.html#aafb94d53fb7044338907fdb8b9acde3a">longport::fund::FundPositionDetailValues</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_position_profits.html#a2db50ed93e7772678ff777bc1cdeb879">longport::fund::FundPositionProfits</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_stock_holding.html#a081abe8fd49bcb13f3e0ed861a639f47">longport::fund::FundStockHolding</a>
+, <a class="el" href="structlongport_1_1fund_1_1_fund_transaction.html#a4b9c2b9c2096ad7cda987e03fae5d64b">longport::fund::FundTransaction</a>
+, <a class="el" href="structlongport_1_1fund_1_1_get_fund_orders_options.html#acc3e4d58a54ac0e3e24ef44c04c72461">longport::fund::GetFundOrdersOptions</a>
+, <a class="el" href="structlongport_1_1fund_1_1_get_fund_position_dividends_options.html#aa70bcc066545cf8aa5103fbdfa6baa4f">longport::fund::GetFundPositionDividendsOptions</a>
+, <a class="el" href="structlongport_1_1fund_1_1_hot_fund.html#a46acb73e64e4245d4ebd68fe896213ce">longport::fund::HotFund</a>
+, <a class="el" href="structlongport_1_1fund_1_1_submit_fund_order_options.html#a2e06aae8c7875c1f89d087acf3d62722">longport::fund::SubmitFundOrderOptions</a>
+, <a class="el" href="structlongport_1_1fund_1_1_validate_fund_order_options.html#ab3fdf5d1aec6949e85b2fa7552c7c148">longport::fund::ValidateFundOrderOptions</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_business_segments.html#abd7d55098c6dec15521466478040f67a">longport::fundamental::BusinessSegments</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_business_segments_historical_item.html#ab62fd56a34bc5640a9d739b6da3e37e9">longport::fundamental::BusinessSegmentsHistoricalItem</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_buyback_history_item.html#a80fb74a2d3f32ecc5f29a293608e4d0f">longport::fundamental::BuybackHistoryItem</a>
@@ -384,6 +549,8 @@ $(function() {
 , <a class="el" href="structlongport_1_1fundamental_1_1_invest_security.html#a3dbf308daaeca5e76d76a7af4067967d">longport::fundamental::InvestSecurity</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_recent_buybacks.html#a5bc9fc480951e6002b52c54f0b48f507">longport::fundamental::RecentBuybacks</a>
 , <a class="el" href="structlongport_1_1fundamental_1_1_valuation_comparison_item.html#a1f36ebb06d5c22196723c98205256ab7">longport::fundamental::ValuationComparisonItem</a>
+, <a class="el" href="structlongport_1_1grid_1_1_grid_channel_info.html#ad2c21ea0bc3252c254a3c3006b507bf0">longport::grid::GridChannelInfo</a>
+, <a class="el" href="structlongport_1_1grid_1_1_trigger_order.html#aa4ada0bcabf7bc184582c0fd8ed18808">longport::grid::TriggerOrder</a>
 , <a class="el" href="structlongport_1_1portfolio_1_1_profit_analysis_detail.html#af796ca99a1188690d459d9264f549ca9">longport::portfolio::ProfitAnalysisDetail</a>
 , <a class="el" href="structlongport_1_1portfolio_1_1_profit_analysis_item.html#a95c61ba804c76b74d1dc715dba873622">longport::portfolio::ProfitAnalysisItem</a>
 , <a class="el" href="structlongport_1_1portfolio_1_1_profit_analysis_summary.html#acf2aad2bc7c4b20e4c8406486818ffcb">longport::portfolio::ProfitAnalysisSummary</a>
@@ -404,6 +571,11 @@ $(function() {
 <li>currency_rate
 : <a class="el" href="structlongport_1_1market_1_1_ah_premium_kline.html#a1a1e66b20c3c5c6e5419e3f8655a9d8a">longport::market::AhPremiumKline</a>
 </li>
+<li>current_base_price
+: <a class="el" href="structlongport_1_1grid_1_1_grid_order.html#ae22e739f2456d8cc1a82303ba4f926eb">longport::grid::GridOrder</a>
+, <a class="el" href="structlongport_1_1grid_1_1_grid_order_detail.html#a3477919e137031b39bbdd169e7d7af43">longport::grid::GridOrderDetail</a>
+, <a class="el" href="structlongport_1_1trade_1_1_push_grid_order_changed.html#a3656e91f891cf123c05d0a67d9e6dfb3">longport::trade::PushGridOrderChanged</a>
+</li>
 <li>current_index
 : <a class="el" href="structlongport_1_1fundamental_1_1_financial_consensus.html#aca61e049abb350842ff76fa8519a1d1f">longport::fundamental::FinancialConsensus</a>
 </li>
@@ -421,6 +593,9 @@ $(function() {
 </li>
 <li>current_volume
 : <a class="el" href="structlongport_1_1quote_1_1_push_quote.html#a34ec4a1a09223c50ca00f6cf5cc0edaa">longport::quote::PushQuote</a>
+</li>
+<li>cut_off_time
+: <a class="el" href="structlongport_1_1fund_1_1_fund_detail.html#a4d6b6b1787cc972cb69c74ce49e80dae">longport::fund::FundDetail</a>
 </li>
 </ul>
 </div><!-- contents -->

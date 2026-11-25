@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C SDK: lb_order_t Struct Reference</title>
+<title>LongPort OpenAPI C SDK: lb_order_t Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C SDK
+   <div id="projectname">LongPort OpenAPI C SDK
    </div>
   </td>
  </tr>
@@ -130,10 +130,35 @@ Data Fields</h2></td></tr>
 <tr class="separator:a92ab50a8dface7bbd9e7ba54e112b444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__t.html#a9a51a4c0d5faa2f4386a52affa7e12d7">remark</a></td></tr>
 <tr class="separator:a9a51a4c0d5faa2f4386a52affa7e12d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2df2b7231e8705c75a1c42aa9e1f13f9"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="struct_c_attached_order_detail.html">CAttachedOrderDetail</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__t.html#a2df2b7231e8705c75a1c42aa9e1f13f9">attached_orders</a></td></tr>
+<tr class="separator:a2df2b7231e8705c75a1c42aa9e1f13f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a715ecc6ae36e21ec9972072a3fe2ed74"><td class="memItemLeft" align="right" valign="top">uintptr_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__t.html#a715ecc6ae36e21ec9972072a3fe2ed74">num_attached_orders</a></td></tr>
+<tr class="separator:a715ecc6ae36e21ec9972072a3fe2ed74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ec7d795cac47a012c0fb75a5496bd75"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__t.html#a5ec7d795cac47a012c0fb75a5496bd75">has_multi_leg</a></td></tr>
+<tr class="separator:a5ec7d795cac47a012c0fb75a5496bd75"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d6491ced786fc37d2ec8911ab18e2d9"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_c_multi_leg_info.html">CMultiLegInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__t.html#a1d6491ced786fc37d2ec8911ab18e2d9">multi_leg</a></td></tr>
+<tr class="separator:a1d6491ced786fc37d2ec8911ab18e2d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f76ca65dfe4fd40ae37ca5968ac028b"><td class="memItemLeft" align="right" valign="top">const int64_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structlb__order__t.html#a2f76ca65dfe4fd40ae37ca5968ac028b">delayed_until</a></td></tr>
+<tr class="separator:a2f76ca65dfe4fd40ae37ca5968ac028b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Order </p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a2df2b7231e8705c75a1c42aa9e1f13f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2df2b7231e8705c75a1c42aa9e1f13f9">&#9670;&nbsp;</a></span>attached_orders</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const struct <a class="el" href="struct_c_attached_order_detail.html">CAttachedOrderDetail</a>* attached_orders</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Attached orders </p>
+
+</div>
+</div>
 <a id="ac677610d010638851abb8ebe76fb508c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac677610d010638851abb8ebe76fb508c">&#9670;&nbsp;</a></span>currency</h2>
 
@@ -146,6 +171,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Currency </p>
+
+</div>
+</div>
+<a id="a2f76ca65dfe4fd40ae37ca5968ac028b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f76ca65dfe4fd40ae37ca5968ac028b">&#9670;&nbsp;</a></span>delayed_until</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int64_t* delayed_until</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Time-condition submit time (maybe null) </p>
 
 </div>
 </div>
@@ -191,6 +231,21 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Long term order expire date (maybe null) </p>
+
+</div>
+</div>
+<a id="a5ec7d795cac47a012c0fb75a5496bd75"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ec7d795cac47a012c0fb75a5496bd75">&#9670;&nbsp;</a></span>has_multi_leg</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool has_multi_leg</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Whether multi_leg is valid (true only for multi-leg option combination orders) </p>
 
 </div>
 </div>
@@ -266,6 +321,36 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Rejected Message or remark </p>
+
+</div>
+</div>
+<a id="a1d6491ced786fc37d2ec8911ab18e2d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d6491ced786fc37d2ec8911ab18e2d9">&#9670;&nbsp;</a></span>multi_leg</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="struct_c_multi_leg_info.html">CMultiLegInfo</a> multi_leg</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Multi-leg strategy information (only valid when has_multi_leg is true) </p>
+
+</div>
+</div>
+<a id="a715ecc6ae36e21ec9972072a3fe2ed74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a715ecc6ae36e21ec9972072a3fe2ed74">&#9670;&nbsp;</a></span>num_attached_orders</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uintptr_t num_attached_orders</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Number of attached orders </p>
 
 </div>
 </div>

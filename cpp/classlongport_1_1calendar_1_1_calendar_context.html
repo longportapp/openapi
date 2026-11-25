@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Longport OpenAPI C++ SDK: longport::calendar::CalendarContext Class Reference</title>
+<title>LongPort OpenAPI C++ SDK: longport::calendar::CalendarContext Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Longport OpenAPI C++ SDK
+   <div id="projectname">LongPort OpenAPI C++ SDK
    </div>
   </td>
  </tr>
@@ -93,9 +93,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab1d7b56f3fb1e2204d0b92b9f1151c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88fe8e42ed302ed40890335b50580832"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html">CalendarContext</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html#a88fe8e42ed302ed40890335b50580832">operator=</a> (const <a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html">CalendarContext</a> &amp;)</td></tr>
 <tr class="separator:a88fe8e42ed302ed40890335b50580832"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e522d05b1a724153f5cb4ce859f943c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html#a0e522d05b1a724153f5cb4ce859f943c">finance_calendar</a> (<a class="el" href="namespacelongport_1_1calendar.html#a6900d573031788c1fe2c517f9c884da2">CalendarCategory</a> category, const std::string &amp;start, const std::string &amp;end, const std::string &amp;market, <a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html">CalendarContext</a>, <a class="el" href="structlongport_1_1calendar_1_1_calendar_events_response.html">CalendarEventsResponse</a> &gt; callback) const</td></tr>
-<tr class="memdesc:a0e522d05b1a724153f5cb4ce859f943c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get financial calendar events for the given date range.  <a href="classlongport_1_1calendar_1_1_calendar_context.html#a0e522d05b1a724153f5cb4ce859f943c">More...</a><br /></td></tr>
-<tr class="separator:a0e522d05b1a724153f5cb4ce859f943c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada440b67660fc6b7739f409830872e1c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html#ada440b67660fc6b7739f409830872e1c">finance_calendar</a> (<a class="el" href="namespacelongport_1_1calendar.html#a6900d573031788c1fe2c517f9c884da2">CalendarCategory</a> category, const std::string &amp;start, const std::string &amp;end, const std::string &amp;market, std::optional&lt; int32_t &gt; count, std::optional&lt; int32_t &gt; offset, std::optional&lt; <a class="el" href="namespacelongport_1_1calendar.html#ae4155dd5e0f701214a8fcada4921f373">CalendarPageDirection</a> &gt; next, <a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html">CalendarContext</a>, <a class="el" href="structlongport_1_1calendar_1_1_calendar_events_response.html">CalendarEventsResponse</a> &gt; callback) const</td></tr>
+<tr class="separator:ada440b67660fc6b7739f409830872e1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -223,8 +222,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0e522d05b1a724153f5cb4ce859f943c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e522d05b1a724153f5cb4ce859f943c">&#9670;&nbsp;</a></span>finance_calendar()</h2>
+<a id="ada440b67660fc6b7739f409830872e1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada440b67660fc6b7739f409830872e1c">&#9670;&nbsp;</a></span>finance_calendar()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -256,6 +255,24 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">std::optional&lt; int32_t &gt;&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::optional&lt; int32_t &gt;&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::optional&lt; <a class="el" href="namespacelongport_1_1calendar.html#ae4155dd5e0f701214a8fcada4921f373">CalendarPageDirection</a> &gt;&#160;</td>
+          <td class="paramname"><em>next</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype"><a class="el" href="namespacelongport.html#a5474340afc19827a58958a5af2cb33fc">AsyncCallback</a>&lt; <a class="el" href="classlongport_1_1calendar_1_1_calendar_context.html">CalendarContext</a>, <a class="el" href="structlongport_1_1calendar_1_1_calendar_events_response.html">CalendarEventsResponse</a> &gt;&#160;</td>
           <td class="paramname"><em>callback</em>&#160;</td>
         </tr>
@@ -266,8 +283,8 @@ Static Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Get financial calendar events for the given date range. </p>
+<p>Get financial calendar events for the given date range.</p>
+<p>The endpoint paginates: the server caps each response (historically 10 events per page unless a larger <code>count</code> is requested) and returns a <code>next_date</code> cursor. To page through the full window, request a larger <code>count</code>, or re-call with the returned <code>next_date</code> as <code>start</code>. <code>count</code>, <code>offset</code> and <code>next</code> are optional (pass <code>std::nullopt</code> to use the server default). </p>
 
 </div>
 </div>
