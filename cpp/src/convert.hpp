@@ -1,6 +1,7 @@
 #pragma once
 
 #include "longport.h"
+#include "fund_ffi.hpp"
 #include "types.hpp"
 #include "portfolio_context.hpp"
 #include <algorithm>
@@ -30,8 +31,11 @@ using longport::quote::IssuerInfo;
 using longport::quote::MarketTemperature;
 using longport::quote::MarketTradingDays;
 using longport::quote::MarketTradingSession;
+using longport::quote::OptionChainContract;
 using longport::quote::OptionDirection;
+using longport::quote::OptionExpiryCycleType;
 using longport::quote::OptionQuote;
+using longport::quote::OptionStandardAttr;
 using longport::quote::OptionType;
 using longport::quote::ParticipantInfo;
 using longport::quote::Period;
@@ -53,7 +57,6 @@ using longport::quote::SecurityListCategory;
 using longport::quote::SecurityQuote;
 using longport::quote::SecurityStaticInfo;
 using longport::quote::SortOrderType;
-using longport::quote::StrikePriceInfo;
 using longport::quote::SubFlags;
 using longport::quote::Subscription;
 using longport::quote::Trade;
@@ -88,7 +91,13 @@ using longport::trade::FundPositionsResponse;
 using longport::trade::GetHistoryExecutionsOptions;
 using longport::trade::GetHistoryOrdersOptions;
 using longport::trade::GetTodayExecutionsOptions;
+using longport::trade::ContractDirection;
 using longport::trade::MarginRatio;
+using longport::trade::RiskAssessment;
+using longport::trade::MultiLegInfo;
+using longport::trade::MultiLegOrderLeg;
+using longport::trade::MultiLegPosition;
+using longport::trade::MultiLegStrategy;
 using longport::trade::Order;
 using longport::trade::OrderChargeDetail;
 using longport::trade::OrderChargeFee;
@@ -106,10 +115,69 @@ using longport::trade::StockPosition;
 using longport::trade::StockPositionChannel;
 using longport::trade::StockPositionsResponse;
 using longport::trade::SubmitAttachedParams;
+using longport::trade::SubmitMultiLegOrderLeg;
+using longport::trade::SubmitMultiLegOrderOptions;
 using longport::trade::SubmitOrderResponse;
 using longport::trade::TimeInForceType;
 using longport::trade::TopicType;
 using longport::trade::TriggerStatus;
+using longport::grid::GridBidSize;
+using longport::grid::GridChannelInfo;
+using longport::grid::GridLimitEvent;
+using longport::grid::GridTimeInForce;
+using longport::grid::TriggerPriceType;
+using longport::grid::GridOrder;
+using longport::grid::GridOrderDetail;
+using longport::grid::GridOrderHistory;
+using longport::grid::GridSymbolInfo;
+using longport::grid::GridOrdersResponse;
+using longport::grid::GridOrderSubOrder;
+using longport::grid::GridTradeRule;
+using longport::grid::GridTriggerHistoryResponse;
+using longport::trade::PushGridOrderChanged;
+using longport::grid::SubmitGridOrderResponse;
+using longport::grid::TriggerOrder;
+using longport::fund::FundAnalysis;
+using longport::fund::FundAnalysisDetail;
+using longport::fund::FundAnnualReturn;
+using longport::fund::FundAssetAllocation;
+using longport::fund::FundAssetAllocationItem;
+using longport::fund::FundBrief;
+using longport::fund::FundDatedValue;
+using longport::fund::FundDetail;
+using longport::fund::FundDividend;
+using longport::fund::FundDividends;
+using longport::fund::FundFilters;
+using longport::fund::FundHolding;
+using longport::fund::FundHoldings;
+using longport::fund::FundNamedContrast;
+using longport::fund::FundNavValue;
+using longport::fund::FundOrder;
+using longport::fund::FundOrderDetail;
+using longport::fund::FundOrderInfo;
+using longport::fund::FundOrderKeyword;
+using longport::fund::FundOrderStage;
+using longport::fund::FundOrderSubmitResponse;
+using longport::fund::FundOrderValidation;
+using longport::fund::FundPerformance;
+using longport::fund::FundPerformanceComparison;
+using longport::fund::FundPerformancePoint;
+// NB: `FundPosition` is intentionally NOT imported here — it collides with
+// `longport::trade::FundPosition`. The fund converters qualify it as
+// `fund::FundPosition`.
+using longport::fund::FundPositionDetail;
+using longport::fund::FundPositionDetailValues;
+using longport::fund::FundPositionNav;
+using longport::fund::FundPositionPerformance;
+using longport::fund::FundPositionProfits;
+using longport::fund::FundPositions;
+using longport::fund::FundQuarterlyReturn;
+using longport::fund::FundStockHolding;
+using longport::fund::FundTransaction;
+using longport::fund::FundTrend;
+using longport::fund::FundTrendContrast;
+using longport::fund::FundUnitValue;
+using longport::fund::HotFund;
 using longport::quote::FilingItem;
 using longport::content::OwnedTopic;
 using longport::content::NewsItem;
@@ -157,6 +225,19 @@ convert(PushCandlestickMode mode)
       return PushCandlestickMode_Realtime;
     case PushCandlestickMode::Confirmed:
       return PushCandlestickMode_Confirmed;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline lb_quote_transport_t
+convert(QuoteTransport transport)
+{
+  switch (transport) {
+    case QuoteTransport::WebSocket:
+      return QuoteTransport_WebSocket;
+    case QuoteTransport::Http:
+      return QuoteTransport_Http;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -483,6 +564,38 @@ convert(lb_option_direction_t ty)
       return OptionDirection::Call;
     case OptionDirectionPut:
       return OptionDirection::Put;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline OptionExpiryCycleType
+convert(lb_option_expiry_cycle_type_t ty)
+{
+  switch (ty) {
+    case OptionExpiryCycleTypeUnknown:
+      return OptionExpiryCycleType::Unknown;
+    case OptionExpiryCycleTypeMonthly:
+      return OptionExpiryCycleType::Monthly;
+    case OptionExpiryCycleTypeWeekly:
+      return OptionExpiryCycleType::Weekly;
+    case OptionExpiryCycleTypeQuarterly:
+      return OptionExpiryCycleType::Quarterly;
+    default:
+      throw std::invalid_argument("unreachable");
+  }
+}
+
+inline OptionStandardAttr
+convert(lb_option_standard_attr_t ty)
+{
+  switch (ty) {
+    case OptionStandardAttrUnknown:
+      return OptionStandardAttr::Unknown;
+    case OptionStandardAttrNormal:
+      return OptionStandardAttr::Normal;
+    case OptionStandardAttrOld:
+      return OptionStandardAttr::Old;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -850,14 +963,17 @@ convert(AdjustType ty)
   }
 }
 
-inline StrikePriceInfo
-convert(const lb_strike_price_info_t* info)
+inline OptionChainContract
+convert(const lb_option_chain_contract_t* info)
 {
-  return StrikePriceInfo{
-    Decimal(info->price),
-    info->call_symbol,
-    info->put_symbol,
-    info->standard,
+  return OptionChainContract{
+    info->symbol,
+    convert(&info->expiry_date),
+    Decimal(info->strike_price),
+    convert(info->direction),
+    convert(info->option_type),
+    convert(info->standard_attr),
+    info->days_to_expiry,
   };
 }
 
@@ -963,12 +1079,16 @@ convert(TopicType ty)
   }
 }
 
+inline OrderSide
+convert(lb_order_side_t side);
+
 inline Execution
 convert(const lb_execution_t* info)
 {
   return Execution{
     info->order_id,      info->trade_id, info->symbol,
     info->trade_done_at, info->quantity, Decimal(info->price),
+    convert(info->side),
   };
 }
 
@@ -1024,6 +1144,8 @@ convert(lb_order_status_t status)
       return OrderStatus::Expired;
     case OrderStatusPartialWithdrawal:
       return OrderStatus::PartialWithdrawal;
+    case OrderStatusDelayedNotReported:
+      return OrderStatus::DelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1069,6 +1191,8 @@ convert(OrderStatus status)
       return OrderStatusExpired;
     case OrderStatus::PartialWithdrawal:
       return OrderStatusPartialWithdrawal;
+    case OrderStatus::DelayedNotReported:
+      return OrderStatusDelayedNotReported;
     default:
       throw std::invalid_argument("unreachable");
   }
@@ -1347,6 +1471,8 @@ convert(const CAttachedOrderDetail* detail)
                          : std::nullopt,
     detail->submit_price ? std::optional{ Decimal(detail->submit_price) }
                          : std::nullopt,
+    detail->limit_depth_level ? std::optional{ *detail->limit_depth_level }
+                              : std::nullopt,
   };
 }
 
@@ -1391,6 +1517,10 @@ convert_submit_attached(const SubmitAttachedParams& src)
     s.activate_rth = convert(*src.activate_rth);
     s.params.activate_rth = &s.activate_rth;
   }
+  s.params.profit_taker_depth_level =
+    src.profit_taker_depth_level ? &*src.profit_taker_depth_level : nullptr;
+  s.params.stop_loss_depth_level =
+    src.stop_loss_depth_level ? &*src.stop_loss_depth_level : nullptr;
   return s;
 }
 
@@ -1445,7 +1575,128 @@ convert_replace_attached(const ReplaceAttachedParams& src)
     src.quantity ? (const lb_decimal_t*)src.quantity.value() : nullptr;
   s.params.market_price =
     src.market_price ? (const lb_decimal_t*)src.market_price.value() : nullptr;
+  s.params.profit_taker_depth_level =
+    src.profit_taker_depth_level ? &*src.profit_taker_depth_level : nullptr;
+  s.params.stop_loss_depth_level =
+    src.stop_loss_depth_level ? &*src.stop_loss_depth_level : nullptr;
   return s;
+}
+
+inline MultiLegStrategy
+convert(CMultiLegStrategy strategy)
+{
+  switch (strategy) {
+    case MultiLegStrategyUnknown:
+      return MultiLegStrategy::Unknown;
+    case MultiLegStrategyCoveredCall:
+      return MultiLegStrategy::CoveredCall;
+    case MultiLegStrategyCoveredPut:
+      return MultiLegStrategy::CoveredPut;
+    case MultiLegStrategyVerticalCallSpread:
+      return MultiLegStrategy::VerticalCallSpread;
+    case MultiLegStrategyVerticalPutSpread:
+      return MultiLegStrategy::VerticalPutSpread;
+    case MultiLegStrategyCollar:
+      return MultiLegStrategy::Collar;
+    case MultiLegStrategyStraddle:
+      return MultiLegStrategy::Straddle;
+    case MultiLegStrategyStrangle:
+      return MultiLegStrategy::Strangle;
+    case MultiLegStrategyCalendarCallSpread:
+      return MultiLegStrategy::CalendarCallSpread;
+    case MultiLegStrategyCalendarPutSpread:
+      return MultiLegStrategy::CalendarPutSpread;
+    default:
+      return MultiLegStrategy::Unknown;
+  }
+}
+
+inline CMultiLegStrategy
+convert(MultiLegStrategy strategy)
+{
+  switch (strategy) {
+    case MultiLegStrategy::Unknown:
+      return MultiLegStrategyUnknown;
+    case MultiLegStrategy::CoveredCall:
+      return MultiLegStrategyCoveredCall;
+    case MultiLegStrategy::CoveredPut:
+      return MultiLegStrategyCoveredPut;
+    case MultiLegStrategy::VerticalCallSpread:
+      return MultiLegStrategyVerticalCallSpread;
+    case MultiLegStrategy::VerticalPutSpread:
+      return MultiLegStrategyVerticalPutSpread;
+    case MultiLegStrategy::Collar:
+      return MultiLegStrategyCollar;
+    case MultiLegStrategy::Straddle:
+      return MultiLegStrategyStraddle;
+    case MultiLegStrategy::Strangle:
+      return MultiLegStrategyStrangle;
+    case MultiLegStrategy::CalendarCallSpread:
+      return MultiLegStrategyCalendarCallSpread;
+    case MultiLegStrategy::CalendarPutSpread:
+      return MultiLegStrategyCalendarPutSpread;
+    default:
+      return MultiLegStrategyUnknown;
+  }
+}
+
+inline MultiLegPosition
+convert(CMultiLegPosition position)
+{
+  switch (position) {
+    case MultiLegPositionUnknown:
+      return MultiLegPosition::Unknown;
+    case MultiLegPositionLong:
+      return MultiLegPosition::Long;
+    case MultiLegPositionShort:
+      return MultiLegPosition::Short;
+    default:
+      return MultiLegPosition::Unknown;
+  }
+}
+
+inline ContractDirection
+convert(CContractDirection direction)
+{
+  switch (direction) {
+    case ContractDirectionUnknown:
+      return ContractDirection::Unknown;
+    case ContractDirectionCall:
+      return ContractDirection::Call;
+    case ContractDirectionPut:
+      return ContractDirection::Put;
+    default:
+      return ContractDirection::Unknown;
+  }
+}
+
+inline MultiLegOrderLeg
+convert(const CMultiLegOrderLeg* leg)
+{
+  return MultiLegOrderLeg{
+    leg->symbol,
+    convert(leg->side),
+    convert(leg->position),
+    Decimal(leg->ratio_quantity),
+    leg->strike_price ? std::optional{ Decimal(leg->strike_price) }
+                      : std::nullopt,
+    leg->expire_date ? std::optional{ convert(leg->expire_date) } : std::nullopt,
+    convert(leg->contract_direction),
+  };
+}
+
+inline MultiLegInfo
+convert(const CMultiLegInfo* info)
+{
+  std::vector<MultiLegOrderLeg> legs;
+  std::transform(info->legs,
+                 info->legs + info->num_legs,
+                 std::back_inserter(legs),
+                 [](auto& item) { return convert(&item); });
+  return MultiLegInfo{
+    convert(info->strategy), info->strategy_name, info->multileg_id,
+    info->code,              legs,
+  };
 }
 
 inline Order
@@ -1498,7 +1749,11 @@ convert(const lb_order_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     attached_orders,
+    order->has_multi_leg ? std::optional{ convert(&order->multi_leg) }
+                         : std::nullopt,
   };
 }
 
@@ -1629,7 +1884,7 @@ inline FundPosition
 convert(const lb_fund_position_t* position)
 {
   return FundPosition{
-    position->symbol,
+    position->counter_id,
     Decimal(position->current_net_asset_value),
     position->net_asset_value_day,
     position->symbol_name,
@@ -1736,6 +1991,8 @@ convert(const lb_push_order_changed_t* info)
     info->last_price ? std::optional{ Decimal(info->last_price) }
                      : std::nullopt,
     info->remark,
+    info->has_multi_leg ? std::optional{ convert(&info->multi_leg) }
+                        : std::nullopt,
   };
 }
 
@@ -1769,6 +2026,34 @@ convert(const lb_margin_ratio_t* info)
   return MarginRatio{ Decimal(info->im_factor),
                       Decimal(info->mm_factor),
                       Decimal(info->fm_factor) };
+}
+
+inline RiskAssessment
+convert(const lb_risk_assessment_t* info)
+{
+  std::map<std::string, std::string> approvals;
+  for (size_t i = 0; i < info->num_approvals; ++i) {
+    const auto& entry = info->approvals[i];
+    approvals.emplace(entry.key ? entry.key : "",
+                      entry.value ? entry.value : "");
+  }
+  std::map<std::string, int64_t> deadlines;
+  for (size_t i = 0; i < info->num_deadlines; ++i) {
+    const auto& entry = info->deadlines[i];
+    deadlines.emplace(entry.key ? entry.key : "", entry.value);
+  }
+  std::vector<std::string> strategy_risk_levels(
+    info->strategy_risk_levels,
+    info->strategy_risk_levels + info->num_strategy_risk_levels);
+  return RiskAssessment{ info->risk,
+                         info->pi,
+                         std::move(approvals),
+                         info->re_authentication,
+                         info->pi_end_at,
+                         std::move(deadlines),
+                         info->risk_assessment_at,
+                         info->score,
+                         std::move(strategy_risk_levels) };
 }
 
 inline OrderHistoryDetail
@@ -1927,6 +2212,8 @@ convert(const lb_order_detail_t* order)
     order->monitor_price ? std::optional{ Decimal(order->monitor_price) }
                          : std::nullopt,
     order->remark,
+    order->delayed_until ? std::optional{ *order->delayed_until }
+                         : std::nullopt,
     convert(order->free_status),
     order->free_amount ? std::optional{ Decimal(order->free_amount) }
                        : std::nullopt,
@@ -1949,7 +2236,371 @@ convert(const lb_order_detail_t* order)
     history,
     order->has_charge_detail ? std::optional{ convert(&order->charge_detail) } : std::nullopt,
     attached_orders,
+    order->has_multi_leg ? std::optional{ convert(&order->multi_leg) }
+                         : std::nullopt,
   };
+}
+
+/// Convert a nullable grid response numeric field (a null pointer means "no
+/// value") to an optional decimal.
+inline std::optional<Decimal>
+convert_grid_opt_decimal(const lb_decimal_t* d)
+{
+  if (d == nullptr) {
+    return std::nullopt;
+  }
+  return std::optional<Decimal>(Decimal(d));
+}
+
+inline SubmitGridOrderResponse
+convert(const lb_submit_grid_order_response_t* info)
+{
+  return SubmitGridOrderResponse{ info->order_id };
+}
+
+inline GridOrder
+convert(const lb_grid_order_t* o)
+{
+  return GridOrder{
+    o->order_id,
+    o->symbol,
+    o->stock_name,
+    o->market,
+    o->status,
+    o->grid_status,
+    convert_grid_opt_decimal(o->submitted_base_price),
+    convert_grid_opt_decimal(o->current_base_price),
+    convert_grid_opt_decimal(o->pre_trigger_base_price),
+    convert_grid_opt_decimal(o->post_trigger_base_price),
+    convert_grid_opt_decimal(o->upper_limit_price),
+    convert_grid_opt_decimal(o->lower_limit_price),
+    static_cast<TriggerPriceType>(o->trigger_price_type),
+    convert_grid_opt_decimal(o->trigger_spread_up),
+    convert_grid_opt_decimal(o->trigger_spread_down),
+    convert_grid_opt_decimal(o->trigger_percent_up),
+    convert_grid_opt_decimal(o->trigger_percent_down),
+    convert_grid_opt_decimal(o->pullback_percent),
+    convert_grid_opt_decimal(o->pullback_spread),
+    convert_grid_opt_decimal(o->rebound_percent),
+    convert_grid_opt_decimal(o->rebound_spread),
+    o->trigger_sell_order_type,
+    o->trigger_buy_order_type,
+    o->trigger_sell_depth,
+    o->trigger_buy_depth,
+    convert_grid_opt_decimal(o->trigger_quantity),
+    convert_grid_opt_decimal(o->trigger_sell_quantity),
+    convert_grid_opt_decimal(o->trigger_buy_quantity),
+    convert_grid_opt_decimal(o->upper_limit_quantity),
+    convert_grid_opt_decimal(o->lower_limit_quantity),
+    static_cast<GridLimitEvent>(o->upper_limit_event),
+    static_cast<GridLimitEvent>(o->lower_limit_event),
+    o->multiple_trigger,
+    o->trigger_times,
+    convert_grid_opt_decimal(o->total_buy_quantity),
+    convert_grid_opt_decimal(o->total_sell_quantity),
+    convert_grid_opt_decimal(o->total_profit_balance),
+    o->settlement_currency,
+    static_cast<GridTimeInForce>(o->time_in_force),
+    o->gtd,
+    o->created_at ? std::optional{ *o->created_at } : std::nullopt,
+    o->rth,
+    o->support_shortsell,
+    o->grid_order_type_up,
+    o->grid_order_type_down,
+  };
+}
+
+inline GridOrderSubOrder
+convert(const lb_grid_order_sub_order_t* s)
+{
+  return GridOrderSubOrder{
+    s->id,
+    convert_grid_opt_decimal(s->price),
+    s->order_type,
+    convert_grid_opt_decimal(s->quantity),
+    convert_grid_opt_decimal(s->executed_qty),
+    s->action,
+    s->status,
+    s->submitted_at ? std::optional{ *s->submitted_at } : std::nullopt,
+    s->rth,
+  };
+}
+
+inline GridOrderHistory
+convert(const lb_grid_order_history_t* h)
+{
+  return GridOrderHistory{
+    h->history_id,
+    h->created_at ? std::optional{ *h->created_at } : std::nullopt,
+    h->status,
+    h->suspend_reason,
+    h->reason,
+  };
+}
+
+inline GridOrderDetail
+convert(const lb_grid_order_detail_t* d)
+{
+  std::vector<GridOrderSubOrder> grid_sub_orders;
+  std::transform(d->grid_sub_orders,
+                 d->grid_sub_orders + d->num_grid_sub_orders,
+                 std::back_inserter(grid_sub_orders),
+                 [](auto& item) { return convert(&item); });
+
+  std::vector<GridOrderHistory> grid_order_history;
+  std::transform(d->grid_order_history,
+                 d->grid_order_history + d->num_grid_order_history,
+                 std::back_inserter(grid_order_history),
+                 [](auto& item) { return convert(&item); });
+
+  return GridOrderDetail{
+    d->order_id,
+    d->symbol,
+    d->stock_name,
+    d->status,
+    d->grid_status,
+    d->suspend_reason,
+    d->sleeping_reason,
+    convert_grid_opt_decimal(d->submitted_base_price),
+    convert_grid_opt_decimal(d->current_base_price),
+    convert_grid_opt_decimal(d->upper_limit_price),
+    convert_grid_opt_decimal(d->lower_limit_price),
+    static_cast<TriggerPriceType>(d->trigger_price_type),
+    convert_grid_opt_decimal(d->trigger_spread_up),
+    convert_grid_opt_decimal(d->trigger_spread_down),
+    convert_grid_opt_decimal(d->trigger_percent_up),
+    convert_grid_opt_decimal(d->trigger_percent_down),
+    convert_grid_opt_decimal(d->pullback_percent),
+    convert_grid_opt_decimal(d->pullback_spread),
+    convert_grid_opt_decimal(d->rebound_percent),
+    convert_grid_opt_decimal(d->rebound_spread),
+    d->multiple_trigger,
+    static_cast<GridTimeInForce>(d->time_in_force),
+    convert_grid_opt_decimal(d->trigger_quantity),
+    convert_grid_opt_decimal(d->trigger_sell_quantity),
+    convert_grid_opt_decimal(d->trigger_buy_quantity),
+    convert_grid_opt_decimal(d->upper_limit_quantity),
+    convert_grid_opt_decimal(d->lower_limit_quantity),
+    static_cast<GridLimitEvent>(d->upper_limit_event),
+    static_cast<GridLimitEvent>(d->lower_limit_event),
+    d->trigger_sell_depth,
+    d->trigger_buy_depth,
+    d->created_at ? std::optional{ *d->created_at } : std::nullopt,
+    d->updated_at ? std::optional{ *d->updated_at } : std::nullopt,
+    d->settlement_currency,
+    d->expire_time ? std::optional{ *d->expire_time } : std::nullopt,
+    d->gtd,
+    grid_sub_orders,
+    d->sub_has_more,
+    grid_order_history,
+    d->history_has_more,
+    d->support_shortsell,
+    d->rth,
+    d->grid_order_type_up,
+    d->grid_order_type_down,
+  };
+}
+
+inline TriggerOrder
+convert(const lb_trigger_order_t* t)
+{
+  return TriggerOrder{
+    t->id,
+    t->status,
+    t->name,
+    t->symbol,
+    convert_grid_opt_decimal(t->price),
+    convert_grid_opt_decimal(t->quantity),
+    convert_grid_opt_decimal(t->executed_price),
+    convert_grid_opt_decimal(t->executed_qty),
+    t->submitted_at ? std::optional{ *t->submitted_at } : std::nullopt,
+    t->action,
+    t->order_type,
+    convert_grid_opt_decimal(t->trigger_price),
+    t->msg,
+    t->currency,
+    convert_grid_opt_decimal(t->last_done),
+    t->updated_at ? std::optional{ *t->updated_at } : std::nullopt,
+    static_cast<GridTimeInForce>(t->time_in_force),
+    t->gtd,
+    t->trigger_at ? std::optional{ *t->trigger_at } : std::nullopt,
+    t->trigger_status,
+  };
+}
+
+inline GridBidSize
+convert(const lb_grid_bid_size_t* b)
+{
+  return GridBidSize{
+    convert_grid_opt_decimal(b->str_proceed),
+    convert_grid_opt_decimal(b->end_proceed),
+    convert_grid_opt_decimal(b->bid_size),
+  };
+}
+
+inline GridChannelInfo
+convert(const lb_grid_channel_info_t* c)
+{
+  std::vector<std::string> settlement_currency;
+  std::transform(c->settlement_currency,
+                 c->settlement_currency + c->num_settlement_currency,
+                 std::back_inserter(settlement_currency),
+                 [](auto item) { return std::string(item); });
+
+  return GridChannelInfo{
+    c->strategy_granted,
+    c->support_rth,
+    c->currency,
+    settlement_currency,
+  };
+}
+
+inline GridSymbolInfo
+convert(const lb_grid_symbol_info_t* info)
+{
+  std::vector<GridBidSize> bid_sizes;
+  std::transform(info->bid_sizes,
+                 info->bid_sizes + info->num_bid_sizes,
+                 std::back_inserter(bid_sizes),
+                 [](auto& item) { return convert(&item); });
+
+  return GridSymbolInfo{
+    info->name,
+    convert_grid_opt_decimal(info->last_done),
+    convert_grid_opt_decimal(info->lot_size),
+    convert_grid_opt_decimal(info->buy_lot_size),
+    convert_grid_opt_decimal(info->sell_lot_size),
+    bid_sizes,
+    convert(&info->channel_info),
+  };
+}
+
+inline GridOrdersResponse
+convert(const lb_grid_orders_response_t* resp)
+{
+  std::vector<GridOrder> grid_order;
+  std::transform(resp->grid_order,
+                 resp->grid_order + resp->num_grid_order,
+                 std::back_inserter(grid_order),
+                 [](auto& item) { return convert(&item); });
+
+  return GridOrdersResponse{
+    grid_order,
+    resp->has_more,
+  };
+}
+
+inline GridTriggerHistoryResponse
+convert(const lb_grid_trigger_history_response_t* resp)
+{
+  std::vector<TriggerOrder> trigger_orders;
+  std::transform(resp->trigger_orders,
+                 resp->trigger_orders + resp->num_trigger_orders,
+                 std::back_inserter(trigger_orders),
+                 [](auto& item) { return convert(&item); });
+
+  return GridTriggerHistoryResponse{
+    trigger_orders,
+    resp->has_more,
+  };
+}
+
+inline PushGridOrderChanged
+convert(const lb_push_grid_order_changed_t* p)
+{
+  return PushGridOrderChanged{
+    p->order_id,
+    p->status,
+    p->symbol,
+    p->suspend_reason,
+    p->submitted_base_price,
+    p->current_base_price,
+    p->upper_limit_price,
+    p->lower_limit_price,
+    p->trigger_price_type,
+    p->trigger_quantity,
+    p->settlement_currency,
+    p->time_in_force,
+    p->rth,
+    p->grid_order_type_up,
+    p->grid_order_type_down,
+  };
+}
+
+inline lb_grid_trade_rule_t
+convert_grid_trade_rule(const GridTradeRule& src)
+{
+  lb_grid_trade_rule_t r = {
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+  };
+  r.submitted_base_price =
+    src.submitted_base_price
+      ? (const lb_decimal_t*)src.submitted_base_price.value()
+      : nullptr;
+  r.upper_limit_price = src.upper_limit_price
+                          ? (const lb_decimal_t*)src.upper_limit_price.value()
+                          : nullptr;
+  r.lower_limit_price = src.lower_limit_price
+                          ? (const lb_decimal_t*)src.lower_limit_price.value()
+                          : nullptr;
+  r.trigger_price_type =
+    src.trigger_price_type
+      ? reinterpret_cast<const int32_t*>(&*src.trigger_price_type)
+      : nullptr;
+  r.trigger_spread_up = src.trigger_spread_up
+                          ? (const lb_decimal_t*)src.trigger_spread_up.value()
+                          : nullptr;
+  r.trigger_spread_down =
+    src.trigger_spread_down
+      ? (const lb_decimal_t*)src.trigger_spread_down.value()
+      : nullptr;
+  r.trigger_percent_up =
+    src.trigger_percent_up
+      ? (const lb_decimal_t*)src.trigger_percent_up.value()
+      : nullptr;
+  r.trigger_percent_down =
+    src.trigger_percent_down
+      ? (const lb_decimal_t*)src.trigger_percent_down.value()
+      : nullptr;
+  r.multiple_trigger = src.multiple_trigger ? &*src.multiple_trigger : nullptr;
+  r.time_in_force =
+    src.time_in_force
+      ? reinterpret_cast<const int32_t*>(&*src.time_in_force)
+      : nullptr;
+  r.upper_limit_quantity =
+    src.upper_limit_quantity
+      ? (const lb_decimal_t*)src.upper_limit_quantity.value()
+      : nullptr;
+  r.lower_limit_quantity =
+    src.lower_limit_quantity
+      ? (const lb_decimal_t*)src.lower_limit_quantity.value()
+      : nullptr;
+  r.expire_time = src.expire_time ? &*src.expire_time : nullptr;
+  r.upper_limit_event =
+    src.upper_limit_event
+      ? reinterpret_cast<const int32_t*>(&*src.upper_limit_event)
+      : nullptr;
+  r.lower_limit_event =
+    src.lower_limit_event
+      ? reinterpret_cast<const int32_t*>(&*src.lower_limit_event)
+      : nullptr;
+  r.trigger_sell_depth =
+    src.trigger_sell_depth ? &*src.trigger_sell_depth : nullptr;
+  r.trigger_buy_depth =
+    src.trigger_buy_depth ? &*src.trigger_buy_depth : nullptr;
+  r.trigger_quantity = src.trigger_quantity
+                         ? (const lb_decimal_t*)src.trigger_quantity.value()
+                         : nullptr;
+  r.support_shortsell =
+    src.support_shortsell ? &*src.support_shortsell : nullptr;
+  r.rth = src.rth ? &*src.rth : nullptr;
+  r.grid_order_type_up =
+    src.grid_order_type_up ? src.grid_order_type_up->c_str() : nullptr;
+  r.grid_order_type_down =
+    src.grid_order_type_down ? src.grid_order_type_down->c_str() : nullptr;
+  return r;
 }
 
 inline lb_securities_update_mode_t
@@ -2241,6 +2892,8 @@ inline lb_warrant_status_t
 convert(WarrantStatus ty)
 {
   switch (ty) {
+    case WarrantStatus::Unknown:
+      return WarrantStatusUnknown;
     case WarrantStatus::Suspend:
       return WarrantStatusSuspend;
     case WarrantStatus::PrepareList:
@@ -2256,6 +2909,8 @@ inline WarrantStatus
 convert(lb_warrant_status_t ty)
 {
   switch (ty) {
+    case WarrantStatusUnknown:
+      return WarrantStatus::Unknown;
     case WarrantStatusSuspend:
       return WarrantStatus::Suspend;
     case WarrantStatusPrepareList:
@@ -2279,7 +2934,8 @@ convert(lb_warrant_info_t info)
     Decimal(info.change_value),
     info.volume,
     Decimal(info.turnover),
-    convert(&info.expiry_date),
+    info.expiry_date ? std::optional{ convert(info.expiry_date) }
+                     : std::nullopt,
     info.strike_price ? std::optional{ Decimal(info.strike_price) }
                       : std::nullopt,
     info.upper_strike_price ? std::optional{ Decimal(info.upper_strike_price) }
@@ -3439,6 +4095,743 @@ inline agent::ConversationStreamEvent convert(const lb_conversation_stream_event
       throw std::invalid_argument("unreachable");
   }
   return event;
+}
+
+// ── fund converters ──────────────────────────────────────────────────────────
+
+/// Convert a C array of JSON-encoded C strings to a vector of raw JSON strings.
+inline std::vector<std::string>
+convert_fund_json_list(const char* const* items, uintptr_t count)
+{
+  std::vector<std::string> out;
+  out.reserve(count);
+  for (uintptr_t i = 0; i < count; i++) {
+    out.emplace_back(items[i]);
+  }
+  return out;
+}
+
+inline FundPerformancePoint
+convert(const fund::ffi::CFundPerformancePoint* p)
+{
+  return FundPerformancePoint{
+    p->date,
+    p->last_done,
+  };
+}
+
+inline FundNavValue
+convert(const fund::ffi::CFundNavValue* v)
+{
+  return FundNavValue{
+    v->change,
+    v->change_percent,
+    v->change_percent_format,
+    v->counter_id,
+    v->counter_name,
+    v->currency,
+    v->date_format,
+    v->isin,
+    v->last_update_time,
+    v->value,
+    v->value_format,
+  };
+}
+
+inline HotFund
+convert(const fund::ffi::CHotFund* f)
+{
+  std::vector<FundPerformancePoint> fund_performances;
+  std::transform(f->fund_performances,
+                 f->fund_performances + f->num_fund_performances,
+                 std::back_inserter(fund_performances),
+                 [](auto& item) { return convert(&item); });
+
+  return HotFund{
+    f->asset_class,
+    f->asset_class_name,
+    f->counter_id,
+    f->currency,
+    f->earning_rate,
+    fund_performances,
+    f->name,
+    f->purchase_amount,
+    f->recommendation_text,
+    f->risk_level,
+    f->risk_level_name,
+    f->time_interval,
+  };
+}
+
+inline FundBrief
+convert(const fund::ffi::CFundBrief* f)
+{
+  return FundBrief{
+    f->asset_class,
+    f->asset_class_name,
+    f->code,
+    f->counter_id,
+    f->currency,
+    f->description,
+    f->earning_rate,
+    f->holding,
+    f->isin,
+    f->name,
+    f->product,
+    f->purchase_amount,
+    f->recommendation_text,
+    f->risk_level,
+    f->risk_level_name,
+    f->time_interval,
+    f->unit_value,
+  };
+}
+
+inline FundFilters
+convert(const fund::ffi::CFundFilters* f)
+{
+  return FundFilters{
+    convert_fund_json_list(f->asset_class, f->num_asset_class),
+    convert_fund_json_list(f->company, f->num_company),
+    convert_fund_json_list(f->currency, f->num_currency),
+    convert_fund_json_list(f->industry_category_name,
+                           f->num_industry_category_name),
+    convert_fund_json_list(f->risk_level, f->num_risk_level),
+  };
+}
+
+inline FundAssetAllocationItem
+convert(const fund::ffi::CFundAssetAllocationItem* i)
+{
+  return FundAssetAllocationItem{
+    i->code,
+    i->counter_id,
+    i->name,
+    i->position_ratio,
+  };
+}
+
+inline FundAssetAllocation
+convert(const fund::ffi::CFundAssetAllocation* a)
+{
+  std::vector<FundAssetAllocationItem> lists;
+  std::transform(a->lists,
+                 a->lists + a->num_lists,
+                 std::back_inserter(lists),
+                 [](auto& item) { return convert(&item); });
+
+  return FundAssetAllocation{
+    a->asset_type,
+    lists,
+    a->report_date,
+  };
+}
+
+inline FundDetail
+convert(const fund::ffi::CFundDetail* d)
+{
+  return FundDetail{
+    d->additional_purchase_amount,
+    d->affirm_day,
+    d->amount_affirm_day,
+    d->asset_allocation ? std::optional{ convert(d->asset_allocation) }
+                        : std::nullopt,
+    d->asset_class,
+    d->asset_class_name,
+    d->bill_purchase_rate,
+    d->channel,
+    d->close_period,
+    d->code,
+    d->currency,
+    d->cut_off_time,
+    d->derivatives,
+    d->done_day,
+    d->excess_return_fee,
+    d->gst_rate,
+    d->introduce,
+    d->is_cash_plus,
+    d->is_complex,
+    d->is_new_cash_plus,
+    d->is_yinghebao,
+    d->isin,
+    d->manage_rate,
+    d->manager,
+    d->min_hold_cash,
+    d->min_hold_share,
+    d->min_sell_share,
+    d->month_raise_day,
+    d->name,
+    d->nav_deadline,
+    d->no_load,
+    d->open_date,
+    d->open_period,
+    d->product,
+    d->product_information_locals,
+    d->profile,
+    d->purchasable,
+    d->purchase_affirm_day,
+    d->purchase_amount,
+    d->purchase_rate,
+    d->rating,
+    d->redeemable,
+    d->redemption_advance_day,
+    d->redemption_amount,
+    d->redemption_close_period_shows,
+    d->redemption_done_day,
+    d->redemption_open_day_shows,
+    d->risk_level,
+    d->risk_level_name,
+    d->verify_status,
+    d->virtual_currency,
+    d->year_to_date_yield,
+    d->ytd_yield_type,
+  };
+}
+
+inline FundAnalysis
+convert(const fund::ffi::CFundAnalysis* a)
+{
+  return FundAnalysis{
+    a->actual_period,
+    a->cost_level,
+    a->return_ability,
+    a->risk_ability,
+    a->updated_at,
+    a->value_for_money,
+    a->visible,
+  };
+}
+
+inline FundAnalysisDetail
+convert(const fund::ffi::CFundAnalysisDetail* a)
+{
+  std::vector<int32_t> available_periods(
+    a->available_periods, a->available_periods + a->num_available_periods);
+
+  return FundAnalysisDetail{
+    a->actual_period,
+    available_periods,
+    a->cost_level,
+    a->return_ability,
+    a->risk_ability,
+    a->updated_at,
+    a->value_for_money,
+    a->visible,
+  };
+}
+
+inline FundTrendContrast
+convert(const fund::ffi::CFundTrendContrast* c)
+{
+  return FundTrendContrast{
+    c->benchmark_name,
+    convert_fund_json_list(c->performances, c->num_performances),
+  };
+}
+
+inline FundTrend
+convert(const fund::ffi::CFundTrend* t)
+{
+  std::vector<int32_t> available_periods(
+    t->available_periods, t->available_periods + t->num_available_periods);
+
+  return FundTrend{
+    t->actual_period,
+    available_periods,
+    convert_fund_json_list(t->category_average_performances,
+                           t->num_category_average_performances),
+    t->contrast_performances ? std::optional{ convert(t->contrast_performances) }
+                             : std::nullopt,
+    convert_fund_json_list(t->fund_performances, t->num_fund_performances),
+  };
+}
+
+inline FundNamedContrast
+convert(const fund::ffi::CFundNamedContrast* c)
+{
+  return FundNamedContrast{
+    c->name,
+    convert_fund_json_list(c->performances, c->num_performances),
+  };
+}
+
+inline FundPerformanceComparison
+convert(const fund::ffi::CFundPerformanceComparison* c)
+{
+  std::vector<FundNamedContrast> contrast_performances;
+  std::transform(c->contrast_performances,
+                 c->contrast_performances + c->num_contrast_performances,
+                 std::back_inserter(contrast_performances),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPerformanceComparison{
+    contrast_performances,
+    convert_fund_json_list(c->fund_performances, c->num_fund_performances),
+  };
+}
+
+inline FundAnnualReturn
+convert(const fund::ffi::CFundAnnualReturn* r)
+{
+  return FundAnnualReturn{
+    r->change_percent,
+    r->year,
+  };
+}
+
+inline FundQuarterlyReturn
+convert(const fund::ffi::CFundQuarterlyReturn* r)
+{
+  return FundQuarterlyReturn{
+    r->change_percent,
+    r->quarter,
+    r->year,
+  };
+}
+
+inline FundPerformance
+convert(const fund::ffi::CFundPerformance* p)
+{
+  return FundPerformance{
+    p->annualized_return_five,
+    p->annualized_return_one,
+    p->annualized_return_ten,
+    p->annualized_return_three,
+    p->annualized_return_two,
+    p->counter_id,
+    p->fund_name,
+    p->performance_rank_five_years,
+    p->performance_rank_one_day,
+    p->performance_rank_one_month,
+    p->performance_rank_one_week,
+    p->performance_rank_one_year,
+    p->performance_rank_six_months,
+    p->performance_rank_ten_years,
+    p->performance_rank_three_months,
+    p->performance_rank_three_years,
+    p->performance_rank_two_years,
+    p->performance_rank_ytd,
+    p->performance_return_five_years,
+    p->performance_return_one_day,
+    p->performance_return_one_month,
+    p->performance_return_one_week,
+    p->performance_return_one_year,
+    p->performance_return_six_months,
+    p->performance_return_ten_years,
+    p->performance_return_three_months,
+    p->performance_return_three_years,
+    p->performance_return_two_years,
+    p->performance_return_ytd,
+    p->performance_total_five_years,
+    p->performance_total_one_day,
+    p->performance_total_one_month,
+    p->performance_total_one_week,
+    p->performance_total_one_year,
+    p->performance_total_six_months,
+    p->performance_total_ten_years,
+    p->performance_total_three_months,
+    p->performance_total_three_years,
+    p->performance_total_two_years,
+    p->performance_total_ytd,
+    p->seven_days_annualized,
+    p->ten_thousand_price,
+    p->update_time,
+  };
+}
+
+inline FundHolding
+convert(const fund::ffi::CFundHolding* h)
+{
+  return FundHolding{
+    h->bond_type,
+    h->bond_type_name,
+    h->country_name,
+    h->holding_type,
+    h->industry_name,
+    h->market_value,
+    h->maturity_date,
+    h->name,
+    h->share_change,
+    h->share_change_percent,
+    h->shares,
+    h->weighting,
+  };
+}
+
+inline FundHoldings
+convert(const fund::ffi::CFundHoldings* h)
+{
+  std::vector<FundHolding> holdings;
+  std::transform(h->holdings,
+                 h->holdings + h->num_holdings,
+                 std::back_inserter(holdings),
+                 [](auto& item) { return convert(&item); });
+
+  return FundHoldings{
+    holdings,
+    h->report_date,
+    h->weighting,
+  };
+}
+
+inline FundStockHolding
+convert(const fund::ffi::CFundStockHolding* h)
+{
+  return FundStockHolding{
+    h->code,
+    h->counter_id,
+    h->currency,
+    h->name,
+    h->position_ratio,
+    h->report_date,
+  };
+}
+
+inline fund::FundPosition
+convert(const fund::ffi::CFundPosition* p)
+{
+  return fund::FundPosition{
+    p->amount,
+    p->counter_id,
+    p->currency,
+    p->freeze_units,
+    p->holding_profit,
+    p->holding_units,
+    p->name,
+    p->recent_profit,
+    p->recent_trading_day,
+    p->sum_recent_profit,
+  };
+}
+
+inline FundPositions
+convert(const fund::ffi::CFundPositions* p)
+{
+  std::vector<fund::FundPosition> list;
+  std::transform(p->list,
+                 p->list + p->num_list,
+                 std::back_inserter(list),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPositions{
+    p->account_channel,
+    list,
+    p->pending_buy_orders,
+    p->recent_trading_day,
+    p->sold_pending_credit_orders,
+  };
+}
+
+inline FundDatedValue
+convert(const fund::ffi::CFundDatedValue* v)
+{
+  return FundDatedValue{
+    v->date,
+    v->value,
+  };
+}
+
+inline FundUnitValue
+convert(const fund::ffi::CFundUnitValue* v)
+{
+  return FundUnitValue{
+    v->date,
+    v->day_increase_rate,
+    v->total_value,
+    v->unit_value,
+  };
+}
+
+inline FundPositionDetailValues
+convert(const fund::ffi::CFundPositionDetailValues* v)
+{
+  return FundPositionDetailValues{
+    v->amount,
+    v->currency,
+    v->holding_cost,
+    v->holding_profit,
+    v->holding_profit_rate,
+    v->holding_units,
+    v->holding_value,
+    v->pending_buy_value,
+    v->pending_sell_value,
+    v->profit_amount_accum_td,
+    v->profit_amount_accum_td_rate,
+    v->recent_profit,
+    v->recent_tradingday,
+    v->recent_unit_value,
+    v->sold_pending_confirm_units,
+  };
+}
+
+inline FundPositionDetail
+convert(const fund::ffi::CFundPositionDetail* d)
+{
+  std::vector<FundDatedValue> sum_profit;
+  std::transform(d->sum_profit,
+                 d->sum_profit + d->num_sum_profit,
+                 std::back_inserter(sum_profit),
+                 [](auto& item) { return convert(&item); });
+
+  std::vector<FundUnitValue> ut_value;
+  std::transform(d->ut_value,
+                 d->ut_value + d->num_ut_value,
+                 std::back_inserter(ut_value),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPositionDetail{
+    d->detail_values ? std::optional{ convert(d->detail_values) }
+                     : std::nullopt,
+    sum_profit,
+    ut_value,
+  };
+}
+
+inline FundPositionPerformance
+convert(const fund::ffi::CFundPositionPerformance* p)
+{
+  return FundPositionPerformance{
+    p->annualized_return_five,
+    p->annualized_return_one,
+    p->annualized_return_ten,
+    p->annualized_return_three,
+    p->annualized_return_two,
+    p->counter_id,
+    p->fund_name,
+    p->performance_return_five_years,
+    p->performance_return_one_day,
+    p->performance_return_one_month,
+    p->performance_return_one_week,
+    p->performance_return_one_year,
+    p->performance_return_six_months,
+    p->performance_return_ten_years,
+    p->performance_return_three_months,
+    p->performance_return_three_years,
+    p->performance_return_two_years,
+    p->performance_return_ytd,
+    p->update_time,
+  };
+}
+
+inline FundPositionProfits
+convert(const fund::ffi::CFundPositionProfits* p)
+{
+  std::vector<FundDatedValue> history_value;
+  std::transform(p->history_value,
+                 p->history_value + p->num_history_value,
+                 std::back_inserter(history_value),
+                 [](auto& item) { return convert(&item); });
+
+  return FundPositionProfits{
+    p->currency,
+    history_value,
+    p->last_update_time,
+    p->sum_profit,
+  };
+}
+
+inline FundPositionNav
+convert(const fund::ffi::CFundPositionNav* v)
+{
+  return FundPositionNav{
+    v->change,
+    v->change_percent,
+    v->counter_id,
+    v->counter_name,
+    v->last_update_time,
+    v->value,
+  };
+}
+
+inline FundDividend
+convert(const fund::ffi::CFundDividend* d)
+{
+  return FundDividend{
+    d->amount,
+    d->counter_id,
+    d->currency,
+    d->date,
+    d->div_method,
+    d->name,
+  };
+}
+
+inline FundDividends
+convert(const fund::ffi::CFundDividends* d)
+{
+  std::vector<FundDividend> div_cash_infos;
+  std::transform(d->div_cash_infos,
+                 d->div_cash_infos + d->num_div_cash_infos,
+                 std::back_inserter(div_cash_infos),
+                 [](auto& item) { return convert(&item); });
+
+  return FundDividends{
+    d->currency,
+    div_cash_infos,
+    d->lastest_date,
+    d->total_div_cash,
+  };
+}
+
+inline FundOrder
+convert(const fund::ffi::CFundOrder* o)
+{
+  return FundOrder{
+    o->action,
+    o->amount,
+    o->counter_id,
+    o->created_at,
+    o->currency,
+    o->fund_name,
+    o->id,
+    o->is_auto,
+    o->net_worth,
+    o->product_type,
+    o->state,
+    o->state_desc,
+    o->units,
+  };
+}
+
+inline FundOrderKeyword
+convert(const fund::ffi::CFundOrderKeyword* k)
+{
+  return FundOrderKeyword{
+    k->content,
+    k->group,
+    k->key,
+    k->line_strategy,
+    k->title,
+  };
+}
+
+inline FundOrderStage
+convert(const fund::ffi::CFundOrderStage* s)
+{
+  return FundOrderStage{
+    s->desc,
+    s->key,
+    s->link,
+    s->link_text,
+    s->progress,
+    s->stage,
+  };
+}
+
+inline FundOrderInfo
+convert(const fund::ffi::CFundOrderInfo* o)
+{
+  return FundOrderInfo{
+    o->aaid,
+    o->account_channel,
+    o->action,
+    o->amount,
+    o->channel,
+    o->counter_id,
+    o->created_at,
+    o->currency,
+    o->dividend_option,
+    o->eq_at,
+    o->fee,
+    o->fund_name,
+    o->fund_source,
+    o->histories,
+    o->id,
+    o->message,
+    o->net_worth,
+    o->price_at,
+    o->processed_at,
+    o->product_type,
+    o->repurchaseable,
+    o->sale_proceeds,
+    o->sales_charge,
+    o->sales_price,
+    o->sales_unit,
+    o->state,
+    o->state_desc,
+    o->status,
+    o->status_ex,
+    o->t_description,
+    o->time_partition,
+    o->total_amount,
+    o->transaction_at,
+    o->units,
+    o->withdraw_at,
+    o->withdrawable,
+  };
+}
+
+inline FundOrderDetail
+convert(const fund::ffi::CFundOrderDetail* d)
+{
+  std::vector<FundOrderKeyword> keywords;
+  std::transform(d->keywords,
+                 d->keywords + d->num_keywords,
+                 std::back_inserter(keywords),
+                 [](auto& item) { return convert(&item); });
+
+  std::vector<FundOrderStage> stages;
+  std::transform(d->stages,
+                 d->stages + d->num_stages,
+                 std::back_inserter(stages),
+                 [](auto& item) { return convert(&item); });
+
+  return FundOrderDetail{
+    keywords,
+    d->order ? std::optional{ convert(d->order) } : std::nullopt,
+    stages,
+  };
+}
+
+inline FundTransaction
+convert(const fund::ffi::CFundTransaction* t)
+{
+  return FundTransaction{
+    t->amount,
+    t->category,
+    t->created_at,
+    t->currency,
+    t->description,
+    t->detail_created_at,
+    t->detail_type,
+    t->done_at,
+    t->quantity_description,
+    t->redirect_page,
+    t->redirect_page_v2,
+    t->ref_no,
+    t->stock_quantity,
+    t->tx_type,
+    t->type_name,
+  };
+}
+
+inline FundOrderValidation
+convert(const fund::ffi::CFundOrderValidation* v)
+{
+  return FundOrderValidation{
+    v->auth_token,
+    v->eval_address,
+    v->fund_risk_level,
+    v->msg,
+    v->user_pi,
+    v->user_risk_level,
+  };
+}
+
+inline FundOrderSubmitResponse
+convert(const fund::ffi::CFundOrderSubmitResponse* r)
+{
+  return FundOrderSubmitResponse{
+    r->action,
+    r->amount,
+    r->counter_id,
+    r->created_at,
+    r->fund_name,
+    r->id,
+    r->msg,
+    r->status,
+    r->units,
+  };
 }
 
 } // namespace convert

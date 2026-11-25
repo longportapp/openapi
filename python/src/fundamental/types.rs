@@ -646,9 +646,11 @@ impl From<lb::ValuationMetricsData> for ValuationMetricsData {
 pub(crate) struct ValuationMetricData {
     /// Human-readable description
     pub desc: String,
-    /// Historical high
+    /// Upper bound of the fair-value band (not the period maximum; the series
+    /// can rise above it)
     pub high: Option<String>,
-    /// Historical low
+    /// Lower bound of the fair-value band (not the period minimum; the series
+    /// can fall below it)
     pub low: Option<String>,
     /// Historical median
     pub median: Option<String>,
@@ -749,9 +751,11 @@ impl From<lb::ValuationHistoryMetrics> for ValuationHistoryMetrics {
 pub(crate) struct ValuationHistoryMetric {
     /// Human-readable description
     pub desc: String,
-    /// Historical high over the period
+    /// Upper bound of the fair-value band (not the period maximum; the series
+    /// can rise above it)
     pub high: Option<String>,
-    /// Historical low over the period
+    /// Lower bound of the fair-value band (not the period minimum; the series
+    /// can fall below it)
     pub low: Option<String>,
     /// Historical median over the period
     pub median: Option<String>,
@@ -959,7 +963,7 @@ pub(crate) struct CompanyOverview {
     pub category: String,
     /// Fiscal year end
     pub year_end: String,
-    /// Number of employees
+    /// Number of employees (returned as a string by the API, e.g. `"10000"`)
     pub employees: String,
     /// Phone number
     pub phone: String,
@@ -1531,6 +1535,31 @@ impl From<FinancialReportKind> for lb::FinancialReportKind {
             FinancialReportKind::BalanceSheet => lb::FinancialReportKind::BalanceSheet,
             FinancialReportKind::CashFlow => lb::FinancialReportKind::CashFlow,
             FinancialReportKind::All => lb::FinancialReportKind::All,
+        }
+    }
+}
+
+/// Financial statement kind
+///
+/// Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+/// needs one specific statement per request.
+#[pyclass(eq, eq_int, from_py_object)]
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq)]
+pub(crate) enum FinancialStatementKind {
+    /// Income statement
+    IncomeStatement = 0,
+    /// Balance sheet
+    BalanceSheet = 1,
+    /// Cash flow statement
+    CashFlow = 2,
+}
+
+impl From<FinancialStatementKind> for lb::FinancialStatementKind {
+    fn from(v: FinancialStatementKind) -> Self {
+        match v {
+            FinancialStatementKind::IncomeStatement => lb::FinancialStatementKind::IncomeStatement,
+            FinancialStatementKind::BalanceSheet => lb::FinancialStatementKind::BalanceSheet,
+            FinancialStatementKind::CashFlow => lb::FinancialStatementKind::CashFlow,
         }
     }
 }

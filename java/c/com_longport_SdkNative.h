@@ -17,19 +17,27 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_init
 
 /*
  * Class:     com_longport_SdkNative
- * Method:    newHttpClient
+ * Method:    newHttpClientFromApikey
  * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newHttpClient
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newHttpClientFromApikey
   (JNIEnv *, jclass, jstring, jstring, jstring, jstring);
 
 /*
  * Class:     com_longport_SdkNative
- * Method:    newHttpClientFromEnv
+ * Method:    newHttpClientFromApikeyEnv
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newHttpClientFromEnv
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newHttpClientFromApikeyEnv
   (JNIEnv *, jclass);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newHttpClientFromOauth
+ * Signature: (JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newHttpClientFromOauth
+  (JNIEnv *, jclass, jlong, jstring);
 
 /*
  * Class:     com_longport_SdkNative
@@ -49,19 +57,107 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_httpClientRequest
 
 /*
  * Class:     com_longport_SdkNative
- * Method:    newConfig
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/longport/Language;ZLcom/longport/PushCandlestickMode;ZLjava/lang/String;)J
+ * Method:    newConfigFromApikey
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J
  */
-JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newConfig
-  (JNIEnv *, jclass, jstring, jstring, jstring, jstring, jstring, jstring, jobject, jboolean, jobject, jboolean, jstring);
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newConfigFromApikey
+  (JNIEnv *, jclass, jstring, jstring, jstring);
 
 /*
  * Class:     com_longport_SdkNative
- * Method:    newConfigFromEnv
+ * Method:    newConfigFromApikeyEnv
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newConfigFromEnv
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newConfigFromApikeyEnv
   (JNIEnv *, jclass);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newConfigFromOauth
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newConfigFromOauth
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetHttpUrl
+ * Signature: (JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetHttpUrl
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetQuoteWsUrl
+ * Signature: (JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetQuoteWsUrl
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetTradeWsUrl
+ * Signature: (JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetTradeWsUrl
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetLanguage
+ * Signature: (JLcom/longport/Language;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetLanguage
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetEnableOvernight
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetEnableOvernight
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetPushCandlestickMode
+ * Signature: (JLcom/longport/PushCandlestickMode;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetPushCandlestickMode
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetQuoteTransport
+ * Signature: (JLcom/longport/QuoteTransport;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetQuoteTransport
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetEnablePrintQuotePackages
+ * Signature: (JZ)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetEnablePrintQuotePackages
+  (JNIEnv *, jclass, jlong, jboolean);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetLogPath
+ * Signature: (JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetLogPath
+  (JNIEnv *, jclass, jlong, jstring);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    configSetEnablePapertrading
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_configSetEnablePapertrading
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     com_longport_SdkNative
@@ -81,11 +177,123 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeConfig
 
 /*
  * Class:     com_longport_SdkNative
- * Method:    newQuoteContext
+ * Method:    oauthBuild
+ * Signature: (Ljava/lang/String;ILjava/util/function/Consumer;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_oauthBuild
+  (JNIEnv *, jclass, jstring, jint, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    oauthRevoke
  * Signature: (JLcom/longport/AsyncCallback;)V
  */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_newQuoteContext
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_oauthRevoke
   (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    oauthClear
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_oauthClear
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeOAuth
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeOAuth
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newAssetContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newAssetContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeAssetContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeAssetContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    assetContextStatements
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_assetContextStatements
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    assetContextDownloadUrl
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_assetContextDownloadUrl
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newContentContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newContentContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeContentContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeContentContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    contentContextMyTopics
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_contentContextMyTopics
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    contentContextCreateTopic
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_contentContextCreateTopic
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    contentContextTopics
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_contentContextTopics
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    contentContextNews
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_contentContextNews
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newQuoteContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newQuoteContext
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     com_longport_SdkNative
@@ -98,26 +306,26 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeQuoteContext
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextGetMemberId
- * Signature: (J)J
+ * Signature: (JLcom/longport/AsyncCallback;)V
  */
-JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_quoteContextGetMemberId
-  (JNIEnv *, jclass, jlong);
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextGetMemberId
+  (JNIEnv *, jclass, jlong, jobject);
 
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextGetQuoteLevel
- * Signature: (J)Ljava/lang/String;
+ * Signature: (JLcom/longport/AsyncCallback;)V
  */
-JNIEXPORT jstring JNICALL Java_com_longport_SdkNative_quoteContextGetQuoteLevel
-  (JNIEnv *, jclass, jlong);
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextGetQuoteLevel
+  (JNIEnv *, jclass, jlong, jobject);
 
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextGetQuotePackageDetails
- * Signature: (J)[Lcom/longport/quote/QuotePackageDetail;
+ * Signature: (JLcom/longport/AsyncCallback;)V
  */
-JNIEXPORT jobjectArray JNICALL Java_com_longport_SdkNative_quoteContextGetQuotePackageDetails
-  (JNIEnv *, jclass, jlong);
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextGetQuotePackageDetails
+  (JNIEnv *, jclass, jlong, jobject);
 
 /*
  * Class:     com_longport_SdkNative
@@ -306,10 +514,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextOptionChainExpiry
 /*
  * Class:     com_longport_SdkNative
  * Method:    quoteContextOptionChainInfoByDate
- * Signature: (JLjava/lang/String;Ljava/time/LocalDate;Lcom/longport/AsyncCallback;)V
+ * Signature: (JLjava/lang/String;Ljava/time/LocalDate;ZLcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextOptionChainInfoByDate
-  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+  (JNIEnv *, jclass, jlong, jstring, jobject, jboolean, jobject);
 
 /*
  * Class:     com_longport_SdkNative
@@ -401,6 +609,14 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextUpdateWatchlistGr
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    quoteContextFilings
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextFilings
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    quoteContextSecurityList
  * Signature: (JLcom/longport/Market;Lcom/longport/quote/SecurityListCategory;Lcom/longport/AsyncCallback;)V
  */
@@ -466,10 +682,10 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextRealtimeCandlesti
 /*
  * Class:     com_longport_SdkNative
  * Method:    newTradeContext
- * Signature: (JLcom/longport/AsyncCallback;)V
+ * Signature: (J)J
  */
-JNIEXPORT void JNICALL Java_com_longport_SdkNative_newTradeContext
-  (JNIEnv *, jclass, jlong, jobject);
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newTradeContext
+  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     com_longport_SdkNative
@@ -521,6 +737,14 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextTodayExecutions
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    tradeContextAllExecutions
+ * Signature: (JLcom/longport/trade/GetAllExecutionsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextAllExecutions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    tradeContextHistoryOrders
  * Signature: (JLcom/longport/trade/GetHistoryOrdersOptions;Lcom/longport/AsyncCallback;)V
  */
@@ -553,10 +777,26 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextSubmitOrder
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    tradeContextSubmitMultileg
+ * Signature: (JLcom/longport/trade/SubmitMultiLegOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextSubmitMultileg
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    tradeContextCancelOrder
  * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextCancelOrder
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    tradeContextCancelOrderAttached
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextCancelOrderAttached
   (JNIEnv *, jclass, jlong, jstring, jobject);
 
 /*
@@ -601,10 +841,26 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextMarginRatio
 
 /*
  * Class:     com_longport_SdkNative
+ * Method:    tradeContextRiskAssessment
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextRiskAssessment
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
  * Method:    tradeContextOrderDetail
  * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextOrderDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    tradeContextOrderDetailAttached
+ * Signature: (JLjava/lang/String;Ljava/lang/Object;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextOrderDetailAttached
   (JNIEnv *, jclass, jlong, jstring, jobject);
 
 /*
@@ -614,6 +870,1222 @@ JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextOrderDetail
  */
 JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextEstimateMaxPurchaseQuantity
   (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    tradeContextSetOnGridOrderChanged
+ * Signature: (JLcom/longport/trade/GridOrderChangedHandler;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_tradeContextSetOnGridOrderChanged
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newGridContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newGridContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeGridContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeGridContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextSubmit
+ * Signature: (JLcom/longport/grid/SubmitGridOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSubmit
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextReplace
+ * Signature: (JLcom/longport/grid/ReplaceGridOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextReplace
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextList
+ * Signature: (JLcom/longport/grid/GetGridOrdersOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextList
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextListByIds
+ * Signature: (J[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextListByIds
+  (JNIEnv *, jclass, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextDetail
+ * Signature: (JLcom/longport/grid/GetGridOrderDetailOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextDetail
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextTriggerHistory
+ * Signature: (JLcom/longport/grid/GetGridTriggerHistoryOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextTriggerHistory
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextCancel
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextCancel
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextSuspend
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSuspend
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextRestart
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextRestart
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    gridContextSymbolInfo
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_gridContextSymbolInfo
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newFundContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newFundContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeFundContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeFundContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextHotFunds
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextHotFunds
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextFunds
+ * Signature: (JLcom/longport/fund/GetFundsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextFunds
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextFilters
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextFilters
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextDetail
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextAnalysis
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextAnalysis
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextAnalysisDetail
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextAnalysisDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextTrend
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextTrend
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextAnnualReturns
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundPageOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextAnnualReturns
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextQuarterlyReturns
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundPageOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextQuarterlyReturns
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPerformance
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPerformance
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPerformanceComparison
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundAnalysisOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPerformanceComparison
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextNav
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextNav
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextNavHistory
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundPageOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextNavHistory
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextNavRange
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundNavRangeOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextNavRange
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextHoldings
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundHoldingsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextHoldings
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextStockHoldings
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundStockHoldingsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextStockHoldings
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositions
+ * Signature: (JLcom/longport/fund/GetFundPositionsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPosition
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundPositionOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPosition
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionPerformance
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionPerformance
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionProfits
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundPositionProfitsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionProfits
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionNav
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/FundNavRangeOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionNav
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextPositionDividends
+ * Signature: (JLjava/lang/String;Lcom/longport/fund/GetFundPositionDividendsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextPositionDividends
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextOrders
+ * Signature: (JLcom/longport/fund/GetFundOrdersOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextOrders
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextOrder
+ * Signature: (JJLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextOrder
+  (JNIEnv *, jclass, jlong, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextTransactions
+ * Signature: (JLcom/longport/fund/GetFundTransactionsOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextTransactions
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextValidateOrder
+ * Signature: (JLcom/longport/fund/ValidateFundOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextValidateOrder
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextSubmitOrder
+ * Signature: (JLcom/longport/fund/SubmitFundOrderOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextSubmitOrder
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundContextCancelOrder
+ * Signature: (JJLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundContextCancelOrder
+  (JNIEnv *, jclass, jlong, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newDcaContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newDcaContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeDcaContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeDcaContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextList
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextList
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextStats
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextStats
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextCheckSupport
+ * Signature: (J[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextCheckSupport
+  (JNIEnv *, jclass, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextHistory
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextHistory
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextPause
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextPause
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextResume
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextResume
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextStop
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextStop
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextCalcDate
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextCalcDate
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextSetReminder
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextSetReminder
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextCreate
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextCreate
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    dcaContextUpdate
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_dcaContextUpdate
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newSharelistContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newSharelistContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeSharelistContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeSharelistContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextList
+ * Signature: (JILcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextList
+  (JNIEnv *, jclass, jlong, jint, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextDetail
+ * Signature: (JJLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextDetail
+  (JNIEnv *, jclass, jlong, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextPopular
+ * Signature: (JILcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextPopular
+  (JNIEnv *, jclass, jlong, jint, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextCreate
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextCreate
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextAddSecurities
+ * Signature: (JJ[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextAddSecurities
+  (JNIEnv *, jclass, jlong, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextRemoveSecurities
+ * Signature: (JJ[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextRemoveSecurities
+  (JNIEnv *, jclass, jlong, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextSortSecurities
+ * Signature: (JJ[Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextSortSecurities
+  (JNIEnv *, jclass, jlong, jlong, jobjectArray, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    sharelistContextDelete
+ * Signature: (JJLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_sharelistContextDelete
+  (JNIEnv *, jclass, jlong, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newAlertContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newAlertContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeAlertContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeAlertContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    alertContextList
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_alertContextList
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    alertContextAdd
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_alertContextAdd
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    alertContextUpdate
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_alertContextUpdate
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    alertContextDelete
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_alertContextDelete
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newCalendarContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newCalendarContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeCalendarContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeCalendarContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    calendarContextFinanceCalendar
+ * Signature: (JLcom/longport/calendar/FinanceCalendarOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_calendarContextFinanceCalendar
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newPortfolioContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newPortfolioContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freePortfolioContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freePortfolioContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    portfolioContextExchangeRate
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_portfolioContextExchangeRate
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    portfolioContextProfitAnalysis
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_portfolioContextProfitAnalysis
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    portfolioContextProfitAnalysisDetail
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_portfolioContextProfitAnalysisDetail
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    portfolioContextProfitAnalysisByMarket
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_portfolioContextProfitAnalysisByMarket
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextShortPositions
+ * Signature: (JLjava/lang/String;ILcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextShortPositions
+  (JNIEnv *, jclass, jlong, jstring, jint, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextOptionVolume
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextOptionVolume
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextOptionVolumeDaily
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextOptionVolumeDaily
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newMarketContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newMarketContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeMarketContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeMarketContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextMarketStatus
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextMarketStatus
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextBrokerHolding
+ * Signature: (JLcom/longport/market/BrokerHoldingOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextBrokerHolding
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextBrokerHoldingDetail
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextBrokerHoldingDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextBrokerHoldingDaily
+ * Signature: (JLcom/longport/market/BrokerHoldingDailyOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextBrokerHoldingDaily
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextAhPremium
+ * Signature: (JLcom/longport/market/AhPremiumOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextAhPremium
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextAhPremiumIntraday
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextAhPremiumIntraday
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextTradeStats
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextTradeStats
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextAnomaly
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextAnomaly
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextConstituent
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextConstituent
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextTopMovers
+ * Signature: (JLcom/longport/market/TopMoversOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextTopMovers
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextRankCategories
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextRankCategories
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    marketContextRankList
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_marketContextRankList
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newScreenerContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newScreenerContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeScreenerContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeScreenerContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    screenerContextRecommendStrategies
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_screenerContextRecommendStrategies
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    screenerContextUserStrategies
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_screenerContextUserStrategies
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    screenerContextStrategy
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_screenerContextStrategy
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    screenerContextSearch
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_screenerContextSearch
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    screenerContextIndicators
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_screenerContextIndicators
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextShareholderTop
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextShareholderTop
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextShareholderDetail
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextShareholderDetail
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextValuationComparison
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextValuationComparison
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextShortTrades
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextShortTrades
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newFundamentalContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newFundamentalContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeFundamentalContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeFundamentalContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextFinancialReport
+ * Signature: (JLcom/longport/fundamental/FinancialReportOptions;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextFinancialReport
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextInstitutionRating
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextInstitutionRating
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextInstitutionRatingDetail
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextInstitutionRatingDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextDividend
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextDividend
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextDividendDetail
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextDividendDetail
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextForecastEps
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextForecastEps
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextConsensus
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextConsensus
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextValuation
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextValuation
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextValuationHistory
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextValuationHistory
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextIndustryValuation
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextIndustryValuation
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextIndustryValuationDist
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextIndustryValuationDist
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextCompany
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextCompany
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextExecutive
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextExecutive
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextShareholder
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextShareholder
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextFundHolder
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextFundHolder
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextCorpAction
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextCorpAction
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextInvestRelation
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextInvestRelation
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextOperating
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextOperating
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextGetBuyback
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetBuyback
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextGetBusinessSegments
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetBusinessSegments
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextGetBusinessSegmentsHistory
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetBusinessSegmentsHistory
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextGetInstitutionRatingViews
+ * Signature: (JLjava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetInstitutionRatingViews
+  (JNIEnv *, jclass, jlong, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextGetIndustryRank
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetIndustryRank
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextGetIndustryPeers
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetIndustryPeers
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextGetFinancialReportSnapshot
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextGetFinancialReportSnapshot
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextMacroeconomicIndicators
+ * Signature: (JLjava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextMacroeconomicIndicators
+  (JNIEnv *, jclass, jlong, jobject, jobject, jobject, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    fundamentalContextMacroeconomic
+ * Signature: (JLjava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_fundamentalContextMacroeconomic
+  (JNIEnv *, jclass, jlong, jobject, jobject, jobject, jobject, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    portfolioContextProfitAnalysisFlows
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_portfolioContextProfitAnalysisFlows
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    quoteContextUpdatePinned
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_quoteContextUpdatePinned
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    newAgentContext
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_com_longport_SdkNative_newAgentContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeAgentContext
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeAgentContext
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    agentContextWorkspaces
+ * Signature: (JLcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_agentContextWorkspaces
+  (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    agentContextAgents
+ * Signature: (JLjava/lang/String;Ljava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_agentContextAgents
+  (JNIEnv *, jclass, jlong, jstring, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    agentContextPublicAgents
+ * Signature: (JLjava/lang/Object;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_agentContextPublicAgents
+  (JNIEnv *, jclass, jlong, jobject, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    agentContextConversation
+ * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_agentContextConversation
+  (JNIEnv *, jclass, jlong, jstring, jstring, jstring, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    agentContextContinueConversation
+ * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/longport/AsyncCallback;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_agentContextContinueConversation
+  (JNIEnv *, jclass, jlong, jstring, jstring, jstring, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    agentContextConversationStreamSubscribe
+ * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/concurrent/Flow/Subscriber;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_agentContextConversationStreamSubscribe
+  (JNIEnv *, jclass, jlong, jstring, jstring, jstring, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    agentContextContinueConversationStreamSubscribe
+ * Signature: (JLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/concurrent/Flow/Subscriber;)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_agentContextContinueConversationStreamSubscribe
+  (JNIEnv *, jclass, jlong, jstring, jstring, jstring, jstring, jobject);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    conversationStreamSubscriptionRequest
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_conversationStreamSubscriptionRequest
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    conversationStreamSubscriptionCancel
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_conversationStreamSubscriptionCancel
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     com_longport_SdkNative
+ * Method:    freeConversationStreamSubscription
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_com_longport_SdkNative_freeConversationStreamSubscription
+  (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

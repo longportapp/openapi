@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use longport_nodejs_macros::{JsEnum, JsObject};
 
-use crate::{decimal::Decimal, time::NaiveDate, types::Market};
+use crate::{decimal::Decimal, time::NaiveDate, types::Market, utils::to_datetime};
 
 /// Topic type
 #[napi_derive::napi]
@@ -30,6 +30,9 @@ pub struct Execution {
     quantity: Decimal,
     /// Executed price
     price: Decimal,
+    /// Order side. `Unknown` when the response omits it (LongPort US
+    /// `/v1/trade/execution/history`)
+    side: OrderSide,
 }
 
 #[napi_derive::napi]
@@ -72,6 +75,8 @@ pub enum OrderStatus {
     Expired,
     /// Partial Withdrawal
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    DelayedNotReported,
 }
 
 #[napi_derive::napi]
@@ -266,6 +271,103 @@ pub struct AttachedOrderDetail {
     /// Submit price
     #[js(opt)]
     submit_price: Option<Decimal>,
+    /// Bid/ask depth level of the limit order submitted price
+    #[js(opt)]
+    limit_depth_level: Option<i32>,
+}
+
+/// Multi-leg strategy
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longport::trade::MultiLegStrategy")]
+pub enum MultiLegStrategy {
+    /// Unknown
+    Unknown,
+    /// Covered call (covered stock)
+    CoveredCall,
+    /// Covered put (covered stock)
+    CoveredPut,
+    /// Vertical call spread
+    VerticalCallSpread,
+    /// Vertical put spread
+    VerticalPutSpread,
+    /// Collar
+    Collar,
+    /// Straddle
+    Straddle,
+    /// Strangle
+    Strangle,
+    /// Calendar call spread
+    CalendarCallSpread,
+    /// Calendar put spread
+    CalendarPutSpread,
+}
+
+/// Multi-leg position direction
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longport::trade::MultiLegPosition")]
+pub enum MultiLegPosition {
+    /// Unknown
+    Unknown,
+    /// Long
+    Long,
+    /// Short
+    Short,
+}
+
+/// Option contract type
+#[napi_derive::napi]
+#[derive(Debug, JsEnum, Hash, Eq, PartialEq, Copy, Clone)]
+#[js(remote = "longport::trade::ContractDirection")]
+pub enum ContractDirection {
+    /// Unknown
+    Unknown,
+    /// Call
+    Call,
+    /// Put
+    Put,
+}
+
+/// A leg of a multi-leg combination order
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longport::trade::MultiLegOrderLeg")]
+pub struct MultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    symbol: String,
+    /// Order side
+    side: OrderSide,
+    /// Position direction
+    position: MultiLegPosition,
+    /// Leg ratio quantity
+    ratio_quantity: Decimal,
+    /// Strike price
+    #[js(opt)]
+    strike_price: Option<Decimal>,
+    /// Option expiry date
+    #[js(opt)]
+    expire_date: Option<NaiveDate>,
+    /// Contract type
+    contract_direction: ContractDirection,
+}
+
+/// Multi-leg strategy information
+#[napi_derive::napi]
+#[derive(Debug, JsObject, Clone)]
+#[js(remote = "longport::trade::MultiLegInfo")]
+pub struct MultiLegInfo {
+    /// Multi-leg strategy
+    strategy: MultiLegStrategy,
+    /// Strategy name
+    strategy_name: String,
+    /// Multi-leg combination ID
+    multileg_id: String,
+    /// Multi-leg combination code
+    code: String,
+    /// Legs of the combination order
+    #[js(array)]
+    legs: Vec<MultiLegOrderLeg>,
 }
 
 /// Order
@@ -347,9 +449,17 @@ pub struct Order {
     monitor_price: Option<Decimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[js(opt, datetime)]
+    delayed_until: Option<DateTime<Utc>>,
     /// Attached orders
     #[js(array)]
     attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[js(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Commission-free Status
@@ -541,6 +651,10 @@ pub struct OrderDetail {
     monitor_price: Option<Decimal>,
     /// Remark
     remark: String,
+    /// Time-condition submit time (not set when the order is not a
+    /// time-condition order)
+    #[js(opt, datetime)]
+    delayed_until: Option<DateTime<Utc>>,
     /// Commission-free Status
     free_status: CommissionFreeStatus,
     /// Commission-free amount
@@ -573,6 +687,10 @@ pub struct OrderDetail {
     /// Attached orders
     #[js(array)]
     attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[js(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Order changed message
@@ -641,6 +759,10 @@ pub struct PushOrderChanged {
     last_price: Option<Decimal>,
     /// Remark message
     remark: String,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[js(opt)]
+    multi_leg: Option<MultiLegInfo>,
 }
 
 /// Response for submit order request
@@ -790,8 +912,8 @@ pub struct FundPositionChannel {
 #[derive(Debug, JsObject, Clone)]
 #[js(remote = "longport::trade::FundPosition")]
 pub struct FundPosition {
-    /// Fund ISIN code
-    symbol: String,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    counter_id: String,
     /// Current equity
     current_net_asset_value: Decimal,
     /// Current equity time
@@ -867,6 +989,58 @@ pub struct MarginRatio {
     fm_factor: Decimal,
 }
 
+/// Risk assessment (suitability questionnaire) result of the current member
+#[napi_derive::napi(object)]
+#[derive(Debug, Clone)]
+pub struct RiskAssessment {
+    /// Risk level of the latest questionnaire (e.g. `A5`). The server does
+    /// not document the scale, so do not infer an ordering between levels.
+    pub risk: String,
+    /// Professional investor (PI) status code. The server does not document
+    /// the code values; treat it as opaque.
+    pub pi: i32,
+    /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`).
+    /// Values are strings, not booleans: `is_corporate_client` arrives as
+    /// `"true"` / `"false"`.
+    pub approvals: std::collections::BTreeMap<String, String>,
+    /// Re-authentication flag, as returned by the server (empty when not set)
+    pub re_authentication: String,
+    /// Professional investor status end time, as returned by the server (`0`
+    /// when not set). Raw integer: the unit (seconds or milliseconds) is not
+    /// documented, so it is not converted to a timestamp.
+    pub pi_end_at: i64,
+    /// Deadlines keyed by item, as returned by the server. Raw integers with
+    /// the same undocumented unit as `piEndAt`.
+    pub deadlines: std::collections::BTreeMap<String, i64>,
+    /// Date of the latest risk assessment, as returned by the server (e.g.
+    /// `2026-10-14`). Kept as the server's string: the `yyyy-mm-dd` form is
+    /// not documented to be guaranteed. May be empty; a null or absent value
+    /// also decodes to an empty string, so emptiness does not by itself mean
+    /// "never assessed".
+    pub risk_assessment_at: String,
+    /// Questionnaire score
+    pub score: i32,
+    /// Strategy risk levels of the member. The server does not document what
+    /// these levels permit, so do not read them as a trading entitlement.
+    pub strategy_risk_levels: Vec<String>,
+}
+
+impl From<longport::trade::RiskAssessment> for RiskAssessment {
+    fn from(v: longport::trade::RiskAssessment) -> Self {
+        Self {
+            risk: v.risk,
+            pi: v.pi,
+            approvals: v.approvals,
+            re_authentication: v.re_authentication,
+            pi_end_at: v.pi_end_at,
+            deadlines: v.deadlines,
+            risk_assessment_at: v.risk_assessment_at,
+            score: v.score,
+            strategy_risk_levels: v.strategy_risk_levels,
+        }
+    }
+}
+
 /// Response for estimate maximum purchase quantity
 #[napi_derive::napi]
 #[derive(Debug, JsObject, Clone)]
@@ -910,9 +1084,26 @@ impl From<longport::trade::USCashEntry> for USCashEntry {
 #[derive(Debug, Clone, Default)]
 pub struct USCryptoEntry {
     pub asset_type: String,
-    pub average_cost: String,
     pub symbol: String,
+    pub quantity: String,
     pub currency: String,
+    pub average_cost: String,
+    pub market: String,
+    pub trade_status: String,
+    pub prev_close: String,
+    pub last_done: String,
+    pub market_price: String,
+    pub pretrade_close: String,
+    pub stock_invest_of_today: String,
+    pub today_pl: String,
+    pub pretrade_stock_invest_of_today: String,
+    pub pretrade_today_pl: String,
+    pub night_last_done: String,
+    pub night_prev_close: String,
+    pub position_side: String,
+    pub open_position_time: String,
+    pub name: String,
+    pub industry_counter_id: String,
     pub industry_name: String,
 }
 
@@ -920,9 +1111,26 @@ impl From<longport::trade::USCryptoEntry> for USCryptoEntry {
     fn from(v: longport::trade::USCryptoEntry) -> Self {
         Self {
             asset_type: v.asset_type,
-            average_cost: v.average_cost,
             symbol: v.symbol,
+            quantity: v.quantity,
             currency: v.currency,
+            average_cost: v.average_cost,
+            market: v.market,
+            trade_status: v.trade_status,
+            prev_close: v.prev_close,
+            last_done: v.last_done,
+            market_price: v.market_price,
+            pretrade_close: v.pretrade_close,
+            stock_invest_of_today: v.stock_invest_of_today,
+            today_pl: v.today_pl,
+            pretrade_stock_invest_of_today: v.pretrade_stock_invest_of_today,
+            pretrade_today_pl: v.pretrade_today_pl,
+            night_last_done: v.night_last_done,
+            night_prev_close: v.night_prev_close,
+            position_side: v.position_side,
+            open_position_time: v.open_position_time,
+            name: v.name,
+            industry_counter_id: v.industry_counter_id,
             industry_name: v.industry_name,
         }
     }
@@ -1072,6 +1280,229 @@ impl From<longport::trade::USRealizedPL> for USRealizedPL {
     fn from(v: longport::trade::USRealizedPL) -> Self {
         Self {
             realized_pl_list: v.realized_pl_list.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// Quantity of a US holding that is available to trade
+#[napi_derive::napi(object, js_name = "USAvailableHolding")]
+#[derive(Debug, Clone, Default)]
+pub struct USAvailableHolding {
+    pub available_qty: String,
+}
+
+impl From<longport::trade::USAvailableHolding> for USAvailableHolding {
+    fn from(v: longport::trade::USAvailableHolding) -> Self {
+        Self {
+            available_qty: v.available_qty,
+        }
+    }
+}
+
+/// Buying power in USCashAndBuyPower
+#[napi_derive::napi(object, js_name = "USBuyLimitInfo")]
+#[derive(Debug, Clone, Default)]
+pub struct USBuyLimitInfo {
+    pub currency: String,
+    pub cash_buy_power: String,
+    pub overnight_buy_power: String,
+    pub day_trade_buy_power: String,
+    pub instant_buy_power: String,
+    pub intraday_margin_buy_power: String,
+    pub option_buy_power: String,
+    pub crypto_buy_power: String,
+    pub mme: String,
+}
+
+impl From<longport::trade::USBuyLimitInfo> for USBuyLimitInfo {
+    fn from(v: longport::trade::USBuyLimitInfo) -> Self {
+        Self {
+            currency: v.currency,
+            cash_buy_power: v.cash_buy_power,
+            overnight_buy_power: v.overnight_buy_power,
+            day_trade_buy_power: v.day_trade_buy_power,
+            instant_buy_power: v.instant_buy_power,
+            intraday_margin_buy_power: v.intraday_margin_buy_power,
+            option_buy_power: v.option_buy_power,
+            crypto_buy_power: v.crypto_buy_power,
+            mme: v.mme,
+        }
+    }
+}
+
+/// One cash currency entry in USCashAndBuyPower
+#[napi_derive::napi(object, js_name = "USCashDetail")]
+#[derive(Debug, Clone, Default)]
+pub struct USCashDetail {
+    pub currency: String,
+    pub total_amount: String,
+    pub available_cash: String,
+    pub withdraw_cash: String,
+    pub frozen_cash: String,
+    pub settled_cash: String,
+    pub outstanding: String,
+    pub external_amount: String,
+}
+
+impl From<longport::trade::USCashDetail> for USCashDetail {
+    fn from(v: longport::trade::USCashDetail) -> Self {
+        Self {
+            currency: v.currency,
+            total_amount: v.total_amount,
+            available_cash: v.available_cash,
+            withdraw_cash: v.withdraw_cash,
+            frozen_cash: v.frozen_cash,
+            settled_cash: v.settled_cash,
+            outstanding: v.outstanding,
+            external_amount: v.external_amount,
+        }
+    }
+}
+
+/// Margin account status in USCashAndBuyPower
+#[napi_derive::napi(object, js_name = "USMarginStatus")]
+#[derive(Debug, Clone, Default)]
+pub struct USMarginStatus {
+    pub currency: String,
+    pub nlv: String,
+    pub margin_equity: String,
+    pub margin_maintenance_excess: String,
+    pub mmr: String,
+    pub reg_t_excess: String,
+    pub sma: String,
+}
+
+impl From<longport::trade::USMarginStatus> for USMarginStatus {
+    fn from(v: longport::trade::USMarginStatus) -> Self {
+        Self {
+            currency: v.currency,
+            nlv: v.nlv,
+            margin_equity: v.margin_equity,
+            margin_maintenance_excess: v.margin_maintenance_excess,
+            mmr: v.mmr,
+            reg_t_excess: v.reg_t_excess,
+            sma: v.sma,
+        }
+    }
+}
+
+/// Cash, buying power and margin status of a US account
+#[napi_derive::napi(object, js_name = "USCashAndBuyPower")]
+#[derive(Debug, Clone, Default)]
+pub struct USCashAndBuyPower {
+    pub buy_limit_info: USBuyLimitInfo,
+    pub cash_list: Vec<USCashDetail>,
+    pub margin_status: USMarginStatus,
+}
+
+impl From<longport::trade::USCashAndBuyPower> for USCashAndBuyPower {
+    fn from(v: longport::trade::USCashAndBuyPower) -> Self {
+        Self {
+            buy_limit_info: v.buy_limit_info.into(),
+            cash_list: v.cash_list.into_iter().map(Into::into).collect(),
+            margin_status: v.margin_status.into(),
+        }
+    }
+}
+
+/// One record in USTransactionHistory
+#[napi_derive::napi(object, js_name = "USTransaction")]
+#[derive(Debug, Clone, Default)]
+pub struct USTransaction {
+    pub title: String,
+    pub biz_code: String,
+    pub biz_code_name: String,
+    pub amount: String,
+    pub currency: String,
+    pub symbol: String,
+    pub market: String,
+    pub equity_type: String,
+    pub position_side: String,
+    pub quantity: String,
+    pub quantity_description: String,
+    pub ref_no: String,
+    pub remark: String,
+    pub create_at: Option<DateTime<Utc>>,
+    pub done_at: Option<DateTime<Utc>>,
+}
+
+impl From<longport::trade::USTransaction> for USTransaction {
+    fn from(v: longport::trade::USTransaction) -> Self {
+        Self {
+            title: v.title,
+            biz_code: v.biz_code,
+            biz_code_name: v.biz_code_name,
+            amount: v.amount,
+            currency: v.currency,
+            symbol: v.symbol,
+            market: v.market,
+            equity_type: v.equity_type,
+            position_side: v.position_side,
+            quantity: v.quantity,
+            quantity_description: v.quantity_description,
+            ref_no: v.ref_no,
+            remark: v.remark,
+            create_at: v.create_at.map(to_datetime),
+            done_at: v.done_at.map(to_datetime),
+        }
+    }
+}
+
+/// One page of US account transaction history
+#[napi_derive::napi(object, js_name = "USTransactionHistory")]
+#[derive(Debug, Clone, Default)]
+pub struct USTransactionHistory {
+    pub current_page: i64,
+    pub items: Vec<USTransaction>,
+}
+
+impl From<longport::trade::USTransactionHistory> for USTransactionHistory {
+    fn from(v: longport::trade::USTransactionHistory) -> Self {
+        Self {
+            current_page: v.current_page,
+            items: v.items.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
+/// One exchange rate in USExchangeRates
+#[napi_derive::napi(object, js_name = "USExchangeRate")]
+#[derive(Debug, Clone, Default)]
+pub struct USExchangeRate {
+    pub universal_key: String,
+    pub spec_key: String,
+    pub base_currency: String,
+    pub other_currency: String,
+    pub bid_rate: String,
+    pub offer_rate: String,
+    pub average_rate: String,
+}
+
+impl From<longport::trade::USExchangeRate> for USExchangeRate {
+    fn from(v: longport::trade::USExchangeRate) -> Self {
+        Self {
+            universal_key: v.universal_key,
+            spec_key: v.spec_key,
+            base_currency: v.base_currency,
+            other_currency: v.other_currency,
+            bid_rate: v.bid_rate,
+            offer_rate: v.offer_rate,
+            average_rate: v.average_rate,
+        }
+    }
+}
+
+/// Exchange rates of a US account
+#[napi_derive::napi(object, js_name = "USExchangeRates")]
+#[derive(Debug, Clone, Default)]
+pub struct USExchangeRates {
+    pub exchanges: Vec<USExchangeRate>,
+}
+
+impl From<longport::trade::USExchangeRates> for USExchangeRates {
+    fn from(v: longport::trade::USExchangeRates) -> Self {
+        Self {
+            exchanges: v.exchanges.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -1403,4 +1834,43 @@ impl From<longport::trade::USOrderDetailResponse> for USOrderDetailResponse {
             current_millisecond: v.current_millisecond,
         }
     }
+}
+
+// ── Grid trading types ────────────────────────────────────────────────────
+
+/// Grid trading master-order changed message.
+#[napi_derive::napi]
+#[derive(Debug, JsObject)]
+#[js(remote = "longport::trade::PushGridOrderChanged")]
+pub struct PushGridOrderChanged {
+    /// Grid master order ID
+    order_id: String,
+    /// Order status
+    status: String,
+    /// Security symbol (e.g. `700.HK`)
+    symbol: String,
+    /// Suspend reason, if any
+    suspend_reason: String,
+    /// Submitted base price
+    submitted_base_price: String,
+    /// Current base price
+    current_base_price: String,
+    /// Upper price bound
+    upper_limit_price: String,
+    /// Lower price bound
+    lower_limit_price: String,
+    /// Trigger price type
+    trigger_price_type: i32,
+    /// Quantity per trigger
+    trigger_quantity: String,
+    /// Settlement currency
+    settlement_currency: String,
+    /// Time in force (`0` = Day, `1` = GTC, `6` = GTD)
+    time_in_force: i32,
+    /// Regular trading hours flag
+    rth: i32,
+    /// Sell-side order type when depth is 0
+    grid_order_type_up: String,
+    /// Buy-side order type when depth is 0
+    grid_order_type_down: String,
 }

@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use num_enum::{FromPrimitive, IntoPrimitive};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
@@ -109,6 +111,9 @@ pub enum OrderStatus {
     /// Partial Withdrawal
     #[strum(serialize = "PartialWithdrawal")]
     PartialWithdrawal,
+    /// Monitoring (Time-Conditional Order)
+    #[strum(serialize = "DelayedNotReported")]
+    DelayedNotReported,
 }
 
 /// Execution
@@ -130,6 +135,10 @@ pub struct Execution {
     pub quantity: Decimal,
     /// Executed price
     pub price: Decimal,
+    /// Order side. `Unknown` when the response omits it, as
+    /// `/v1/trade/execution/history` does for LongPort US accounts.
+    #[serde(default)]
+    pub side: OrderSide,
 }
 
 /// Response for get all executions request
@@ -311,6 +320,111 @@ pub struct AttachedOrderDetail {
     /// Submit price (limit price)
     #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
     pub submit_price: Option<Decimal>,
+    /// Bid/ask depth level of the limit order submitted price
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::int32_opt_null_or_0_is_none::deserialize",
+        serialize_with = "serde_utils::int32_opt_0_is_none::serialize"
+    )]
+    pub limit_depth_level: Option<i32>,
+}
+
+/// Multi-leg strategy
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum MultiLegStrategy {
+    /// Unknown
+    Unknown,
+    /// Covered call (covered stock)
+    #[strum(to_string = "CoveredCall", serialize = "0")]
+    CoveredCall,
+    /// Covered put (covered stock)
+    #[strum(to_string = "CoveredPut", serialize = "1")]
+    CoveredPut,
+    /// Vertical call spread
+    #[strum(to_string = "VerticalCallSpread", serialize = "2")]
+    VerticalCallSpread,
+    /// Vertical put spread
+    #[strum(to_string = "VerticalPutSpread", serialize = "3")]
+    VerticalPutSpread,
+    /// Collar
+    #[strum(to_string = "Collar", serialize = "4")]
+    Collar,
+    /// Straddle
+    #[strum(to_string = "Straddle", serialize = "5")]
+    Straddle,
+    /// Strangle
+    #[strum(to_string = "Strangle", serialize = "6")]
+    Strangle,
+    /// Calendar call spread
+    #[strum(to_string = "CalendarCallSpread", serialize = "7")]
+    CalendarCallSpread,
+    /// Calendar put spread
+    #[strum(to_string = "CalendarPutSpread", serialize = "8")]
+    CalendarPutSpread,
+}
+
+/// Multi-leg position direction
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum MultiLegPosition {
+    /// Unknown
+    Unknown,
+    /// Long
+    #[strum(serialize = "LONG")]
+    Long,
+    /// Short
+    #[strum(serialize = "SHORT")]
+    Short,
+}
+
+/// Option contract type
+#[derive(Debug, Copy, Clone, Hash, Eq, PartialEq, EnumString, Display)]
+pub enum ContractDirection {
+    /// Unknown
+    Unknown,
+    /// Call
+    #[strum(serialize = "C")]
+    Call,
+    /// Put
+    #[strum(serialize = "P")]
+    Put,
+}
+
+/// A leg of a multi-leg combination order
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiLegOrderLeg {
+    /// Option symbol, in `ticker.region` format
+    pub symbol: String,
+    /// Order side
+    pub side: OrderSide,
+    /// Position direction
+    pub position: MultiLegPosition,
+    /// Leg ratio quantity
+    #[serde(with = "serde_utils::decimal_empty_is_0")]
+    pub ratio_quantity: Decimal,
+    /// Strike price
+    #[serde(with = "serde_utils::decimal_opt_empty_is_none")]
+    pub strike_price: Option<Decimal>,
+    /// Option expiry date
+    #[serde(default, with = "serde_utils::date_ymd_opt")]
+    pub expire_date: Option<Date>,
+    /// Contract type
+    pub contract_direction: ContractDirection,
+}
+
+/// Multi-leg strategy information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MultiLegInfo {
+    /// Multi-leg strategy
+    pub strategy: MultiLegStrategy,
+    /// Strategy name
+    pub strategy_name: String,
+    /// Multi-leg combination ID
+    pub multileg_id: String,
+    /// Multi-leg combination code
+    pub code: String,
+    /// Legs of the combination order
+    #[serde(default)]
+    pub legs: Vec<MultiLegOrderLeg>,
 }
 
 /// Order
@@ -399,9 +513,21 @@ pub struct Order {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
     /// Attached orders
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[serde(default)]
+    pub multi_leg: Option<MultiLegInfo>,
 }
 
 /// Commission-free Status
@@ -596,6 +722,14 @@ pub struct OrderDetail {
     pub monitor_price: Option<Decimal>,
     /// Remark
     pub remark: String,
+    /// Time-condition submit time (`None` when the order is not a
+    /// time-condition order)
+    #[serde(
+        default,
+        deserialize_with = "serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "serde_utils::rfc3339_opt::serialize"
+    )]
+    pub delayed_until: Option<OffsetDateTime>,
     /// Commission-free Status
     pub free_status: CommissionFreeStatus,
     /// Commission-free amount
@@ -627,6 +761,10 @@ pub struct OrderDetail {
     /// Attached orders
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub attached_orders: Vec<AttachedOrderDetail>,
+    /// Multi-leg strategy information (only present for multi-leg option
+    /// combination orders)
+    #[serde(default)]
+    pub multi_leg: Option<MultiLegInfo>,
 }
 
 /// Cash info
@@ -789,8 +927,9 @@ pub struct FundPositionChannel {
 /// Fund position
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FundPosition {
-    /// Fund ISIN code
-    pub symbol: String,
+    /// Fund counter id (the ISIN is the last `/`-separated segment)
+    #[serde(alias = "symbol")]
+    pub counter_id: String,
     /// Current equity
     #[serde(with = "serde_utils::decimal_empty_is_0")]
     pub current_net_asset_value: Decimal,
@@ -870,6 +1009,72 @@ pub struct MarginRatio {
     pub fm_factor: Decimal,
 }
 
+/// Risk assessment (suitability questionnaire) result of the current member
+///
+/// Mirrors the server response of `GET /v1/members/me/risk-assessment`
+/// field-for-field. Decoding is lenient: integers are accepted as JSON integers
+/// or integer strings (anything else becomes 0), string fields render
+/// non-string values as JSON text (null becomes empty), and a map or list
+/// field holding anything other than an object / array (e.g. null, or `[]` for
+/// a map) becomes empty.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct RiskAssessment {
+    /// Risk level of the latest questionnaire (e.g. `A5`).
+    ///
+    /// The server does not document the scale, so do not infer an ordering
+    /// between levels; report the value as-is. May be empty; the server does
+    /// not document when.
+    #[serde(default, deserialize_with = "serde_utils::string_lenient")]
+    pub risk: String,
+    /// Professional investor (PI) status code, as returned by the server.
+    ///
+    /// The server does not document the code values; treat it as an opaque
+    /// identifier rather than inferring an ordering from it.
+    #[serde(default, deserialize_with = "serde_utils::int32_lenient")]
+    pub pi: i32,
+    /// Approval states keyed by item (e.g. `car`, `cka`, `risk_audit`,
+    /// `is_corporate_client`).
+    ///
+    /// Values are the server's strings, not booleans: `is_corporate_client`
+    /// arrives as `"true"` / `"false"`, so compare the string rather than
+    /// testing it for truthiness.
+    #[serde(default, deserialize_with = "serde_utils::string_map_lenient")]
+    pub approvals: BTreeMap<String, String>,
+    /// Re-authentication flag, as returned by the server (empty when not set)
+    #[serde(default, deserialize_with = "serde_utils::string_lenient")]
+    pub re_authentication: String,
+    /// Professional investor status end time, as returned by the server (`0`
+    /// when not set).
+    ///
+    /// Deliberately left as the raw integer: the server does not document the
+    /// unit (seconds or milliseconds), so the SDK does not convert it to a
+    /// timestamp the way other `*_at` fields are converted. Confirm the unit
+    /// with the gateway before interpreting a non-zero value.
+    #[serde(default, deserialize_with = "serde_utils::int64_lenient")]
+    pub pi_end_at: i64,
+    /// Deadlines keyed by item, as returned by the server.
+    ///
+    /// Raw integers, with the same undocumented unit as [`Self::pi_end_at`].
+    #[serde(default, deserialize_with = "serde_utils::int64_map_lenient")]
+    pub deadlines: BTreeMap<String, i64>,
+    /// Date of the latest risk assessment, as returned by the server (e.g.
+    /// `2026-10-14`).
+    ///
+    /// Kept as the server's string rather than a `Date`: the server is not
+    /// documented to guarantee the `yyyy-mm-dd` form. May be empty; a null or
+    /// absent value also decodes to an empty string, so emptiness does not by
+    /// itself mean "never assessed".
+    #[serde(default, deserialize_with = "serde_utils::string_lenient")]
+    pub risk_assessment_at: String,
+    /// Questionnaire score
+    #[serde(default, deserialize_with = "serde_utils::int32_lenient")]
+    pub score: i32,
+    /// Strategy risk levels of the member. The server does not document what
+    /// these levels permit, so do not read them as a trading entitlement.
+    #[serde(default, deserialize_with = "serde_utils::string_vec_lenient")]
+    pub strategy_risk_levels: Vec<String>,
+}
+
 impl_serde_for_enum_string!(
     OrderType,
     OrderStatus,
@@ -885,6 +1090,8 @@ impl_serde_for_enum_string!(
 );
 impl_serde_for_enum_string!(AttachedOrderType);
 impl_default_for_enum_string!(AttachedOrderType);
+impl_serde_for_enum_string!(MultiLegStrategy, MultiLegPosition, ContractDirection);
+impl_default_for_enum_string!(MultiLegStrategy, MultiLegPosition, ContractDirection);
 impl_default_for_enum_string!(
     OrderType,
     OrderStatus,
@@ -1380,15 +1587,67 @@ pub struct USCryptoEntry {
     /// Asset type (e.g. `"CRYPTO"`)
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub asset_type: String,
-    /// Average cost price
-    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
-    pub average_cost: String,
-    /// User-facing trading-pair symbol (e.g. `"BTCUSD.BKKT"`)
+    /// Trading-pair code (e.g. `"BTCUSD"`); the user-facing symbol is
+    /// `"<symbol>.<market>"` (e.g. `"BTCUSD.BKKT"`)
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub symbol: String,
+    /// Holding quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
     /// Settlement currency
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub currency: String,
+    /// Average cost price; empty when the server has none
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub average_cost: String,
+    /// Market code (e.g. `"BKKT"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market: String,
+    /// Trade status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub trade_status: String,
+    /// Previous close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub prev_close: String,
+    /// Latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub last_done: String,
+    /// Market price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market_price: String,
+    /// Pre-market close price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_close: String,
+    /// Today's investment value
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub stock_invest_of_today: String,
+    /// Today's profit/loss
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub today_pl: String,
+    /// Today's investment value (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_stock_invest_of_today: String,
+    /// Today's profit/loss (pre-market)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub pretrade_today_pl: String,
+    /// Overnight-session latest price
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_last_done: String,
+    /// Overnight-session previous close
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub night_prev_close: String,
+    /// Position side (long/short)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub position_side: String,
+    /// Position open time (Unix-second string; `"0"` when unknown)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub open_position_time: String,
+    /// Asset name (e.g. `"Bitcoin"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub name: String,
+    /// Industry classification ID
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub industry_counter_id: String,
     /// Industry name
     #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
     pub industry_name: String,
@@ -1554,11 +1813,473 @@ pub struct USRealizedPL {
     pub realized_pl_list: Vec<USRealizedPLEntry>,
 }
 
+/// Request for [`crate::TradeContext::us_available_holding`].
+#[derive(Debug, Clone, Default)]
+pub struct GetUSAvailableHoldingOptions {
+    /// Security symbol, e.g. `"AAPL.US"`, an option symbol such as
+    /// `"AAPL261120C345000.US"`, or a crypto pair such as `"BTCUSD.BKKT"`.
+    pub symbol: String,
+    /// Holding type: `"STOCK"`, `"OPTION"` or `"CRYPTO"`. Defaults to
+    /// `"STOCK"` if empty.
+    pub equity_type: String,
+    /// Position side: `"LONG"` or `"SHORT"`. Defaults to `"LONG"` if empty.
+    pub position_side: String,
+}
+
+/// Response for [`crate::TradeContext::us_available_holding`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USAvailableHolding {
+    /// Quantity available to sell (long) or buy to cover (short); negative for
+    /// a short position
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub available_qty: String,
+}
+
+/// Buying power in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USBuyLimitInfo {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Cash buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_buy_power: String,
+    /// Overnight buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub overnight_buy_power: String,
+    /// Day-trade buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub day_trade_buy_power: String,
+    /// Instant buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub instant_buy_power: String,
+    /// Intraday margin buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub intraday_margin_buy_power: String,
+    /// Option buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub option_buy_power: String,
+    /// Crypto buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub crypto_buy_power: String,
+    /// Margin maintenance excess used for buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub mme: String,
+}
+
+/// One cash currency entry in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashDetail {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Total cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub total_amount: String,
+    /// Available cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub available_cash: String,
+    /// Withdrawable cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub withdraw_cash: String,
+    /// Cash frozen for pending orders
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub frozen_cash: String,
+    /// Settled cash
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub settled_cash: String,
+    /// Outstanding (unsettled) amount
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub outstanding: String,
+    /// Amount held for external use (e.g. IPO or fund subscriptions)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub external_amount: String,
+}
+
+/// Margin account status in [`USCashAndBuyPower`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USMarginStatus {
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Net liquidation value
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub nlv: String,
+    /// Margin equity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_equity: String,
+    /// Margin maintenance excess
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_maintenance_excess: String,
+    /// Maintenance margin requirement
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub mmr: String,
+    /// Regulation T excess
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub reg_t_excess: String,
+    /// Special memorandum account
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub sma: String,
+}
+
+/// Response for [`crate::TradeContext::us_cash_and_buy_power`].
+/// Field names match `GET /v1/us/assets/cash-and-buy-power`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USCashAndBuyPower {
+    /// Buying power
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub buy_limit_info: USBuyLimitInfo,
+    /// Cash per currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub cash_list: Vec<USCashDetail>,
+    /// Margin account status
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub margin_status: USMarginStatus,
+}
+
+/// Request for [`crate::TradeContext::us_transaction_history`].
+#[derive(Debug, Clone)]
+pub struct GetUSTransactionHistoryOptions {
+    /// Start time (inclusive)
+    pub start_at: OffsetDateTime,
+    /// End time (inclusive)
+    pub end_at: OffsetDateTime,
+    /// Page number, starting at 1. Defaults to 1 if 0.
+    pub page: i32,
+    /// Page size. Defaults to 20 if 0.
+    pub size: i32,
+    /// Transaction types to include; empty means all. Values:
+    /// `"TT_DEPOSIT_AND_WITHDRAWAL"`, `"TT_STOCKS_AND_ETFS_TRADING"`,
+    /// `"TT_OPTIONS_TRADING"`, `"TT_CRYPTO_TRADING"`, `"TT_CORPORATE_ACTION"`,
+    /// `"TT_TRANSFER_IN_AND_OUT"`, `"TT_CRYPTO_TRANSFER"`,
+    /// `"TT_MARGIN_FINANCING"`, `"TT_OTHER"`.
+    pub types: Vec<String>,
+    /// Currency filter, e.g. `"USD"`; empty means all.
+    pub currency: String,
+}
+
+impl GetUSTransactionHistoryOptions {
+    /// Create a request for transactions between `start_at` and `end_at`.
+    pub fn new(start_at: OffsetDateTime, end_at: OffsetDateTime) -> Self {
+        Self {
+            start_at,
+            end_at,
+            page: 1,
+            size: 20,
+            types: Vec::new(),
+            currency: String::new(),
+        }
+    }
+}
+
+/// One record in [`USTransactionHistory`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USTransaction {
+    /// Display title
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub title: String,
+    /// Business code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub biz_code: String,
+    /// Business code name
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub biz_code_name: String,
+    /// Amount; negative for outflows
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub amount: String,
+    /// Currency
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub currency: String,
+    /// Security symbol, if the record relates to one (e.g. `"AAPL.US"`)
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub symbol: String,
+    /// Market code
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub market: String,
+    /// Holding type
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub equity_type: String,
+    /// Position side
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub position_side: String,
+    /// Quantity
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity: String,
+    /// Quantity description
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub quantity_description: String,
+    /// Reference number
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub ref_no: String,
+    /// Remark
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub remark: String,
+    /// Creation time
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "crate::serde_utils::rfc3339_opt::serialize"
+    )]
+    pub create_at: Option<OffsetDateTime>,
+    /// Completion time
+    #[serde(
+        default,
+        deserialize_with = "crate::serde_utils::timestamp_opt_lenient::deserialize",
+        serialize_with = "crate::serde_utils::rfc3339_opt::serialize"
+    )]
+    pub done_at: Option<OffsetDateTime>,
+}
+
+/// Response for [`crate::TradeContext::us_transaction_history`].
+/// Field names match `POST /v1/us/assets/transaction-history`.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USTransactionHistory {
+    /// Current page number
+    #[serde(default, with = "crate::serde_utils::int64_str")]
+    pub current_page: i64,
+    /// Records on this page. The API returns no total count: a page shorter
+    /// than the requested size is the last one.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    pub items: Vec<USTransaction>,
+}
+
+/// One exchange rate in [`USExchangeRates`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct USExchangeRate {
+    /// Account channel the rates apply to, e.g. `"us_lb_apex"` (outer
+    /// `universal_exchanges` key)
+    pub universal_key: String,
+    /// Rate type, e.g. `"am"` or `"reference"` (inner `spec_exchanges` key)
+    pub spec_key: String,
+    /// Base currency
+    pub base_currency: String,
+    /// Other (quote) currency
+    pub other_currency: String,
+    /// Bid rate
+    pub bid_rate: String,
+    /// Offer rate
+    pub offer_rate: String,
+    /// Average rate
+    pub average_rate: String,
+}
+
+/// Response for [`crate::TradeContext::us_exchange_rates`].
+///
+/// The upstream response is a two-level map
+/// (`universal_exchanges.<key>.spec_exchanges.<key>.exchanges[]`); it is
+/// flattened into a single list, sorted by the two upstream map keys, with
+/// the keys kept on each entry as [`USExchangeRate::universal_key`] and
+/// [`USExchangeRate::spec_key`].
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[serde(from = "RawUSExchangeRates")]
+pub struct USExchangeRates {
+    /// Exchange rates
+    pub exchanges: Vec<USExchangeRate>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSExchangeRate {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    base_currency: String,
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    other_currency: String,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    bid_rate: Option<String>,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    offer_rate: Option<String>,
+    #[serde(default, with = "crate::serde_utils::value_as_opt_string")]
+    average_rate: Option<String>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSSpecExchanges {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    exchanges: Vec<RawUSExchangeRate>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSUniversalExchanges {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    spec_exchanges: BTreeMap<String, RawUSSpecExchanges>,
+}
+
+#[derive(Deserialize, Default)]
+struct RawUSExchangeRates {
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    universal_exchanges: BTreeMap<String, RawUSUniversalExchanges>,
+    /// Already-flattened form, so that the serialized [`USExchangeRates`]
+    /// deserializes back.
+    #[serde(default, deserialize_with = "crate::serde_utils::null_as_default")]
+    exchanges: Vec<USExchangeRate>,
+}
+
+impl From<RawUSExchangeRates> for USExchangeRates {
+    fn from(raw: RawUSExchangeRates) -> Self {
+        let mut exchanges = raw.exchanges;
+        for (universal_key, universal) in raw.universal_exchanges {
+            for (spec_key, spec) in universal.spec_exchanges {
+                exchanges.extend(spec.exchanges.into_iter().map(|rate| USExchangeRate {
+                    universal_key: universal_key.clone(),
+                    spec_key: spec_key.clone(),
+                    base_currency: rate.base_currency,
+                    other_currency: rate.other_currency,
+                    bid_rate: rate.bid_rate.unwrap_or_default(),
+                    offer_rate: rate.offer_rate.unwrap_or_default(),
+                    average_rate: rate.average_rate.unwrap_or_default(),
+                }));
+            }
+        }
+        Self { exchanges }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use time::macros::datetime;
 
     use super::*;
+
+    #[test]
+    fn execution_without_side_defaults_to_unknown() {
+        // `/v1/trade/execution/history` on a LongPort US account returns
+        // trades with no `side`; they must still deserialize.
+        let data = r#"{
+            "order_id": "1000000000000000001",
+            "trade_id": "1000000000000000001-1",
+            "symbol": "ETHUSD.BKKT",
+            "trade_done_at": "1790203596",
+            "quantity": "0.168",
+            "price": "2690.34165646"
+        }"#;
+        let execution: Execution = serde_json::from_str(data).expect("execution without side");
+        assert_eq!(
+            execution.side,
+            OrderSide::Unknown,
+            "missing side defaults to Unknown"
+        );
+        assert_eq!(execution.symbol, "ETHUSD.BKKT", "symbol is kept");
+    }
+
+    #[test]
+    fn us_exchange_rates_response() {
+        let data = r#"{
+            "universal_exchanges": {
+                "2": {"spec_exchanges": {"USD": {"exchanges": [
+                    {"base_currency": "USD", "other_currency": "HKD", "bid_rate": 7.8, "offer_rate": "7.85", "average_rate": null}
+                ]}}},
+                "1": {"spec_exchanges": {
+                    "b": {"exchanges": [{"base_currency": "USD", "other_currency": "CNH", "bid_rate": "7.1"}]},
+                    "a": {"exchanges": null}
+                }}
+            }
+        }"#;
+        let resp: USExchangeRates = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.exchanges.len(), 2);
+        assert_eq!(resp.exchanges[0].universal_key, "1");
+        assert_eq!(resp.exchanges[0].spec_key, "b");
+        assert_eq!(resp.exchanges[0].other_currency, "CNH");
+        assert_eq!(resp.exchanges[0].offer_rate, "");
+        assert_eq!(resp.exchanges[1].universal_key, "2");
+        assert_eq!(resp.exchanges[1].spec_key, "USD");
+        assert_eq!(resp.exchanges[1].bid_rate, "7.8");
+        assert_eq!(resp.exchanges[1].offer_rate, "7.85");
+        assert_eq!(resp.exchanges[1].average_rate, "");
+
+        let json = serde_json::to_string(&resp).unwrap();
+        let back: USExchangeRates = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.exchanges.len(), 2);
+        assert_eq!(back.exchanges[1].bid_rate, "7.8");
+    }
+
+    #[test]
+    fn us_cash_and_buy_power_response() {
+        let data = r#"{
+            "buy_limit_info": {"currency": "USD", "cash_buy_power": "100.5", "overnight_buy_power": "90"},
+            "cash_list": [{"currency": "USD", "total_amount": "120", "available_cash": "100.5", "withdraw_cash": "80", "frozen_cash": null}],
+            "margin_status": {"currency": "USD", "nlv": "1200"}
+        }"#;
+        let resp: USCashAndBuyPower = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.buy_limit_info.cash_buy_power, "100.5");
+        assert_eq!(resp.cash_list[0].withdraw_cash, "80");
+        assert_eq!(resp.cash_list[0].frozen_cash, "");
+        assert_eq!(resp.margin_status.nlv, "1200");
+    }
+
+    #[test]
+    fn us_transaction_history_response() {
+        let data = r#"{
+            "current_page": "2",
+            "items": [
+                {"title": "Buy", "amount": "-100", "currency": "USD", "symbol": "AAPL.US", "create_at": "1792600000", "done_at": 1792600060},
+                {"title": "Buy", "amount": "-10", "currency": "USD", "symbol": "BTCUSD.BKKT", "counter_id": "VA/BKKT/BTCUSD", "done_at": "0"}
+            ]
+        }"#;
+        let resp: USTransactionHistory = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.current_page, 2);
+        assert_eq!(resp.items[0].symbol, "AAPL.US");
+        assert_eq!(
+            resp.items[0].create_at.unwrap().unix_timestamp(),
+            1792600000
+        );
+        assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1792600060);
+        assert_eq!(resp.items[1].symbol, "BTCUSD.BKKT");
+        assert!(resp.items[1].done_at.is_none());
+    }
+
+    /// Shapes (field names, JSON types, map keys) as returned by US prod.
+    #[test]
+    fn us_asset_responses_as_returned_by_prod() {
+        let data = r#"{
+            "current_page": 1,
+            "items": [{
+                "amount": "0.5", "biz_code": "LVAVNSCR", "biz_code_name": "Cryptocurrency Deposit",
+                "counter_id": "VA/BKKT/BTCUSD", "create_at": "1791478565", "currency": "",
+                "done_at": "1791478565", "equity_type": "CRYPTO", "market": "BKKT",
+                "position_side": "LONG", "quantity": "0.5", "quantity_description": "0.5",
+                "ref_no": "R1", "remark": "", "symbol": "BTCUSD.BKKT",
+                "title": "Cryptocurrency Deposit: BTCUSD"
+            }]
+        }"#;
+        let resp: USTransactionHistory = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.current_page, 1);
+        assert_eq!(resp.items[0].symbol, "BTCUSD.BKKT");
+        assert_eq!(resp.items[0].equity_type, "CRYPTO");
+        assert_eq!(resp.items[0].done_at.unwrap().unix_timestamp(), 1791478565);
+
+        let data = r#"{"universal_exchanges": {"us_lb_apex": {"spec_exchanges": {
+            "reference": {"exchanges": [{"average_rate": 1, "base_currency": "USD", "bid_rate": 1, "offer_rate": 1, "other_currency": "USD"}]},
+            "am": {"exchanges": [{"average_rate": 1, "base_currency": "USD", "bid_rate": 1, "offer_rate": 1, "other_currency": "USD"}]}
+        }}}}"#;
+        let resp: USExchangeRates = serde_json::from_str(data).unwrap();
+        let keys: Vec<_> = resp
+            .exchanges
+            .iter()
+            .map(|e| (e.universal_key.as_str(), e.spec_key.as_str()))
+            .collect();
+        assert_eq!(keys, [("us_lb_apex", "am"), ("us_lb_apex", "reference")]);
+        assert_eq!(resp.exchanges[0].average_rate, "1");
+
+        let data = r#"{
+            "account_type": "1", "asset_timestamp": "1792661597", "currency": "USD",
+            "stock_list": [{"symbol": "MULL", "full_symbol": "MULL.US", "counter_id": "ETF/US/MULL", "quantity": "10", "market": "US"}],
+            "crypto_list": [{
+                "asset_type": "CRYPTO", "average_cost": "", "counter_id": "VA/BKKT/ETHUSD",
+                "currency": "USD", "last_done": "2500", "market": "BKKT", "market_price": "2500",
+                "name": "Ethereum", "open_position_time": "0", "position_side": "LONG",
+                "quantity": "0.1", "symbol": "ETHUSD", "today_pl": "", "trade_status": "105"
+            }],
+            "option_list": [], "multi_leg": {"holdings": []}
+        }"#;
+        let resp: USAssetOverview = serde_json::from_str(data).unwrap();
+        assert_eq!(resp.asset_timestamp.unwrap().unix_timestamp(), 1792661597);
+        assert_eq!(resp.stock_list[0].full_symbol, "MULL.US");
+        let crypto = &resp.crypto_list[0];
+        assert_eq!(crypto.symbol, "ETHUSD");
+        assert_eq!(crypto.market, "BKKT");
+        assert_eq!(crypto.quantity, "0.1");
+        assert_eq!(crypto.name, "Ethereum");
+        assert_eq!(crypto.market_price, "2500");
+    }
 
     #[test]
     fn fund_position_response() {
@@ -1567,7 +2288,7 @@ mod tests {
             "list": [{
                 "account_channel": "lb",
                 "fund_info": [{
-                    "symbol": "HK0000447943",
+                    "counter_id": "UT/FD/HK0000447943",
                     "symbol_name": "高腾亚洲收益基金",
                     "currency": "USD",
                     "holding_units": "5.000",
@@ -1587,13 +2308,19 @@ mod tests {
         assert_eq!(channel.positions.len(), 1);
 
         let position = &channel.positions[0];
-        assert_eq!(position.symbol, "HK0000447943");
+        assert_eq!(position.counter_id, "UT/FD/HK0000447943");
         assert_eq!(position.symbol_name, "高腾亚洲收益基金");
         assert_eq!(position.currency, "USD");
         assert_eq!(position.current_net_asset_value, decimal!(0i32));
         assert_eq!(position.cost_net_asset_value, decimal!(0i32));
         assert_eq!(position.holding_units, decimal!(5i32));
         assert_eq!(position.net_asset_value_day, datetime!(2022-4-14 0:00 +8));
+
+        // Transition compatibility: the legacy `symbol` key (which carried a
+        // bare ISIN) still deserializes into `counter_id` via the serde alias.
+        let legacy = r#"{"list":[{"account_channel":"lb","fund_info":[{"symbol":"HK0000447943","symbol_name":"x","currency":"USD","holding_units":"0","current_net_asset_value":"0","cost_net_asset_value":"0","net_asset_value_day":"1649865600"}]}]}"#;
+        let resp: FundPositionsResponse = serde_json::from_str(legacy).unwrap();
+        assert_eq!(resp.channels[0].positions[0].counter_id, "HK0000447943");
     }
 
     #[test]
@@ -1846,7 +2573,8 @@ mod tests {
                 "limit_depth_level": 0,
                 "trigger_count": 0,
                 "monitor_price": "",
-                "remark": "abc"
+                "remark": "abc",
+                "delayed_until": "1767225600"
               }
             ]
           }
@@ -1887,6 +2615,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert_eq!(order.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
     }
 
     #[test]
@@ -1964,6 +2693,7 @@ mod tests {
         assert!(order.trigger_status.is_none());
         assert_eq!(order.updated_at, Some(datetime!(2022-05-04 14:14:58 +8)));
         assert_eq!(order.remark, "abc");
+        assert!(order.delayed_until.is_none());
     }
 
     #[test]
@@ -1978,7 +2708,8 @@ mod tests {
                 "quantity": "100",
                 "symbol": "700.HK",
                 "trade_done_at": "1648611351",
-                "trade_id": "693664675163312128-1648611351433741210"
+                "trade_id": "693664675163312128-1648611351433741210",
+                "side": "Buy"
               }
             ]
           }
@@ -1999,6 +2730,7 @@ mod tests {
         assert_eq!(execution.symbol, "700.HK");
         assert_eq!(execution.trade_done_at, datetime!(2022-03-30 11:35:51 +8));
         assert_eq!(execution.trade_id, "693664675163312128-1648611351433741210");
+        assert_eq!(execution.side, OrderSide::Buy);
     }
 
     #[test]
@@ -2034,6 +2766,7 @@ mod tests {
             "trigger_count": 0,
             "monitor_price": "",
             "remark": "1680863603.927165",
+            "delayed_until": "0",
             "free_status": "None",
             "free_amount": "",
             "free_currency": "",
@@ -2072,6 +2805,178 @@ mod tests {
         }
         "#;
 
-        _ = serde_json::from_str::<OrderDetail>(data).unwrap();
+        let detail = serde_json::from_str::<OrderDetail>(data).unwrap();
+        assert!(
+            detail.delayed_until.is_none(),
+            "\"0\" means no time condition"
+        );
+
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["status"] = "DelayedNotReported".into();
+        value["delayed_until"] = "1767225600".into();
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert_eq!(detail.status, OrderStatus::DelayedNotReported);
+        assert_eq!(detail.delayed_until, Some(datetime!(2026-01-01 00:00 UTC)));
+
+        // The spec marks delayed_until nullable.
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value["delayed_until"] = serde_json::Value::Null;
+        let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+        assert!(detail.delayed_until.is_none());
+
+        // A malformed value in this new field must not fail the whole response.
+        for (raw, expected) in [
+            (
+                serde_json::json!(1767225600),
+                Some(datetime!(2026-01-01 00:00 UTC)),
+            ),
+            (serde_json::json!("abc"), None),
+            (serde_json::json!("99999999999999"), None),
+            (serde_json::json!(""), None),
+            (serde_json::json!("-5"), None),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+            value["delayed_until"] = raw.clone();
+            let detail = serde_json::from_value::<OrderDetail>(value).unwrap();
+            assert_eq!(detail.delayed_until, expected, "{raw}");
+        }
+    }
+
+    #[test]
+    fn attached_order_limit_depth_level() {
+        let data = r#"
+        {
+            "order_id": "706388312699592705",
+            "attached_type_display": "STOP_LOSS",
+            "trigger_price": "10.500",
+            "quantity": "200",
+            "executed_qty": "0",
+            "status": "NewStatus",
+            "updated_at": "1651644898",
+            "withdrawn": false,
+            "gtd": "",
+            "time_in_force": "Day",
+            "counter_id": "",
+            "trigger_status": "NOT_USED",
+            "executed_amount": "0",
+            "tag": "Normal",
+            "submitted_at": "1651644897",
+            "executed_price": "0.000",
+            "force_only_rth": "RTH_ONLY",
+            "reviewed": false,
+            "activate_order_type": "MIT",
+            "activate_rth": "RTH_ONLY",
+            "submit_price": "",
+            "limit_depth_level": 0
+        }
+        "#;
+        for (raw, expected) in [
+            (serde_json::json!(0), None),
+            (serde_json::json!(3), Some(3)),
+            (serde_json::json!(-2), Some(-2)),
+            (serde_json::json!("3"), Some(3)),
+            (serde_json::json!("abc"), None),
+            (serde_json::Value::Null, None),
+        ] {
+            let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+            value["limit_depth_level"] = raw.clone();
+            let detail = serde_json::from_value::<AttachedOrderDetail>(value).unwrap();
+            assert_eq!(detail.limit_depth_level, expected, "{raw}");
+        }
+
+        // Responses that predate the field still deserialize.
+        let mut value: serde_json::Value = serde_json::from_str(data).unwrap();
+        value.as_object_mut().unwrap().remove("limit_depth_level");
+        let detail = serde_json::from_value::<AttachedOrderDetail>(value).unwrap();
+        assert!(detail.limit_depth_level.is_none());
+    }
+
+    #[test]
+    fn risk_assessment_decode() {
+        // Real test-env response (2026-11-16).
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"approvals":{"car":"pass","cka":"pass","is_corporate_client":"false","risk_audit":"pass"},
+                "deadlines":{},"pi":0,"pi_end_at":"0","re_authentication":"","risk":"A5",
+                "risk_assessment_at":"2026-10-14","score":0,"strategy_risk_levels":[]}"#,
+        )
+        .unwrap();
+        assert_eq!(ra.risk, "A5");
+        assert_eq!(ra.pi, 0);
+        assert_eq!(ra.pi_end_at, 0);
+        assert_eq!(ra.re_authentication, "");
+        assert_eq!(ra.risk_assessment_at, "2026-10-14");
+        assert_eq!(ra.score, 0);
+        assert!(ra.strategy_risk_levels.is_empty());
+        assert!(ra.deadlines.is_empty());
+        assert_eq!(ra.approvals.len(), 4);
+        assert_eq!(ra.approvals["car"], "pass");
+        assert_eq!(ra.approvals["is_corporate_client"], "false");
+
+        // int64 as strings or numbers, int32 as strings, non-string approval
+        // values, null list.
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"risk":"R1","pi":"1","pi_end_at":1790000000,"score":"42",
+                "deadlines":{"pi":"1790000000","risk":1790000001,"x":null},
+                "approvals":{"flag":true,"n":3},"strategy_risk_levels":null}"#,
+        )
+        .unwrap();
+        assert_eq!(ra.pi, 1);
+        assert_eq!(ra.pi_end_at, 1790000000);
+        assert_eq!(ra.score, 42);
+        assert_eq!(ra.deadlines["pi"], 1790000000);
+        assert_eq!(ra.deadlines["risk"], 1790000001);
+        assert_eq!(ra.deadlines["x"], 0);
+        assert_eq!(ra.approvals["flag"], "true");
+        assert_eq!(ra.approvals["n"], "3");
+        assert!(ra.strategy_risk_levels.is_empty());
+
+        // Floats, out-of-range ints and non-numeric strings become 0;
+        // non-string string fields render as JSON text; null list elements
+        // become empty strings.
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"risk":5,"re_authentication":true,"risk_assessment_at":null,"pi":1.5,
+                "score":3000000000,"pi_end_at":1.79e9,
+                "deadlines":{"a":-2,"b":-2.7,"c":"x","d":18446744073709551615},
+                "approvals":{"o":{"b":1,"a":2}},"strategy_risk_levels":["S1",null,3]}"#,
+        )
+        .unwrap();
+        assert_eq!(ra.risk, "5");
+        assert_eq!(ra.re_authentication, "true");
+        assert_eq!(ra.risk_assessment_at, "");
+        assert_eq!((ra.pi, ra.score, ra.pi_end_at), (0, 0, 0));
+        assert_eq!(
+            ra.deadlines.into_iter().collect::<Vec<_>>(),
+            vec![
+                ("a".to_string(), -2),
+                ("b".to_string(), 0),
+                ("c".to_string(), 0),
+                ("d".to_string(), 0)
+            ]
+        );
+        assert_eq!(ra.approvals["o"], r#"{"a":2,"b":1}"#);
+        assert_eq!(ra.strategy_risk_levels, vec!["S1", "", "3"]);
+
+        // Maps serialize in key order.
+        let ra: RiskAssessment =
+            serde_json::from_str(r#"{"approvals":{"z":"1","a":"2","m":"3"}}"#).unwrap();
+        let json = serde_json::to_string(&ra).unwrap();
+        assert!(json.contains(r#""approvals":{"a":"2","m":"3","z":"1"}"#));
+
+        // Wrong-shaped maps and lists become empty instead of failing the call.
+        let ra: RiskAssessment = serde_json::from_str(
+            r#"{"approvals":[],"deadlines":"x","strategy_risk_levels":{"a":1}}"#,
+        )
+        .unwrap();
+        assert!(ra.approvals.is_empty() && ra.deadlines.is_empty());
+        assert!(ra.strategy_risk_levels.is_empty());
+        let ra: RiskAssessment = serde_json::from_str(r#"{"strategy_risk_levels":"S1"}"#).unwrap();
+        assert!(ra.strategy_risk_levels.is_empty());
+
+        // Empty object and null maps still decode.
+        let ra: RiskAssessment =
+            serde_json::from_str(r#"{"approvals":null,"deadlines":null}"#).unwrap();
+        assert!(ra.risk.is_empty());
+        assert_eq!(ra.score, 0);
+        assert!(ra.approvals.is_empty() && ra.deadlines.is_empty());
     }
 }

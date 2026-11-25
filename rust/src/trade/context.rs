@@ -14,11 +14,15 @@ use crate::{
         Execution, FundPositionsResponse, GetCashFlowOptions, GetFundPositionsOptions,
         GetHistoryExecutionsOptions, GetHistoryOrdersOptions, GetOrderDetailOptions,
         GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions,
-        GetUSHistoryOrders, GetUSRealizedPLOptions, MarginRatio, Order, OrderDetail, OrderSide,
-        PushEvent, QueryUSOrdersResponse, ReplaceOrderOptions, StockPositionsResponse,
-        SubmitOrderOptions, TopicType, USAssetOverview, USOrderDetailResponse, USRealizedPL,
+        GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
+        GetUSTransactionHistoryOptions, MarginRatio, Order, OrderDetail, OrderSide, PushEvent,
+        QueryUSOrdersResponse, ReplaceOrderOptions, RiskAssessment, StockPositionsResponse,
+        SubmitMultiLegOrderOptions, SubmitOrderOptions, TopicType, USAssetOverview,
+        USAvailableHolding, USCashAndBuyPower, USExchangeRates, USOrderDetailResponse,
+        USRealizedPL, USTransactionHistory,
         core::{Command, Core},
     },
+    types::normalize_symbol_owned,
 };
 
 #[derive(Debug, Deserialize)]
@@ -178,6 +182,8 @@ impl TradeContext {
 
     /// Get history executions
     ///
+    /// `side` may be `Unknown` on LongPort US accounts.
+    ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/execution/history_executions>
     ///
     /// # Examples
@@ -212,22 +218,50 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryExecutionsOptions>>,
     ) -> Result<Vec<Execution>> {
+        use std::collections::HashSet;
+
         #[derive(Deserialize)]
         struct Response {
+            #[serde(default)]
+            has_more: bool,
             trades: Vec<Execution>,
         }
 
-        Ok(self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/trade/execution/history")
-            .query_params(options.into().unwrap_or_default())
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?
-            .0
-            .trades)
+        // The endpoint caps each response at 1000 records; walk the `page`
+        // param (1-based) until `has_more` is false. Dedupe by
+        // `trade_id` and stop if a page adds nothing new, guarding
+        // against the gateway ignoring `page`. Bounded to 1000 pages as
+        // a runaway guard.
+        let mut options = options.into().unwrap_or_default();
+        let mut all: Vec<Execution> = Vec::new();
+        let mut seen: HashSet<String> = HashSet::new();
+        for page in 1..=1000u32 {
+            options = options.with_page(page);
+            let resp = self
+                .0
+                .http_cli
+                .request(Method::GET, "/v1/trade/execution/history")
+                .query_params(&options)
+                .response::<Json<Response>>()
+                .send()
+                .with_subscriber(self.0.log_subscriber.clone())
+                .await?
+                .0;
+            if resp.trades.is_empty() {
+                break;
+            }
+            let mut added = 0usize;
+            for t in resp.trades {
+                if seen.insert(t.trade_id.clone()) {
+                    all.push(t);
+                    added += 1;
+                }
+            }
+            if !resp.has_more || added == 0 {
+                break;
+            }
+        }
+        Ok(all)
     }
 
     /// Get today executions
@@ -283,6 +317,9 @@ impl TradeContext {
     // TODO: temporarily disabled — restore when API is available
     // Get all executions
     //
+    // AP accounts only: US data-center accounts get a region error; use
+    // `history_executions` instead.
+    //
     // Reference: <https://open.longportapp.com/en/docs/trade/execution/all_executions>
     // pub async fn all_executions(
     // &self,
@@ -292,6 +329,7 @@ impl TradeContext {
     // .0
     // .http_cli
     // .request(Method::GET, "/v3/trade/execution/all")
+    // .dc_restrict(DcRegion::Ap)
     // .query_params(options.into().unwrap_or_default())
     // .response::<Json<AllExecutionsResponse>>()
     // .send()
@@ -339,22 +377,50 @@ impl TradeContext {
         &self,
         options: impl Into<Option<GetHistoryOrdersOptions>>,
     ) -> Result<Vec<Order>> {
+        use std::collections::HashSet;
+
         #[derive(Deserialize)]
         struct Response {
             orders: Vec<Order>,
+            #[serde(default)]
+            has_more: bool,
         }
 
-        Ok(self
-            .0
-            .http_cli
-            .request(Method::GET, "/v1/trade/order/history")
-            .query_params(options.into().unwrap_or_default())
-            .response::<Json<Response>>()
-            .send()
-            .with_subscriber(self.0.log_subscriber.clone())
-            .await?
-            .0
-            .orders)
+        // The endpoint caps each response at 1000 records and reports the
+        // overflow in `has_more`; walk the `page` param (1-based) until it is
+        // false. Dedupe by `order_id` and stop if a page adds nothing new,
+        // guarding against the gateway ignoring `page`. Bounded to 1000 pages
+        // as a runaway guard. Mirrors `history_executions`.
+        let mut options = options.into().unwrap_or_default();
+        let mut all: Vec<Order> = Vec::new();
+        let mut seen: HashSet<String> = HashSet::new();
+        for page in 1..=1000u32 {
+            options = options.with_page(page);
+            let resp = self
+                .0
+                .http_cli
+                .request(Method::GET, "/v1/trade/order/history")
+                .query_params(&options)
+                .response::<Json<Response>>()
+                .send()
+                .with_subscriber(self.0.log_subscriber.clone())
+                .await?
+                .0;
+            if resp.orders.is_empty() {
+                break;
+            }
+            let mut added = 0usize;
+            for o in resp.orders {
+                if seen.insert(o.order_id.clone()) {
+                    all.push(o);
+                    added += 1;
+                }
+            }
+            if !resp.has_more || added == 0 {
+                break;
+            }
+        }
+        Ok(all)
     }
 
     /// Get today orders
@@ -505,6 +571,67 @@ impl TradeContext {
         Ok(resp)
     }
 
+    /// Submit a multi-leg option combination order (such as vertical spreads,
+    /// straddles, strangles, collars, etc.). All legs are submitted together
+    /// as a single strategy order.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{
+    ///     Config, decimal,
+    ///     oauth::OAuthBuilder,
+    ///     trade::{
+    ///         MultiLegStrategy, OrderSide, OrderType, SubmitMultiLegOrderLeg,
+    ///         SubmitMultiLegOrderOptions, TradeContext,
+    ///     },
+    /// };
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let (ctx, _) = TradeContext::new(config);
+    ///
+    /// let opts = SubmitMultiLegOrderOptions::new(
+    ///     OrderSide::Buy,
+    ///     OrderType::LO,
+    ///     decimal!(1i32),
+    ///     MultiLegStrategy::VerticalCallSpread,
+    ///     [
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C764000.US", decimal!(1i32)),
+    ///         SubmitMultiLegOrderLeg::new("QQQ260731C767000.US", decimal!(1i32)),
+    ///     ],
+    /// )
+    /// .submitted_price(decimal!(1.5));
+    /// let resp = ctx.submit_multileg(opts).await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn submit_multileg(
+        &self,
+        options: SubmitMultiLegOrderOptions,
+    ) -> Result<SubmitOrderResponse> {
+        let resp: SubmitOrderResponse = self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/trade/order/multileg")
+            .body(Json(options))
+            .response::<Json<_>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0;
+        _ = self.0.command_tx.send(Command::SubmittedOrder {
+            order_id: resp.order_id.clone(),
+        });
+        Ok(resp)
+    }
+
     /// Cancel order
     ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/order/withdraw>
@@ -542,6 +669,9 @@ impl TradeContext {
 
     /// Get account balance
     ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_cash_and_buy_power` (or `us_asset_overview`) instead.
+    ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/asset/account>
     ///
     /// # Examples
@@ -578,6 +708,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/account")
+            .dc_restrict(DcRegion::Ap)
             .query_params(Request { currency })
             .response::<Json<Response>>()
             .send()
@@ -588,6 +719,9 @@ impl TradeContext {
     }
 
     /// Get cash flow
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_transaction_history` instead.
     ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/asset/cashflow>
     ///
@@ -626,6 +760,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/cashflow")
+            .dc_restrict(DcRegion::Ap)
             .query_params(options)
             .response::<Json<Response>>()
             .send()
@@ -638,6 +773,9 @@ impl TradeContext {
     /// Get fund positions
     ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/asset/fund>
+    ///
+    /// AP accounts only: US data-center accounts have no fund holdings and
+    /// get a region error. No US equivalent.
     ///
     /// # Examples
     ///
@@ -666,6 +804,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/fund")
+            .dc_restrict(DcRegion::Ap)
             .query_params(opts.into().unwrap_or_default())
             .response::<Json<FundPositionsResponse>>()
             .send()
@@ -675,6 +814,9 @@ impl TradeContext {
     }
 
     /// Get stock positions
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_asset_overview` (`stock_list`) instead.
     ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/asset/stock>
     ///
@@ -705,6 +847,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/asset/stock")
+            .dc_restrict(DcRegion::Ap)
             .query_params(opts.into().unwrap_or_default())
             .response::<Json<StockPositionsResponse>>()
             .send()
@@ -716,6 +859,10 @@ impl TradeContext {
     /// Get margin ratio
     ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/asset/margin_ratio>
+    ///
+    /// AP accounts only: US data-center accounts get a region error. No US
+    /// equivalent; for US margin info see `us_cash_and_buy_power`
+    /// (`margin_status`).
     ///
     /// # Examples
     ///
@@ -746,8 +893,9 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/risk/margin-ratio")
+            .dc_restrict(DcRegion::Ap)
             .query_params(Request {
-                symbol: symbol.into(),
+                symbol: normalize_symbol_owned(symbol),
             })
             .response::<Json<MarginRatio>>()
             .send()
@@ -756,7 +904,44 @@ impl TradeContext {
             .0)
     }
 
+    /// Get the risk assessment (suitability questionnaire) result of the
+    /// current member
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::sync::Arc;
+    ///
+    /// use longport::{Config, oauth::OAuthBuilder, trade::TradeContext};
+    ///
+    /// # tokio::runtime::Runtime::new().unwrap().block_on(async {
+    /// let oauth = OAuthBuilder::new("your-client-id")
+    ///     .build(|url| println!("Visit: {url}"))
+    ///     .await?;
+    /// let config = Arc::new(Config::from_oauth(oauth));
+    /// let (ctx, _) = TradeContext::new(config);
+    ///
+    /// let resp = ctx.risk_assessment().await?;
+    /// println!("{:?}", resp);
+    /// # Ok::<_, Box<dyn std::error::Error>>(())
+    /// # });
+    /// ```
+    pub async fn risk_assessment(&self) -> Result<RiskAssessment> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/members/me/risk-assessment")
+            .response::<Json<RiskAssessment>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
     /// Get order detail
+    ///
+    /// AP accounts only: US data-center accounts get a region error; use
+    /// `us_order_detail` instead.
     ///
     /// Reference: <https://open.longportapp.com/en/docs/trade/order/order_detail>
     ///
@@ -792,6 +977,7 @@ impl TradeContext {
             .0
             .http_cli
             .request(Method::GET, "/v1/trade/order")
+            .dc_restrict(DcRegion::Ap)
             .response::<Json<OrderDetail>>()
             .query_params(options.into())
             .send()
@@ -852,7 +1038,8 @@ impl TradeContext {
             .0)
     }
 
-    // ── US-market APIs ────────────────────────────────────────────────────────
+    // ── US-market APIs
+    // ────────────────────────────────────────────────────────
 
     /// Query the paginated US order list.
     ///
@@ -1001,5 +1188,270 @@ impl TradeContext {
             .with_subscriber(self.0.log_subscriber.clone())
             .await?
             .0)
+    }
+
+    /// Get cash, buying power and margin status for the US account.
+    ///
+    /// `currency`: optional, e.g. `"USD"`.
+    ///
+    /// Path: `GET /v1/us/assets/cash-and-buy-power`
+    ///
+    /// US token required.
+    pub async fn us_cash_and_buy_power(&self, currency: Option<&str>) -> Result<USCashAndBuyPower> {
+        #[derive(Serialize)]
+        struct Query<'a> {
+            #[serde(skip_serializing_if = "Option::is_none")]
+            currency: Option<&'a str>,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/cash-and-buy-power")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query { currency })
+            .response::<Json<USCashAndBuyPower>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the quantity of a US holding that is available to trade.
+    ///
+    /// Path: `GET /v1/us/assets/available-holding`
+    ///
+    /// US token required.
+    pub async fn us_available_holding(
+        &self,
+        opts: GetUSAvailableHoldingOptions,
+    ) -> Result<USAvailableHolding> {
+        #[derive(Serialize)]
+        struct Query {
+            symbol: String,
+            equity_type: String,
+            position_side: String,
+        }
+
+        let equity_type = if opts.equity_type.is_empty() {
+            "STOCK".to_string()
+        } else {
+            opts.equity_type
+        };
+        let position_side = if opts.position_side.is_empty() {
+            "LONG".to_string()
+        } else {
+            opts.position_side
+        };
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/available-holding")
+            .dc_restrict(DcRegion::Us)
+            .query_params(Query {
+                symbol: opts.symbol,
+                equity_type,
+                position_side,
+            })
+            .response::<Json<USAvailableHolding>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the US account transaction history (deposits, withdrawals, trades,
+    /// corporate actions, transfers and so on), one page at a time.
+    ///
+    /// Path: `POST /v1/us/assets/transaction-history`
+    ///
+    /// US token required.
+    pub async fn us_transaction_history(
+        &self,
+        opts: GetUSTransactionHistoryOptions,
+    ) -> Result<USTransactionHistory> {
+        #[derive(Debug, Serialize)]
+        struct Body {
+            start: i64,
+            end: i64,
+            page: i32,
+            size: i32,
+            #[serde(skip_serializing_if = "Vec::is_empty")]
+            types: Vec<String>,
+            #[serde(skip_serializing_if = "String::is_empty")]
+            currency: String,
+        }
+
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::POST, "/v1/us/assets/transaction-history")
+            .dc_restrict(DcRegion::Us)
+            .body(Json(Body {
+                start: opts.start_at.unix_timestamp(),
+                end: opts.end_at.unix_timestamp(),
+                page: if opts.page > 0 { opts.page } else { 1 },
+                size: if opts.size > 0 { opts.size } else { 20 },
+                types: opts.types,
+                currency: opts.currency,
+            }))
+            .response::<Json<USTransactionHistory>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+
+    /// Get the exchange rates used by the US account.
+    ///
+    /// The upstream two-level map is flattened into
+    /// [`USExchangeRates::exchanges`]; each entry keeps the two upstream map
+    /// keys as `universal_key` and `spec_key`.
+    ///
+    /// Path: `GET /v1/us/assets/exchange-rates`
+    ///
+    /// US token required.
+    pub async fn us_exchange_rates(&self) -> Result<USExchangeRates> {
+        Ok(self
+            .0
+            .http_cli
+            .request(Method::GET, "/v1/us/assets/exchange-rates")
+            .dc_restrict(DcRegion::Us)
+            .response::<Json<USExchangeRates>>()
+            .send()
+            .with_subscriber(self.0.log_subscriber.clone())
+            .await?
+            .0)
+    }
+}
+
+#[cfg(test)]
+mod dc_restrict_tests {
+    use longport_httpcli::HttpClientError;
+    use time::macros::datetime;
+
+    use super::*;
+    use crate::Error;
+
+    fn us_trade_context() -> TradeContext {
+        let config = Arc::new(Config::from_apikey("us_app_key", "app_secret", "us_token"));
+        TradeContext::new(config).0
+    }
+
+    #[track_caller]
+    fn assert_ap_restricted<T>(res: Result<T>, path: &str)
+    where
+        T: std::fmt::Debug,
+    {
+        match res {
+            Err(Error::HttpClient(HttpClientError::DcRegionRestricted {
+                path: p,
+                required,
+                current,
+            })) => {
+                assert_eq!(p, path, "restricted path mismatch");
+                assert_eq!(required, DcRegion::Ap, "expected AP-only restriction");
+                assert_eq!(current, DcRegion::Us, "expected US session region");
+            }
+            other => panic!("expected DcRegionRestricted for {path}, got {other:?}"),
+        }
+    }
+
+    /// AP-only asset/risk/order endpoints fail fast for a US (`us_`) token
+    /// instead of sending a request the US data center rejects.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn ap_only_endpoints_reject_us_token() {
+        let ctx = us_trade_context();
+
+        assert_ap_restricted(ctx.account_balance(None).await, "/v1/asset/account");
+        assert_ap_restricted(
+            ctx.cash_flow(GetCashFlowOptions::new(
+                datetime!(2026-01-01 0:00 UTC),
+                datetime!(2026-01-02 0:00 UTC),
+            ))
+            .await,
+            "/v1/asset/cashflow",
+        );
+        assert_ap_restricted(ctx.fund_positions(None).await, "/v1/asset/fund");
+        assert_ap_restricted(ctx.stock_positions(None).await, "/v1/asset/stock");
+        assert_ap_restricted(ctx.margin_ratio("700.HK").await, "/v1/risk/margin-ratio");
+        assert_ap_restricted(ctx.order_detail("1").await, "/v1/trade/order");
+        // all_executions is temporarily disabled
+    }
+}
+
+#[cfg(test)]
+mod symbol_normalization_tests {
+    use time::macros::datetime;
+
+    use super::*;
+    use crate::trade::{
+        GetCashFlowOptions, GetHistoryExecutionsOptions, GetHistoryOrdersOptions,
+        GetStockPositionsOptions, GetTodayExecutionsOptions, GetTodayOrdersOptions, OrderSide,
+        OrderType, SubmitMultiLegOrderLeg, SubmitOrderOptions, TimeInForceType,
+    };
+
+    fn query(value: &impl Serialize) -> String {
+        serde_json::to_string(&serde_json::to_value(value).unwrap()).unwrap()
+    }
+
+    /// `/v1/asset/stock?symbol=00700.HK` answers `200` with **no** positions
+    /// rather than an error, so a padded HK symbol has to be canonicalized
+    /// before it leaves the SDK. Checked against the gateway on 2026-11-18:
+    /// `700.HK` returned the position, `00700.HK` returned none.
+    #[test]
+    fn stock_positions_strips_hk_padding() {
+        let opts = GetStockPositionsOptions::new().symbols(["00700.HK", "AAPL.US", "000001.SZ"]);
+        let q = query(&opts);
+        assert!(q.contains("700.HK"), "{q}");
+        assert!(!q.contains("00700.HK"), "{q}");
+        // Every other market keeps its symbol verbatim.
+        assert!(q.contains("AAPL.US"), "{q}");
+        assert!(q.contains("000001.SZ"), "{q}");
+    }
+
+    #[test]
+    fn every_symbol_filter_is_normalized() {
+        assert!(query(&GetHistoryOrdersOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
+        assert!(query(&GetTodayOrdersOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
+        assert!(
+            query(&GetHistoryExecutionsOptions::new().symbol("00700.HK")).contains("\"700.HK\"")
+        );
+        assert!(query(&GetTodayExecutionsOptions::new().symbol("00700.HK")).contains("\"700.HK\""));
+        assert!(
+            query(
+                &GetCashFlowOptions::new(
+                    datetime!(2026-01-01 0:00 UTC),
+                    datetime!(2026-01-31 0:00 UTC)
+                )
+                .symbol("00700.HK")
+            )
+            .contains("\"700.HK\"")
+        );
+    }
+
+    #[test]
+    fn submit_order_normalizes_the_symbol() {
+        let opts = SubmitOrderOptions::new(
+            "00700.HK",
+            OrderType::LO,
+            OrderSide::Buy,
+            decimal!(100i32),
+            TimeInForceType::Day,
+        );
+        let body = serde_json::to_value(&opts).unwrap();
+        assert_eq!(body["symbol"], "700.HK");
+    }
+
+    #[test]
+    fn submit_multileg_normalizes_leg_symbols() {
+        let leg = SubmitMultiLegOrderLeg::new("00700.HK", decimal!(1i32));
+        assert_eq!(serde_json::to_value(&leg).unwrap()["symbol"], "700.HK");
+        let leg = SubmitMultiLegOrderLeg::new("QQQ260731C764000.US", decimal!(1i32));
+        assert_eq!(
+            serde_json::to_value(&leg).unwrap()["symbol"],
+            "QQQ260731C764000.US"
+        );
     }
 }

@@ -26,28 +26,34 @@ pub mod asset;
 pub mod calendar;
 pub mod content;
 pub mod dca;
+pub mod fund;
 pub mod fundamental;
+pub mod grid;
 pub mod market;
 pub mod portfolio;
 pub mod quote;
 pub mod screener;
 pub mod sharelist;
+pub mod signal;
 pub mod trade;
 
 pub use agent::AgentContext;
 pub use alert::AlertContext;
 pub use asset::AssetContext;
 pub use calendar::CalendarContext;
-pub use config::{Config, Language, PushCandlestickMode};
+pub use config::{Config, Language, PushCandlestickMode, QuoteTransport};
 pub use content::ContentContext;
 pub use dca::DCAContext;
 pub use error::{Error, Result, SimpleError, SimpleErrorKind};
+pub use fund::FundContext;
 pub use fundamental::FundamentalContext;
-// ── US-market type re-exports ─────────────────────────────────────────────────
+// US-market type re-exports
 pub use fundamental::types::{
-    USCompanyDividends, USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile,
-    USETFFilesResponse, USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
+    FinancialStatementKind, IndustryRankIndicator, IndustryRankSortType, USCompanyDividends,
+    USCompanyOverview, USDividendItem, USETFDividendInfo, USETFFile, USETFFilesResponse,
+    USFinancialStatement, USRankTag, USValuationMetric, USValuationOverview,
 };
+pub use grid::GridContext;
 pub use longport_httpcli as httpclient;
 pub use longport_httpcli::{DC_REGION_HEADER, DcRegion};
 pub use longport_wscli as wsclient;
@@ -57,9 +63,13 @@ pub use quote::{QuoteContext, USCryptoOverview};
 pub use rust_decimal::Decimal;
 pub use screener::ScreenerContext;
 pub use sharelist::SharelistContext;
+pub use signal::SignalContext;
 pub use trade::{
-    GetUSHistoryOrders, GetUSRealizedPLOptions, QueryUSOrdersOptions, QueryUSOrdersResponse,
-    TradeContext, USAssetOverview, USCashEntry, USCryptoEntry, USOrderDetailResponse,
-    USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+    GetUSAvailableHoldingOptions, GetUSHistoryOrders, GetUSRealizedPLOptions,
+    GetUSTransactionHistoryOptions, QueryUSOrdersOptions, QueryUSOrdersResponse, TradeContext,
+    USAssetOverview, USAvailableHolding, USBuyLimitInfo, USCashAndBuyPower, USCashDetail,
+    USCashEntry, USCryptoEntry, USExchangeRate, USExchangeRates, USMarginStatus,
+    USOrderDetailResponse, USOrderHistory, USRealizedPL, USRealizedPLEntry, USRealizedPLMetric,
+    USTransaction, USTransactionHistory,
 };
 pub use types::Market;

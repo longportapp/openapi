@@ -589,9 +589,11 @@ impl From<lb::ValuationMetricsData> for ValuationMetricsData {
 pub struct ValuationMetricData {
     /// Description
     pub desc: String,
-    /// Historical high
+    /// Upper bound of the fair-value band (not the period maximum; the series
+    /// can rise above it)
     pub high: Option<String>,
-    /// Historical low
+    /// Lower bound of the fair-value band (not the period minimum; the series
+    /// can fall below it)
     pub low: Option<String>,
     /// Historical median
     pub median: Option<String>,
@@ -902,7 +904,7 @@ pub struct CompanyOverview {
     pub category: String,
     /// Fiscal year end
     pub year_end: String,
-    /// Number of employees
+    /// Number of employees (returned as a string by the API, e.g. `"10000"`)
     pub employees: String,
     /// Phone number
     pub phone: String,
@@ -1474,6 +1476,31 @@ impl From<FinancialReportKind> for lb::FinancialReportKind {
             FinancialReportKind::BalanceSheet => lb::FinancialReportKind::BalanceSheet,
             FinancialReportKind::CashFlow => lb::FinancialReportKind::CashFlow,
             FinancialReportKind::All => lb::FinancialReportKind::All,
+        }
+    }
+}
+
+/// Financial statement kind
+///
+/// Unlike `FinancialReportKind` there is no `All`: the statements endpoint
+/// needs one specific statement per request.
+#[napi_derive::napi]
+#[derive(Debug, Clone, Copy)]
+pub enum FinancialStatementKind {
+    /// Income statement
+    IncomeStatement,
+    /// Balance sheet
+    BalanceSheet,
+    /// Cash flow statement
+    CashFlow,
+}
+
+impl From<FinancialStatementKind> for lb::FinancialStatementKind {
+    fn from(v: FinancialStatementKind) -> Self {
+        match v {
+            FinancialStatementKind::IncomeStatement => lb::FinancialStatementKind::IncomeStatement,
+            FinancialStatementKind::BalanceSheet => lb::FinancialStatementKind::BalanceSheet,
+            FinancialStatementKind::CashFlow => lb::FinancialStatementKind::CashFlow,
         }
     }
 }

@@ -108,6 +108,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get history executions
+     * <p>
+     * {@code side} may be {@code Unknown} on LongPort US accounts.
      * 
      * <pre>
      * {@code
@@ -181,6 +183,9 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get all executions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error; use
+     * {@link #getHistoryExecutions} instead.
      *
      * @param opts Options for this request
      * @return A Future representing the result of the operation
@@ -342,6 +347,49 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Submit a multi-leg option combination order (such as vertical spreads,
+     * straddles, strangles, collars, etc.). All legs are submitted together as
+     * a single strategy order.
+     *
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.trade.*;
+     * import java.math.BigDecimal;
+     *
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
+     *             SubmitMultiLegOrderOptions opts = new SubmitMultiLegOrderOptions(
+     *                     OrderSide.Buy,
+     *                     OrderType.LO,
+     *                     new BigDecimal(1),
+     *                     MultiLegStrategy.VerticalCallSpread,
+     *                     new SubmitMultiLegOrderLeg[] {
+     *                             new SubmitMultiLegOrderLeg("QQQ260731C764000.US", new BigDecimal(1)),
+     *                             new SubmitMultiLegOrderLeg("QQQ260731C767000.US", new BigDecimal(1)),
+     *                     }).setSubmittedPrice(new BigDecimal("1.5"));
+     *             SubmitOrderResponse resp = ctx.submitMultileg(opts).get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     *
+     * @param opts Options for this request, not null
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<SubmitOrderResponse> submitMultileg(SubmitMultiLegOrderOptions opts) throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextSubmitMultileg(raw(), opts, callback);
+        });
+    }
+
+    /**
      * Cancel order
      * 
      * <pre>
@@ -392,6 +440,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get account balance with currency
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -425,6 +475,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get account balance
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -457,6 +509,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get cash flow
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -494,6 +548,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get fund positions
+     * <p>
+     * AP accounts only: US data-center accounts have no fund holdings and get a region error. No US equivalent.
      * 
      * <pre>
      * {@code
@@ -526,6 +582,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get stock positions
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -558,6 +616,8 @@ public class TradeContext implements AutoCloseable {
 
     /**
      * Get margin ratio
+     * <p>
+     * AP accounts only: US data-center accounts get a region error. No US equivalent.
      * 
      * <pre>
      * {@code
@@ -589,7 +649,41 @@ public class TradeContext implements AutoCloseable {
     }
 
     /**
+     * Get the risk assessment (suitability questionnaire) result of the current
+     * member
+     * 
+     * <pre>
+     * {@code
+     * import com.longport.*;
+     * import com.longport.trade.*;
+     * 
+     * class Main {
+     *     public static void main(String[] args) throws Exception {
+     *         OAuth oauth = new OAuthBuilder("your-client-id")
+     *             .build(url -> System.out.println("Visit: " + url)).get();
+     *         try (Config config = Config.fromOAuth(oauth); TradeContext ctx = TradeContext.create(config)) {
+     *             RiskAssessment resp = ctx.getRiskAssessment().get();
+     *             System.out.println(resp);
+     *         }
+     *     }
+     * }
+     * }
+     * </pre>
+     * 
+     * @return A Future representing the result of the operation
+     * @throws OpenApiException If an error occurs
+     */
+    public synchronized CompletableFuture<RiskAssessment> getRiskAssessment()
+            throws OpenApiException {
+        return AsyncCallback.executeTask((callback) -> {
+            SdkNative.tradeContextRiskAssessment(raw(), callback);
+        });
+    }
+
+    /**
      * Get order detail
+     * <p>
+     * AP accounts only: US data-center accounts get a region error.
      * 
      * <pre>
      * {@code
@@ -648,5 +742,15 @@ public class TradeContext implements AutoCloseable {
         return AsyncCallback.executeTask((callback) -> {
             SdkNative.tradeContextEstimateMaxPurchaseQuantity(raw(), opts, callback);
         });
+    }
+
+    /**
+     * Set grid trading order changed event callback. After receiving a grid order
+     * changed event, it will call back to this handler.
+     *
+     * @param handler A grid order changed handler
+     */
+    public void setOnGridOrderChange(GridOrderChangedHandler handler) {
+        SdkNative.tradeContextSetOnGridOrderChanged(raw(), handler);
     }
 }

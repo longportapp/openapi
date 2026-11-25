@@ -300,8 +300,8 @@ where
             .and_then(|value| value.parse().ok())
             .unwrap_or_else(Timestamp::now);
 
-        // Resolve app_key, access_token, optional app_secret, and the data-center
-        // region from the auth config.
+        // Resolve app_key, access_token, optional app_secret, and the
+        // data-center region from the auth config.
         let (app_key, access_token, app_secret, dc_region) = match &config.auth {
             AuthConfig::ApiKey {
                 app_key,
@@ -314,10 +314,7 @@ where
                 DcRegion::from_credentials(&[app_key, access_token, app_secret]),
             ),
             AuthConfig::OAuth(oauth) => {
-                let token = oauth
-                    .access_token()
-                    .await
-                    .map_err(|e| HttpClientError::OAuth(e.to_string()))?;
+                let token = oauth.access_token().await.map_err(HttpClientError::OAuth)?;
                 // Derive DC region from the token prefix (us_→US, others→AP).
                 // The token is sent as-is (including any prefix); the gateway
                 // accepts the full token and routes via the x-dc-region header.
@@ -543,7 +540,8 @@ where
         let status = resp.status();
 
         if status != StatusCode::OK {
-            // Error responses are still a one-shot JSON body ({code, message}), not SSE.
+            // Error responses are still a one-shot JSON body ({code, message}),
+            // not SSE.
             let trace_id = resp
                 .headers()
                 .get("x-trace-id")

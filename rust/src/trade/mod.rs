@@ -8,13 +8,13 @@ mod requests;
 mod types;
 
 pub use context::{EstimateMaxPurchaseQuantityResponse, SubmitOrderResponse, TradeContext};
-pub use push_types::{PushEvent, PushOrderChanged, TopicType};
+pub use push_types::{PushEvent, PushGridOrderChanged, PushOrderChanged, TopicType};
 pub use requests::{
     CancelOrderOptions, EstimateMaxPurchaseQuantityOptions, GetAllExecutionsOptions,
     GetCashFlowOptions, GetFundPositionsOptions, GetHistoryExecutionsOptions,
     GetHistoryOrdersOptions, GetOrderDetailOptions, GetStockPositionsOptions,
     GetTodayExecutionsOptions, GetTodayOrdersOptions, ReplaceAttachedParams, ReplaceOrderOptions,
-    SubmitAttachedParams, SubmitOrderOptions,
+    SubmitAttachedParams, SubmitMultiLegOrderLeg, SubmitMultiLegOrderOptions, SubmitOrderOptions,
 };
 pub use types::{
     AccountBalance,
@@ -27,6 +27,7 @@ pub use types::{
     CashInfo,
     ChargeCategoryCode,
     CommissionFreeStatus,
+    ContractDirection,
     DeductionStatus,
     Execution,
     FrozenTransactionFee,
@@ -34,9 +35,15 @@ pub use types::{
     FundPositionChannel,
     FundPositionsResponse,
     // US-market types
+    GetUSAvailableHoldingOptions,
     GetUSHistoryOrders,
     GetUSRealizedPLOptions,
+    GetUSTransactionHistoryOptions,
     MarginRatio,
+    MultiLegInfo,
+    MultiLegOrderLeg,
+    MultiLegPosition,
+    MultiLegStrategy,
     Order,
     OrderChargeDetail,
     OrderChargeFee,
@@ -50,6 +57,7 @@ pub use types::{
     OutsideRTH,
     QueryUSOrdersOptions,
     QueryUSOrdersResponse,
+    RiskAssessment,
     StockPosition,
     StockPositionChannel,
     StockPositionsResponse,
@@ -58,11 +66,18 @@ pub use types::{
     TriggerStatus,
     USAssetOverview,
     USAttachedOrder,
+    USAvailableHolding,
     USButtonControl,
+    USBuyLimitInfo,
+    USCashAndBuyPower,
+    USCashDetail,
     USCashEntry,
     USChargeDetail,
     USChargeItem,
     USCryptoEntry,
+    USExchangeRate,
+    USExchangeRates,
+    USMarginStatus,
     USOrderDetail,
     USOrderDetailResponse,
     USOrderHistory,
@@ -70,4 +85,6 @@ pub use types::{
     USRealizedPLEntry,
     USRealizedPLMetric,
     USStockEntry,
+    USTransaction,
+    USTransactionHistory,
 };

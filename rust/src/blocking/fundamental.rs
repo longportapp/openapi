@@ -3,7 +3,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc;
 
 use crate::{
-    Config, Result,
+    Config, Market, Result,
     blocking::runtime::BlockingRuntime,
     fundamental::{FundamentalContext, types::*},
 };
@@ -174,11 +174,12 @@ impl FundamentalContextSync {
             .call(move |ctx| async move { ctx.buyback(symbol).await })
     }
 
-    /// Get stock ratings
-    pub fn ratings(&self, symbol: impl Into<String> + Send + 'static) -> Result<StockRatings> {
-        self.rt
-            .call(move |ctx| async move { ctx.ratings(symbol).await })
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings
+    // pub fn ratings(&self, symbol: impl Into<String> + Send + 'static) ->
+    // Result<StockRatings> {     self.rt
+    //         .call(move |ctx| async move { ctx.ratings(symbol).await })
+    // }
 
     /// Get latest business segment breakdown
     pub fn business_segments(
@@ -213,9 +214,9 @@ impl FundamentalContextSync {
     /// Get industry rank for a market
     pub fn industry_rank(
         &self,
-        market: impl Into<String> + Send + 'static,
-        indicator: impl Into<String> + Send + 'static,
-        sort_type: impl Into<String> + Send + 'static,
+        market: Market,
+        indicator: IndustryRankIndicator,
+        sort_type: IndustryRankSortType,
         limit: u32,
     ) -> Result<IndustryRankResponse> {
         self.rt.call(move |ctx| async move {
@@ -349,7 +350,8 @@ impl FundamentalContextSync {
         })
     }
 
-    // ── US-market blocking wrappers ───────────────────────────────────────────
+    // ── US-market blocking wrappers
+    // ───────────────────────────────────────────
 
     /// Get US company overview (blocking)
     pub fn us_company_overview(
@@ -383,7 +385,7 @@ impl FundamentalContextSync {
     pub fn us_financial_statement(
         &self,
         symbol: impl Into<String> + Send + 'static,
-        kind: impl Into<String> + Send + 'static,
+        kind: FinancialStatementKind,
         report: impl Into<String> + Send + 'static,
     ) -> Result<USFinancialStatement> {
         self.rt

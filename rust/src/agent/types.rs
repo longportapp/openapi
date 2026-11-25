@@ -1044,9 +1044,9 @@ mod tests {
 
     #[test]
     fn workflow_finished_tolerates_null_outputs() {
-        // A resumed/continued conversation can send `"outputs": null`; that must
-        // deserialize to the default rather than erroring, otherwise the whole
-        // event stream fails mid-turn.
+        // A resumed/continued conversation can send `"outputs": null`; that
+        // must deserialize to the default rather than erroring,
+        // otherwise the whole event stream fails mid-turn.
         let payload: WorkflowFinishedPayload =
             serde_json::from_str(r#"{"status":"succeeded","outputs":null}"#).unwrap();
         assert!(payload.outputs.answer.is_none());
@@ -1055,6 +1055,23 @@ mod tests {
         let payload: WorkflowFinishedPayload =
             serde_json::from_str(r#"{"status":"succeeded"}"#).unwrap();
         assert!(payload.outputs.answer.is_none());
+    }
+
+    #[test]
+    fn streamed_vec_fields_tolerate_null_sequences() {
+        // The server can send an explicit `null` for list-typed fields; that
+        // must deserialize to an empty list, not error with
+        // "invalid type: null, expected a sequence" and abort the stream.
+        let payload: WorkflowFinishedPayload =
+            serde_json::from_str(r#"{"status":"succeeded","process_data":null}"#).unwrap();
+        assert!(payload.process_data.is_empty());
+
+        let payload: NodeToolUseStartedPayload =
+            serde_json::from_str(r#"{"tip_chips":null}"#).unwrap();
+        assert!(payload.tip_chips.is_empty());
+
+        let payload: SubagentStartedPayload = serde_json::from_str(r#"{"tools":null}"#).unwrap();
+        assert!(payload.tools.is_empty());
     }
 
     // The `data` payload of the "Run succeeded" example from

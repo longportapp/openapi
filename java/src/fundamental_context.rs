@@ -4,7 +4,7 @@ use jni::{
     JNIEnv,
     objects::{JClass, JObject},
 };
-use longport::{Config, FundamentalContext, fundamental::types::*};
+use longport::{Config, FundamentalContext, Market, fundamental::types::*};
 
 use crate::{
     async_util,
@@ -76,9 +76,9 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetI
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let market: String = get_field(env, &opts, "market")?;
-        let indicator: String = get_field(env, &opts, "indicator")?;
-        let sort_type: String = get_field(env, &opts, "sortType")?;
+        let market: Market = get_field(env, &opts, "market")?;
+        let indicator: IndustryRankIndicator = get_field(env, &opts, "indicator")?;
+        let sort_type: IndustryRankSortType = get_field(env, &opts, "sortType")?;
         let limit: i32 = get_field(env, &opts, "limit")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
@@ -131,7 +131,8 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetB
         let __owned_ctx = context.ctx.clone();
         let symbol: String = get_field(env, &opts, "symbol")?;
         let report: Option<String> = get_field(env, &opts, "report")?;
-        // The core API takes `Option<&'static str>`; leak the short report code.
+        // The core API takes `Option<&'static str>`; leak the short report
+        // code.
         let report: Option<&'static str> = report.map(|s| &*s.leak());
         let cate: Option<String> = get_field(env, &opts, "cate")?;
         async_util::execute(env, callback, async move {
@@ -297,25 +298,26 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetB
     })
 }
 
-#[unsafe(no_mangle)]
-pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextGetRatings(
-    mut env: JNIEnv,
-    _class: JClass,
-    context: i64,
-    symbol: JObject,
-    callback: JObject,
-) {
-    jni_result(&mut env, (), |env| {
-        let context = &*(context as *const ContextObj);
-        let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        async_util::execute(env, callback, async move {
-            let resp = __owned_ctx.ratings(symbol).await?;
-            Ok(resp)
-        })?;
-        Ok(())
-    })
-}
+// TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+// #[unsafe(no_mangle)]
+// pub unsafe extern "system" fn
+// Java_com_longport_SdkNative_fundamentalContextGetRatings(     mut env:
+// JNIEnv,     _class: JClass,
+//     context: i64,
+//     symbol: JObject,
+//     callback: JObject,
+// ) {
+//     jni_result(&mut env, (), |env| {
+//         let context = &*(context as *const ContextObj);
+//         let __owned_ctx = context.ctx.clone();
+//         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+//         async_util::execute(env, callback, async move {
+//             let resp = __owned_ctx.ratings(symbol).await?;
+//             Ok(resp)
+//         })?;
+//         Ok(())
+//     })
+// }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextShareholderTop(
@@ -342,14 +344,14 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextShar
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    object_id: i64,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let object_id: i64 = get_field(env, &opts, "objectId")?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx.shareholder_detail(symbol, object_id).await?;
             Ok(resp)
@@ -363,22 +365,17 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextValu
     mut env: JNIEnv,
     _class: JClass,
     context: i64,
-    symbol: JObject,
-    currency: JObject,
-    comparison_symbols: JObject,
+    opts: JObject,
     callback: JObject,
 ) {
     jni_result(&mut env, (), |env| {
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
-        let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        let currency: String = FromJValue::from_jvalue(env, currency.into())?;
-        let comparison_syms: Option<Vec<String>> = if comparison_symbols.is_null() {
-            None
-        } else {
-            let arr: ObjectArray<String> = FromJValue::from_jvalue(env, comparison_symbols.into())?;
-            Some(arr.0)
-        };
+        let symbol: String = get_field(env, &opts, "symbol")?;
+        let currency: String = get_field(env, &opts, "currency")?;
+        let comparison_syms: Option<Vec<String>> =
+            get_field::<_, _, Option<ObjectArray<String>>>(env, &opts, "comparisonSymbols")?
+                .map(|arr| arr.0);
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx
                 .valuation_comparison(symbol, currency, comparison_syms)
@@ -554,7 +551,7 @@ pub unsafe extern "system" fn Java_com_longport_SdkNative_fundamentalContextUsFi
         let context = &*(context as *const ContextObj);
         let __owned_ctx = context.ctx.clone();
         let symbol: String = FromJValue::from_jvalue(env, symbol.into())?;
-        let kind: String = FromJValue::from_jvalue(env, kind.into())?;
+        let kind: FinancialStatementKind = FromJValue::from_jvalue(env, kind.into())?;
         let report: String = FromJValue::from_jvalue(env, report.into())?;
         async_util::execute(env, callback, async move {
             let resp = __owned_ctx

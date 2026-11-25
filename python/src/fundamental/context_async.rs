@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use longport::FundamentalContext;
 use pyo3::{prelude::*, types::PyType};
-// needed for us_financial_overview / us_key_financial_metrics / us_analyst_consensus
+// needed for us_financial_overview / us_key_financial_metrics /
+// us_analyst_consensus
 #[allow(unused_imports)]
 use pythonize;
 
@@ -246,16 +247,17 @@ impl AsyncFundamentalContext {
         .map(|b| b.unbind())
     }
 
-    /// Get stock ratings. Returns awaitable.
-    fn ratings(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
-        let ctx = self.ctx.clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
-            Ok(StockRatings::from(
-                ctx.ratings(symbol).await.map_err(ErrorNewType)?,
-            ))
-        })
-        .map(|b| b.unbind())
-    }
+    // TODO: temporarily disabled — endpoint not yet open (/v1/quote/ratings)
+    // /// Get stock ratings. Returns awaitable.
+    // fn ratings(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>>
+    // {     let ctx = self.ctx.clone();
+    //     pyo3_async_runtimes::tokio::future_into_py(py, async move {
+    //         Ok(StockRatings::from(
+    //             ctx.ratings(symbol).await.map_err(ErrorNewType)?,
+    //         ))
+    //     })
+    //     .map(|b| b.unbind())
+    // }
 
     /// Get ranked list of top shareholders. Returns awaitable.
     fn shareholder_top(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
@@ -362,7 +364,8 @@ impl AsyncFundamentalContext {
         .map(|b| b.unbind())
     }
 
-    // ── US-market async methods ───────────────────────────────────────────────
+    // ── US-market async methods
+    // ───────────────────────────────────────────────
 
     /// Get US company overview. US token required. Returns awaitable.
     fn us_company_overview(&self, py: Python<'_>, symbol: String) -> PyResult<Py<PyAny>> {
@@ -413,13 +416,13 @@ impl AsyncFundamentalContext {
         &self,
         py: Python<'_>,
         symbol: String,
-        kind: String,
+        kind: FinancialStatementKind,
         report: String,
     ) -> PyResult<Py<PyAny>> {
         let ctx = self.ctx.clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             Ok(USFinancialStatement::from(
-                ctx.us_financial_statement(symbol, kind, report)
+                ctx.us_financial_statement(symbol, kind.into(), report)
                     .await
                     .map_err(ErrorNewType)?,
             ))

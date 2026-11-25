@@ -2,7 +2,7 @@ use std::os::raw::c_char;
 
 use longport::alert::{AlertItem, AlertList, AlertSymbolGroup, AlertValueMap};
 
-use crate::types::{COption, CString, CVec, ToFFI};
+use crate::types::{COption, CString, CVec, ToFFI, slice_from_raw_parts};
 
 /// Trigger value of a price alert (exactly one field is populated).
 #[repr(C)]
@@ -110,7 +110,7 @@ impl CAlertItem {
     /// `state` pointer must point to at least `num_state` valid `i32` values.
     pub unsafe fn to_alert_item(&self) -> longport::alert::AlertItem {
         use crate::types::cstr_to_rust;
-        let state = std::slice::from_raw_parts(self.state, self.num_state).to_vec();
+        let state = slice_from_raw_parts(self.state, self.num_state).to_vec();
         longport::alert::AlertItem {
             id: cstr_to_rust(self.id),
             indicator_id: cstr_to_rust(self.indicator_id),

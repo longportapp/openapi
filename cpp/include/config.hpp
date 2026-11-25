@@ -32,7 +32,8 @@ public:
   /// Optional environment variables are read automatically:
   /// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
   /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_QUOTE_TRANSPORT`,
+  /// `LONGPORT_PRINT_QUOTE_PACKAGES`,
   /// `LONGPORT_LOG_PATH`.  Use the chainable `set_*` methods to override any
   /// of these values.
   ///
@@ -48,7 +49,8 @@ public:
   /// Variables: `LONGPORT_APP_KEY`, `LONGPORT_APP_SECRET`,
   /// `LONGPORT_ACCESS_TOKEN`, `LONGPORT_HTTP_URL`, `LONGPORT_QUOTE_WS_URL`,
   /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_ENABLE_OVERNIGHT`,
-  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_QUOTE_TRANSPORT`,
+  /// `LONGPORT_PRINT_QUOTE_PACKAGES`,
   /// `LONGPORT_LOG_PATH`
   static Config from_apikey_env(Status& status);
 
@@ -57,7 +59,8 @@ public:
   /// Optional environment variables are read automatically:
   /// `LONGPORT_HTTP_URL`, `LONGPORT_LANGUAGE`, `LONGPORT_QUOTE_WS_URL`,
   /// `LONGPORT_TRADE_WS_URL`, `LONGPORT_ENABLE_OVERNIGHT`,
-  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_PRINT_QUOTE_PACKAGES`,
+  /// `LONGPORT_PUSH_CANDLESTICK_MODE`, `LONGPORT_QUOTE_TRANSPORT`,
+  /// `LONGPORT_PRINT_QUOTE_PACKAGES`,
   /// `LONGPORT_LOG_PATH`.  Use the chainable `set_*` methods to override any
   /// of these values.
   ///
@@ -95,6 +98,12 @@ public:
 
   /// Set the push candlestick mode
   Config& set_push_candlestick_mode(PushCandlestickMode mode);
+
+  /// Set the transport used by the quote pull APIs
+  ///
+  /// Default: `QuoteTransport::WebSocket` (or `LONGPORT_QUOTE_TRANSPORT` =
+  /// `ws` / `http`)
+  Config& set_quote_transport(QuoteTransport transport);
 
   /// Disable printing of quote packages on connection
   Config& disable_print_quote_packages();

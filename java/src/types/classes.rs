@@ -270,9 +270,17 @@ impl_java_class!(
 );
 
 impl_java_class!(
-    "com/longport/quote/StrikePriceInfo",
-    longport::quote::StrikePriceInfo,
-    [price, call_symbol, put_symbol, standard]
+    "com/longport/quote/OptionChainContract",
+    longport::quote::OptionChainContract,
+    [
+        symbol,
+        expiry_date,
+        strike_price,
+        direction,
+        option_type,
+        standard_attr,
+        days_to_expiry
+    ]
 );
 
 impl_java_class!(
@@ -609,7 +617,35 @@ impl_java_class!(
         reviewed,
         activate_order_type,
         activate_rth,
-        submit_price
+        submit_price,
+        limit_depth_level
+    ]
+);
+
+impl_java_class!(
+    "com/longport/trade/MultiLegOrderLeg",
+    longport::trade::MultiLegOrderLeg,
+    [
+        symbol,
+        side,
+        position,
+        ratio_quantity,
+        strike_price,
+        expire_date,
+        contract_direction
+    ]
+);
+
+impl_java_class!(
+    "com/longport/trade/MultiLegInfo",
+    longport::trade::MultiLegInfo,
+    [
+        strategy,
+        strategy_name,
+        multileg_id,
+        code,
+        #[java(objarray)]
+        legs
     ]
 );
 
@@ -641,14 +677,23 @@ impl_java_class!(
         account_no,
         last_share,
         last_price,
-        remark
+        remark,
+        multi_leg
     ]
 );
 
 impl_java_class!(
     "com/longport/trade/Execution",
     longport::trade::Execution,
-    [order_id, trade_id, symbol, trade_done_at, quantity, price]
+    [
+        order_id,
+        trade_id,
+        symbol,
+        trade_done_at,
+        quantity,
+        price,
+        side
+    ]
 );
 
 impl_java_class!(
@@ -696,8 +741,10 @@ impl_java_class!(
         trigger_count,
         monitor_price,
         remark,
+        delayed_until,
         #[java(objarray)]
-        attached_orders
+        attached_orders,
+        multi_leg
     ]
 );
 
@@ -784,7 +831,7 @@ impl_java_class!(
     "com/longport/trade/FundPosition",
     longport::trade::FundPosition,
     [
-        symbol,
+        counter_id,
         current_net_asset_value,
         net_asset_value_day,
         symbol_name,
@@ -894,6 +941,54 @@ impl_java_class!(
     [im_factor, mm_factor, fm_factor]
 );
 
+/// JNI-side view of [`longport::trade::RiskAssessment`]: the `approvals` /
+/// `deadlines` maps cross the boundary as JSON text, which the Java class
+/// parses into `Map`s with gson.
+pub(crate) struct RiskAssessment {
+    pub(crate) risk: String,
+    pub(crate) pi: i32,
+    pub(crate) approvals: serde_json::Value,
+    pub(crate) re_authentication: String,
+    pub(crate) pi_end_at: i64,
+    pub(crate) deadlines: serde_json::Value,
+    pub(crate) risk_assessment_at: String,
+    pub(crate) score: i32,
+    pub(crate) strategy_risk_levels: Vec<String>,
+}
+
+impl From<longport::trade::RiskAssessment> for RiskAssessment {
+    fn from(value: longport::trade::RiskAssessment) -> Self {
+        Self {
+            risk: value.risk,
+            pi: value.pi,
+            approvals: serde_json::to_value(value.approvals).unwrap_or_default(),
+            re_authentication: value.re_authentication,
+            pi_end_at: value.pi_end_at,
+            deadlines: serde_json::to_value(value.deadlines).unwrap_or_default(),
+            risk_assessment_at: value.risk_assessment_at,
+            score: value.score,
+            strategy_risk_levels: value.strategy_risk_levels,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longport/trade/RiskAssessment",
+    RiskAssessment,
+    [
+        risk,
+        pi,
+        approvals,
+        re_authentication,
+        pi_end_at,
+        deadlines,
+        risk_assessment_at,
+        score,
+        #[java(objarray)]
+        strategy_risk_levels
+    ]
+);
+
 impl_java_class!(
     "com/longport/trade/OrderHistoryDetail",
     longport::trade::OrderHistoryDetail,
@@ -963,6 +1058,7 @@ impl_java_class!(
         trigger_count,
         monitor_price,
         remark,
+        delayed_until,
         free_status,
         free_amount,
         free_currency,
@@ -976,7 +1072,8 @@ impl_java_class!(
         history,
         charge_detail,
         #[java(objarray)]
-        attached_orders
+        attached_orders,
+        multi_leg
     ]
 );
 
@@ -984,6 +1081,273 @@ impl_java_class!(
     "com/longport/trade/EstimateMaxPurchaseQuantityResponse",
     longport::trade::EstimateMaxPurchaseQuantityResponse,
     [cash_max_qty, margin_max_qty]
+);
+
+// ── Grid trading types ────────────────────────────────────────────
+
+impl_java_class!(
+    "com/longport/grid/SubmitGridOrderResponse",
+    longport::grid::SubmitGridOrderResponse,
+    [order_id]
+);
+
+impl_java_class!(
+    "com/longport/grid/GridOrder",
+    longport::grid::GridOrder,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        market,
+        status,
+        grid_status,
+        submitted_base_price,
+        current_base_price,
+        pre_trigger_base_price,
+        post_trigger_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        trigger_sell_order_type,
+        trigger_buy_order_type,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        multiple_trigger,
+        trigger_times,
+        total_buy_quantity,
+        total_sell_quantity,
+        total_profit_balance,
+        settlement_currency,
+        time_in_force,
+        gtd,
+        created_at,
+        rth,
+        support_shortsell,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longport/grid/GridOrderSubOrder",
+    longport::grid::GridOrderSubOrder,
+    [
+        id,
+        price,
+        order_type,
+        quantity,
+        executed_qty,
+        action,
+        status,
+        submitted_at,
+        rth
+    ]
+);
+
+impl_java_class!(
+    "com/longport/grid/GridOrderHistory",
+    longport::grid::GridOrderHistory,
+    [history_id, created_at, status, suspend_reason, reason]
+);
+
+impl_java_class!(
+    "com/longport/grid/GridOrderDetail",
+    longport::grid::GridOrderDetail,
+    [
+        order_id,
+        symbol,
+        stock_name,
+        status,
+        grid_status,
+        suspend_reason,
+        sleeping_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_spread_up,
+        trigger_spread_down,
+        trigger_percent_up,
+        trigger_percent_down,
+        pullback_percent,
+        pullback_spread,
+        rebound_percent,
+        rebound_spread,
+        multiple_trigger,
+        time_in_force,
+        trigger_quantity,
+        trigger_sell_quantity,
+        trigger_buy_quantity,
+        upper_limit_quantity,
+        lower_limit_quantity,
+        upper_limit_event,
+        lower_limit_event,
+        trigger_sell_depth,
+        trigger_buy_depth,
+        created_at,
+        updated_at,
+        settlement_currency,
+        expire_time,
+        gtd,
+        #[java(objarray)]
+        grid_sub_orders,
+        sub_has_more,
+        #[java(objarray)]
+        grid_order_history,
+        history_has_more,
+        support_shortsell,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+impl_java_class!(
+    "com/longport/grid/TriggerOrder",
+    longport::grid::TriggerOrder,
+    [
+        id,
+        status,
+        name,
+        symbol,
+        price,
+        quantity,
+        executed_price,
+        executed_qty,
+        submitted_at,
+        action,
+        order_type,
+        trigger_price,
+        msg,
+        currency,
+        last_done,
+        updated_at,
+        time_in_force,
+        gtd,
+        trigger_at,
+        trigger_status
+    ]
+);
+
+impl_java_class!(
+    "com/longport/grid/GridBidSize",
+    longport::grid::GridBidSize,
+    [str_proceed, end_proceed, bid_size]
+);
+
+impl_java_class!(
+    "com/longport/grid/GridChannelInfo",
+    longport::grid::GridChannelInfo,
+    [
+        strategy_granted,
+        support_rth,
+        currency,
+        #[java(objarray)]
+        settlement_currency
+    ]
+);
+
+impl_java_class!(
+    "com/longport/grid/GridSymbolInfo",
+    longport::grid::GridSymbolInfo,
+    [
+        name,
+        last_done,
+        lot_size,
+        buy_lot_size,
+        sell_lot_size,
+        #[java(objarray)]
+        bid_sizes,
+        channel_info
+    ]
+);
+
+impl_java_class!(
+    "com/longport/trade/PushGridOrderChanged",
+    longport::trade::PushGridOrderChanged,
+    [
+        order_id,
+        status,
+        symbol,
+        suspend_reason,
+        submitted_base_price,
+        current_base_price,
+        upper_limit_price,
+        lower_limit_price,
+        trigger_price_type,
+        trigger_quantity,
+        settlement_currency,
+        time_in_force,
+        rth,
+        grid_order_type_up,
+        grid_order_type_down
+    ]
+);
+
+// Mirror the grid list / trigger-history responses with binding-side structs so
+// the `has_more` paging flag can be flattened alongside the item array.
+pub(crate) struct GridOrdersResponse {
+    grid_order: Vec<longport::grid::GridOrder>,
+    has_more: bool,
+}
+
+impl GridOrdersResponse {
+    pub(crate) fn new(grid_order: Vec<longport::grid::GridOrder>, has_more: bool) -> Self {
+        Self {
+            grid_order,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longport/grid/GridOrdersResponse",
+    GridOrdersResponse,
+    [
+        #[java(objarray)]
+        grid_order,
+        has_more
+    ]
+);
+
+pub(crate) struct GridTriggerHistoryResponse {
+    trigger_orders: Vec<longport::grid::TriggerOrder>,
+    has_more: bool,
+}
+
+impl GridTriggerHistoryResponse {
+    pub(crate) fn new(trigger_orders: Vec<longport::grid::TriggerOrder>, has_more: bool) -> Self {
+        Self {
+            trigger_orders,
+            has_more,
+        }
+    }
+}
+
+impl_java_class!(
+    "com/longport/grid/GridTriggerHistoryResponse",
+    GridTriggerHistoryResponse,
+    [
+        #[java(objarray)]
+        trigger_orders,
+        has_more
+    ]
 );
 
 impl_java_class!(
@@ -3517,3 +3881,623 @@ impl crate::types::IntoJValue for longport::agent::ConversationStreamEvent {
         }
     }
 }
+
+// ── Fund (mutual fund) types ───────────────────────────────────────
+
+impl_java_class!(
+    "com/longport/fund/FundNavValue",
+    longport::fund::FundNavValue,
+    [
+        change,
+        change_percent,
+        change_percent_format,
+        counter_id,
+        counter_name,
+        currency,
+        date_format,
+        isin,
+        last_update_time,
+        value,
+        value_format
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPerformancePoint",
+    longport::fund::FundPerformancePoint,
+    [date, last_done]
+);
+
+impl_java_class!(
+    "com/longport/fund/HotFund",
+    longport::fund::HotFund,
+    [
+        asset_class,
+        asset_class_name,
+        counter_id,
+        currency,
+        earning_rate,
+        #[java(objarray)]
+        fund_performances,
+        name,
+        purchase_amount,
+        recommendation_text,
+        risk_level,
+        risk_level_name,
+        time_interval
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundBrief",
+    longport::fund::FundBrief,
+    [
+        asset_class,
+        asset_class_name,
+        code,
+        counter_id,
+        currency,
+        description,
+        earning_rate,
+        holding,
+        isin,
+        name,
+        product,
+        purchase_amount,
+        recommendation_text,
+        risk_level,
+        risk_level_name,
+        time_interval,
+        unit_value
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundFilters",
+    longport::fund::FundFilters,
+    [
+        #[java(objarray)]
+        asset_class,
+        #[java(objarray)]
+        company,
+        #[java(objarray)]
+        currency,
+        #[java(objarray)]
+        industry_category_name,
+        #[java(objarray)]
+        risk_level
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundAssetAllocationItem",
+    longport::fund::FundAssetAllocationItem,
+    [code, counter_id, name, position_ratio]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundAssetAllocation",
+    longport::fund::FundAssetAllocation,
+    [
+        asset_type,
+        #[java(objarray)]
+        lists,
+        report_date
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundDetail",
+    longport::fund::FundDetail,
+    [
+        additional_purchase_amount,
+        affirm_day,
+        amount_affirm_day,
+        asset_allocation,
+        asset_class,
+        asset_class_name,
+        bill_purchase_rate,
+        channel,
+        close_period,
+        code,
+        currency,
+        cut_off_time,
+        derivatives,
+        done_day,
+        excess_return_fee,
+        gst_rate,
+        introduce,
+        is_cash_plus,
+        is_complex,
+        is_new_cash_plus,
+        is_yinghebao,
+        isin,
+        manage_rate,
+        manager,
+        min_hold_cash,
+        min_hold_share,
+        min_sell_share,
+        month_raise_day,
+        name,
+        nav_deadline,
+        no_load,
+        open_date,
+        open_period,
+        product,
+        product_information_locals,
+        profile,
+        purchasable,
+        purchase_affirm_day,
+        purchase_amount,
+        purchase_rate,
+        rating,
+        redeemable,
+        redemption_advance_day,
+        redemption_amount,
+        redemption_close_period_shows,
+        redemption_done_day,
+        redemption_open_day_shows,
+        risk_level,
+        risk_level_name,
+        verify_status,
+        virtual_currency,
+        year_to_date_yield,
+        ytd_yield_type
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundAnalysis",
+    longport::fund::FundAnalysis,
+    [
+        actual_period,
+        cost_level,
+        return_ability,
+        risk_ability,
+        updated_at,
+        value_for_money,
+        visible
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundAnalysisDetail",
+    longport::fund::FundAnalysisDetail,
+    [
+        actual_period,
+        #[java(priarray)]
+        available_periods,
+        cost_level,
+        return_ability,
+        risk_ability,
+        updated_at,
+        value_for_money,
+        visible
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundTrendContrast",
+    longport::fund::FundTrendContrast,
+    [
+        benchmark_name,
+        #[java(objarray)]
+        performances
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundTrend",
+    longport::fund::FundTrend,
+    [
+        actual_period,
+        #[java(priarray)]
+        available_periods,
+        #[java(objarray)]
+        category_average_performances,
+        contrast_performances,
+        #[java(objarray)]
+        fund_performances
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundNamedContrast",
+    longport::fund::FundNamedContrast,
+    [
+        name,
+        #[java(objarray)]
+        performances
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPerformanceComparison",
+    longport::fund::FundPerformanceComparison,
+    [
+        #[java(objarray)]
+        contrast_performances,
+        #[java(objarray)]
+        fund_performances
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundAnnualReturn",
+    longport::fund::FundAnnualReturn,
+    [change_percent, year]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundQuarterlyReturn",
+    longport::fund::FundQuarterlyReturn,
+    [change_percent, quarter, year]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPerformance",
+    longport::fund::FundPerformance,
+    [
+        annualized_return_five,
+        annualized_return_one,
+        annualized_return_ten,
+        annualized_return_three,
+        annualized_return_two,
+        counter_id,
+        fund_name,
+        performance_rank_five_years,
+        performance_rank_one_day,
+        performance_rank_one_month,
+        performance_rank_one_week,
+        performance_rank_one_year,
+        performance_rank_six_months,
+        performance_rank_ten_years,
+        performance_rank_three_months,
+        performance_rank_three_years,
+        performance_rank_two_years,
+        performance_rank_ytd,
+        performance_return_five_years,
+        performance_return_one_day,
+        performance_return_one_month,
+        performance_return_one_week,
+        performance_return_one_year,
+        performance_return_six_months,
+        performance_return_ten_years,
+        performance_return_three_months,
+        performance_return_three_years,
+        performance_return_two_years,
+        performance_return_ytd,
+        performance_total_five_years,
+        performance_total_one_day,
+        performance_total_one_month,
+        performance_total_one_week,
+        performance_total_one_year,
+        performance_total_six_months,
+        performance_total_ten_years,
+        performance_total_three_months,
+        performance_total_three_years,
+        performance_total_two_years,
+        performance_total_ytd,
+        seven_days_annualized,
+        ten_thousand_price,
+        update_time
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundHolding",
+    longport::fund::FundHolding,
+    [
+        bond_type,
+        bond_type_name,
+        country_name,
+        holding_type,
+        industry_name,
+        market_value,
+        maturity_date,
+        name,
+        share_change,
+        share_change_percent,
+        shares,
+        weighting
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundHoldings",
+    longport::fund::FundHoldings,
+    [
+        #[java(objarray)]
+        holdings,
+        report_date,
+        weighting
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundStockHolding",
+    longport::fund::FundStockHolding,
+    [
+        code,
+        counter_id,
+        currency,
+        name,
+        position_ratio,
+        report_date
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPosition",
+    longport::fund::FundPosition,
+    [
+        amount,
+        counter_id,
+        currency,
+        freeze_units,
+        holding_profit,
+        holding_units,
+        name,
+        recent_profit,
+        recent_trading_day,
+        sum_recent_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPositions",
+    longport::fund::FundPositions,
+    [
+        account_channel,
+        #[java(objarray)]
+        list,
+        pending_buy_orders,
+        recent_trading_day,
+        sold_pending_credit_orders
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundDatedValue",
+    longport::fund::FundDatedValue,
+    [date, value]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundUnitValue",
+    longport::fund::FundUnitValue,
+    [date, day_increase_rate, total_value, unit_value]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPositionDetailValues",
+    longport::fund::FundPositionDetailValues,
+    [
+        amount,
+        currency,
+        holding_cost,
+        holding_profit,
+        holding_profit_rate,
+        holding_units,
+        holding_value,
+        pending_buy_value,
+        pending_sell_value,
+        profit_amount_accum_td,
+        profit_amount_accum_td_rate,
+        recent_profit,
+        recent_tradingday,
+        recent_unit_value,
+        sold_pending_confirm_units
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPositionDetail",
+    longport::fund::FundPositionDetail,
+    [
+        detail_values,
+        #[java(objarray)]
+        sum_profit,
+        #[java(objarray)]
+        ut_value
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPositionPerformance",
+    longport::fund::FundPositionPerformance,
+    [
+        annualized_return_five,
+        annualized_return_one,
+        annualized_return_ten,
+        annualized_return_three,
+        annualized_return_two,
+        counter_id,
+        fund_name,
+        performance_return_five_years,
+        performance_return_one_day,
+        performance_return_one_month,
+        performance_return_one_week,
+        performance_return_one_year,
+        performance_return_six_months,
+        performance_return_ten_years,
+        performance_return_three_months,
+        performance_return_three_years,
+        performance_return_two_years,
+        performance_return_ytd,
+        update_time
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPositionProfits",
+    longport::fund::FundPositionProfits,
+    [
+        currency,
+        #[java(objarray)]
+        history_value,
+        last_update_time,
+        sum_profit
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundPositionNav",
+    longport::fund::FundPositionNav,
+    [
+        change,
+        change_percent,
+        counter_id,
+        counter_name,
+        last_update_time,
+        value
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundDividend",
+    longport::fund::FundDividend,
+    [amount, counter_id, currency, date, div_method, name]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundDividends",
+    longport::fund::FundDividends,
+    [
+        currency,
+        #[java(objarray)]
+        div_cash_infos,
+        lastest_date,
+        total_div_cash
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundOrder",
+    longport::fund::FundOrder,
+    [
+        action,
+        amount,
+        counter_id,
+        created_at,
+        currency,
+        fund_name,
+        id,
+        is_auto,
+        net_worth,
+        product_type,
+        state,
+        state_desc,
+        units
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundOrderKeyword",
+    longport::fund::FundOrderKeyword,
+    [content, group, key, line_strategy, title]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundOrderStage",
+    longport::fund::FundOrderStage,
+    [desc, key, link, link_text, progress, stage]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundOrderInfo",
+    longport::fund::FundOrderInfo,
+    [
+        aaid,
+        account_channel,
+        action,
+        amount,
+        channel,
+        counter_id,
+        created_at,
+        currency,
+        dividend_option,
+        eq_at,
+        fee,
+        fund_name,
+        fund_source,
+        histories,
+        id,
+        message,
+        net_worth,
+        price_at,
+        processed_at,
+        product_type,
+        repurchaseable,
+        sale_proceeds,
+        sales_charge,
+        sales_price,
+        sales_unit,
+        state,
+        state_desc,
+        status,
+        status_ex,
+        t_description,
+        time_partition,
+        total_amount,
+        transaction_at,
+        units,
+        withdraw_at,
+        withdrawable
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundOrderDetail",
+    longport::fund::FundOrderDetail,
+    [
+        #[java(objarray)]
+        keywords,
+        order,
+        #[java(objarray)]
+        stages
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundTransaction",
+    longport::fund::FundTransaction,
+    [
+        amount,
+        category,
+        created_at,
+        currency,
+        description,
+        detail_created_at,
+        detail_type,
+        done_at,
+        quantity_description,
+        redirect_page,
+        redirect_page_v2,
+        ref_no,
+        stock_quantity,
+        tx_type,
+        type_name
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundOrderValidation",
+    longport::fund::FundOrderValidation,
+    [
+        auth_token,
+        eval_address,
+        fund_risk_level,
+        msg,
+        user_pi,
+        user_risk_level
+    ]
+);
+
+impl_java_class!(
+    "com/longport/fund/FundOrderSubmitResponse",
+    longport::fund::FundOrderSubmitResponse,
+    [
+        action, amount, counter_id, created_at, fund_name, id, msg, status, units
+    ]
+);

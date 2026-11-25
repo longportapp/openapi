@@ -9,7 +9,7 @@ use longport_java_macros::impl_java_enum;
 
 use crate::{
     init::DERIVATIVE_TYPE_CLASS,
-    types::{IntoJValue, JSignature},
+    types::{ClassLoader, FromJValue, IntoJValue, JSignature},
 };
 
 impl_java_enum!(
@@ -28,6 +28,12 @@ impl_java_enum!(
     "com/longport/PushCandlestickMode",
     longport::PushCandlestickMode,
     [Realtime, Confirmed]
+);
+
+impl_java_enum!(
+    "com/longport/QuoteTransport",
+    longport::QuoteTransport,
+    [WebSocket, Http]
 );
 
 impl_java_enum!(
@@ -126,6 +132,18 @@ impl_java_enum!(
     "com/longport/quote/OptionDirection",
     longport::quote::OptionDirection,
     [Unknown, Put, Call]
+);
+
+impl_java_enum!(
+    "com/longport/quote/OptionExpiryCycleType",
+    longport::quote::OptionExpiryCycleType,
+    [Unknown, Monthly, Weekly, Quarterly]
+);
+
+impl_java_enum!(
+    "com/longport/quote/OptionStandardAttr",
+    longport::quote::OptionStandardAttr,
+    [Unknown, Normal, Old]
 );
 
 impl_java_enum!(
@@ -277,7 +295,7 @@ impl_java_enum!(
 impl_java_enum!(
     "com/longport/quote/WarrantStatus",
     longport::quote::WarrantStatus,
-    [Suspend, PrepareList, Normal]
+    [Unknown, Suspend, PrepareList, Normal]
 );
 
 impl_java_enum!(
@@ -381,6 +399,7 @@ impl_java_enum!(
         Canceled,
         Expired,
         PartialWithdrawal,
+        DelayedNotReported,
     ]
 );
 
@@ -460,6 +479,35 @@ impl_java_enum!(
 );
 
 impl_java_enum!(
+    "com/longport/trade/MultiLegStrategy",
+    longport::trade::MultiLegStrategy,
+    [
+        Unknown,
+        CoveredCall,
+        CoveredPut,
+        VerticalCallSpread,
+        VerticalPutSpread,
+        Collar,
+        Straddle,
+        Strangle,
+        CalendarCallSpread,
+        CalendarPutSpread
+    ]
+);
+
+impl_java_enum!(
+    "com/longport/trade/MultiLegPosition",
+    longport::trade::MultiLegPosition,
+    [Unknown, Long, Short]
+);
+
+impl_java_enum!(
+    "com/longport/trade/ContractDirection",
+    longport::trade::ContractDirection,
+    [Unknown, Call, Put]
+);
+
+impl_java_enum!(
     "com/longport/alert/AlertCondition",
     longport::alert::types::AlertCondition,
     [PriceRise, PriceFall, PercentRise, PercentFall]
@@ -487,9 +535,38 @@ impl_java_enum!(
     ]
 );
 impl_java_enum!(
+    "com/longport/calendar/CalendarPageDirection",
+    longport::calendar::types::CalendarPageDirection,
+    [Later, Earlier]
+);
+impl_java_enum!(
     "com/longport/fundamental/FinancialReportKind",
     longport::fundamental::types::FinancialReportKind,
     [IncomeStatement, BalanceSheet, CashFlow, All]
+);
+impl_java_enum!(
+    "com/longport/fundamental/FinancialStatementKind",
+    longport::fundamental::types::FinancialStatementKind,
+    [IncomeStatement, BalanceSheet, CashFlow]
+);
+impl_java_enum!(
+    "com/longport/fundamental/IndustryRankIndicator",
+    longport::fundamental::types::IndustryRankIndicator,
+    [
+        LeadingGainer,
+        TodayTrend,
+        Popularity,
+        MarketCap,
+        Revenue,
+        RevenueGrowth,
+        NetProfit,
+        NetProfitGrowth
+    ]
+);
+impl_java_enum!(
+    "com/longport/fundamental/IndustryRankSortType",
+    longport::fundamental::types::IndustryRankSortType,
+    [Single, Multi]
 );
 impl_java_enum!(
     "com/longport/fundamental/FinancialReportPeriod",
@@ -535,3 +612,236 @@ impl_java_enum!(
     longport::agent::ConversationStatus,
     [Succeeded, Interrupted, Failed, Stopped]
 );
+
+// `TriggerPriceType` carries a catch-all `Unknown(i32)` data variant that the
+// unit-variant `impl_java_enum!` macro cannot express, so bridge it by hand.
+// The Java side is a plain enum, so an unknown wire value maps to `Unknown` and
+// back to `Unknown(0)`.
+#[allow(non_upper_case_globals)]
+static com_longport_grid_TriggerPriceType: std::sync::OnceLock<jni::objects::GlobalRef> =
+    std::sync::OnceLock::new();
+
+impl ClassLoader for longport::grid::TriggerPriceType {
+    fn init(env: &mut JNIEnv) {
+        let cls = jni::descriptors::Desc::<jni::objects::JClass>::lookup(
+            "com/longport/grid/TriggerPriceType",
+            env,
+        )
+        .expect("com/longport/grid/TriggerPriceType");
+        let _ = com_longport_grid_TriggerPriceType.set(env.new_global_ref(&*cls).unwrap());
+    }
+
+    fn class_ref() -> jni::objects::GlobalRef {
+        com_longport_grid_TriggerPriceType.get().cloned().unwrap()
+    }
+}
+
+impl JSignature for longport::grid::TriggerPriceType {
+    #[inline]
+    fn signature() -> Cow<'static, str> {
+        "Lcom/longport/grid/TriggerPriceType;".into()
+    }
+}
+
+impl FromJValue for longport::grid::TriggerPriceType {
+    fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
+        use longport::grid::TriggerPriceType;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let value = value.l()?;
+        if value.is_null() {
+            crate::error::throw_illegal_argument(
+                env,
+                "argument of enum type com/longport/grid/TriggerPriceType must not be null",
+            );
+            return Err(jni::errors::Error::JavaException);
+        }
+        for (name, variant) in [
+            ("Spread", TriggerPriceType::Spread),
+            ("Percent", TriggerPriceType::Percent),
+            ("Unknown", TriggerPriceType::Unknown(0)),
+        ] {
+            let r = env
+                .get_static_field(&cls, name, "Lcom/longport/grid/TriggerPriceType;")?
+                .l()?;
+            if env.is_same_object(&value, r)? {
+                return Ok(variant);
+            }
+        }
+        crate::error::throw_illegal_argument(
+            env,
+            "unrecognized enum value for com/longport/grid/TriggerPriceType",
+        );
+        Err(jni::errors::Error::JavaException)
+    }
+}
+
+impl IntoJValue for longport::grid::TriggerPriceType {
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        use longport::grid::TriggerPriceType;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let name = match self {
+            TriggerPriceType::Spread => "Spread",
+            TriggerPriceType::Percent => "Percent",
+            TriggerPriceType::Unknown(_) => "Unknown",
+        };
+        env.get_static_field(&cls, name, "Lcom/longport/grid/TriggerPriceType;")
+    }
+}
+
+// `GridLimitEvent` carries a catch-all `Unknown(i32)` data variant that the
+// unit-variant `impl_java_enum!` macro cannot express, so bridge it by hand.
+// The Java side is a plain enum, so an unknown wire value maps to `Unknown` and
+// back to `Unknown(0)`.
+#[allow(non_upper_case_globals)]
+static com_longport_grid_GridLimitEvent: std::sync::OnceLock<jni::objects::GlobalRef> =
+    std::sync::OnceLock::new();
+
+impl ClassLoader for longport::grid::GridLimitEvent {
+    fn init(env: &mut JNIEnv) {
+        let cls = jni::descriptors::Desc::<jni::objects::JClass>::lookup(
+            "com/longport/grid/GridLimitEvent",
+            env,
+        )
+        .expect("com/longport/grid/GridLimitEvent");
+        let _ = com_longport_grid_GridLimitEvent.set(env.new_global_ref(&*cls).unwrap());
+    }
+
+    fn class_ref() -> jni::objects::GlobalRef {
+        com_longport_grid_GridLimitEvent.get().cloned().unwrap()
+    }
+}
+
+impl JSignature for longport::grid::GridLimitEvent {
+    #[inline]
+    fn signature() -> Cow<'static, str> {
+        "Lcom/longport/grid/GridLimitEvent;".into()
+    }
+}
+
+impl FromJValue for longport::grid::GridLimitEvent {
+    fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
+        use longport::grid::GridLimitEvent;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let value = value.l()?;
+        if value.is_null() {
+            crate::error::throw_illegal_argument(
+                env,
+                "argument of enum type com/longport/grid/GridLimitEvent must not be null",
+            );
+            return Err(jni::errors::Error::JavaException);
+        }
+        for (name, variant) in [
+            ("Ignore", GridLimitEvent::Ignore),
+            ("CloseAtLast", GridLimitEvent::CloseAtLast),
+            ("Unknown", GridLimitEvent::Unknown(0)),
+        ] {
+            let r = env
+                .get_static_field(&cls, name, "Lcom/longport/grid/GridLimitEvent;")?
+                .l()?;
+            if env.is_same_object(&value, r)? {
+                return Ok(variant);
+            }
+        }
+        crate::error::throw_illegal_argument(
+            env,
+            "unrecognized enum value for com/longport/grid/GridLimitEvent",
+        );
+        Err(jni::errors::Error::JavaException)
+    }
+}
+
+impl IntoJValue for longport::grid::GridLimitEvent {
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        use longport::grid::GridLimitEvent;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let name = match self {
+            GridLimitEvent::Ignore => "Ignore",
+            GridLimitEvent::CloseAtLast => "CloseAtLast",
+            GridLimitEvent::Unknown(_) => "Unknown",
+        };
+        env.get_static_field(&cls, name, "Lcom/longport/grid/GridLimitEvent;")
+    }
+}
+
+// `GridTimeInForce` carries a catch-all `Unknown(i32)` data variant that the
+// unit-variant `impl_java_enum!` macro cannot express, so bridge it by hand.
+// The Java side is a plain enum, so an unknown wire value maps to `Unknown` and
+// back to `Unknown(0)`.
+#[allow(non_upper_case_globals)]
+static com_longport_grid_GridTimeInForce: std::sync::OnceLock<jni::objects::GlobalRef> =
+    std::sync::OnceLock::new();
+
+impl ClassLoader for longport::grid::GridTimeInForce {
+    fn init(env: &mut JNIEnv) {
+        let cls = jni::descriptors::Desc::<jni::objects::JClass>::lookup(
+            "com/longport/grid/GridTimeInForce",
+            env,
+        )
+        .expect("com/longport/grid/GridTimeInForce");
+        let _ = com_longport_grid_GridTimeInForce.set(env.new_global_ref(&*cls).unwrap());
+    }
+
+    fn class_ref() -> jni::objects::GlobalRef {
+        com_longport_grid_GridTimeInForce.get().cloned().unwrap()
+    }
+}
+
+impl JSignature for longport::grid::GridTimeInForce {
+    #[inline]
+    fn signature() -> Cow<'static, str> {
+        "Lcom/longport/grid/GridTimeInForce;".into()
+    }
+}
+
+impl FromJValue for longport::grid::GridTimeInForce {
+    fn from_jvalue(env: &mut JNIEnv, value: JValueOwned) -> Result<Self> {
+        use longport::grid::GridTimeInForce;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let value = value.l()?;
+        if value.is_null() {
+            crate::error::throw_illegal_argument(
+                env,
+                "argument of enum type com/longport/grid/GridTimeInForce must not be null",
+            );
+            return Err(jni::errors::Error::JavaException);
+        }
+        for (name, variant) in [
+            ("Day", GridTimeInForce::Day),
+            ("GoodTilCanceled", GridTimeInForce::GoodTilCanceled),
+            ("GoodTilDate", GridTimeInForce::GoodTilDate),
+            ("Unknown", GridTimeInForce::Unknown(0)),
+        ] {
+            let r = env
+                .get_static_field(&cls, name, "Lcom/longport/grid/GridTimeInForce;")?
+                .l()?;
+            if env.is_same_object(&value, r)? {
+                return Ok(variant);
+            }
+        }
+        crate::error::throw_illegal_argument(
+            env,
+            "unrecognized enum value for com/longport/grid/GridTimeInForce",
+        );
+        Err(jni::errors::Error::JavaException)
+    }
+}
+
+impl IntoJValue for longport::grid::GridTimeInForce {
+    fn into_jvalue<'a>(self, env: &mut JNIEnv<'a>) -> Result<JValueOwned<'a>> {
+        use longport::grid::GridTimeInForce;
+
+        let cls = <Self as ClassLoader>::class_ref();
+        let name = match self {
+            GridTimeInForce::Day => "Day",
+            GridTimeInForce::GoodTilCanceled => "GoodTilCanceled",
+            GridTimeInForce::GoodTilDate => "GoodTilDate",
+            GridTimeInForce::Unknown(_) => "Unknown",
+        };
+        env.get_static_field(&cls, name, "Lcom/longport/grid/GridTimeInForce;")
+    }
+}
