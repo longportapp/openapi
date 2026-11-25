@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [5.0.0] - 2026-11-25
 
 > Synced with longbridge/openapi 4.4.0 → 5.5.0 (brand-renamed `longbridge` → `longport`). Deliberately not synced: `all_executions` stays disabled pending API availability; ForexContext (upstream #602, closed without merging); upstream's release-pipeline CI changes (#593, #594, #606, #608, #609, #611, #622, #623), since longport's publish coordinates differ.
 
